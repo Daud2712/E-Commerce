@@ -9,7 +9,8 @@ export interface User {
   name: string;
   email: string;
   role: UserRole;
-  address?: string;
+  registrationNumber?: string; // New field
+  isAvailable?: boolean;
 }
 
 export interface Delivery {
@@ -17,11 +18,8 @@ export interface Delivery {
   trackingNumber: string;
   packageName: string;
   status: 'pending' | 'in-transit' | 'delivered';
-  buyer: {
-    _id: string;
-    name: string;
-    address: string;
-  };
+  price: number;
+  buyer: User; // Changed to reference User with new fields
   seller: {
     _id: string;
     name: string;
@@ -39,6 +37,7 @@ export interface RegisterFormData {
   email: string;
   password: string;
   role: UserRole;
+  registrationNumber?: string; // New field
 }
 
 export interface LoginFormData {
@@ -48,6 +47,7 @@ export interface LoginFormData {
 
 export interface CreateDeliveryFormData {
   packageName: string;
-  buyerName: string;
-  buyerAddress: string;
+  buyerRegistrationNumber: string; // Changed from buyerEmail
+  price: number;
+  quantity?: number; // Optional quantity for bulk creation
 }

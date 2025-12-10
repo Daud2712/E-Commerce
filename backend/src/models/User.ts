@@ -10,6 +10,8 @@ const userSchema = new Schema({
     enum: Object.values(UserRole),
     default: UserRole.Buyer,
   },
+  isAvailable: { type: Boolean, default: false },
+  registrationNumber: { type: String, unique: true, sparse: true }, // Added for buyers
 }, { timestamps: true });
 
 const User = model('User', userSchema);

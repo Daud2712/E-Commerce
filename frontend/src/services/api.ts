@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { RegisterFormData, LoginFormData, CreateDeliveryFormData, Delivery } from '../types';
+import { RegisterFormData, LoginFormData, CreateDeliveryFormData, Delivery, User } from '../types';
 
 const API = axios.create({
   baseURL: 'http://localhost:5000/api', // Adjust this if your backend runs on a different port
@@ -23,7 +23,20 @@ export const createDelivery = (deliveryData: CreateDeliveryFormData) => API.post
 export const updateDeliveryStatus = (id: string, status: Delivery['status']) => API.put(`/deliveries/${id}/status`, { status });
 export const getAvailableDrivers = () => API.get('/users/drivers');
 export const assignDriver = (id: string, driverId: string) => API.put(`/deliveries/${id}/assign-driver`, { driverId });
+export const getBuyerDeliveries = () => API.get('/deliveries/buyer');
 
-// Add other API calls here
+// New API calls
+export const getUserProfile = (userId: string) => API.get(`/users/${userId}`); // Assuming a backend endpoint to get user by ID
+export const updateDriverAvailability = (isAvailable: boolean) => API.patch('/users/drivers/availability', { isAvailable });
+export const deleteAccount = () => API.delete('/users/me');
+
+
+API.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    console.error('API call failed:', error.response?.data || error.message || error);
+    return Promise.reject(error);
+  }
+);
 
 export default API;
