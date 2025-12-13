@@ -166,6 +166,14 @@ const BuyerDashboard = () => {
   const handlePayNow = async (deliveryId: string) => {
     setPaymentError('');
     setPaymentSuccess('');
+    
+    // Basic phone number validation
+    const phoneRegex = /^(?:254|\+254|0)?([17]\d{8})$/;
+    if (!phoneRegex.test(mpesaPhoneNumber.replace(/\s+/g, ''))) {
+      setPaymentError(t('invalid_phone_number') || 'Please enter a valid phone number (e.g., 254712345678 or 0712345678)');
+      return;
+    }
+
     setPaymentLoading(true);
 
     try {
