@@ -1,3 +1,4 @@
+// Payment integration removed
 import axios from 'axios';
 import moment from 'moment';
 import dotenv from 'dotenv';
