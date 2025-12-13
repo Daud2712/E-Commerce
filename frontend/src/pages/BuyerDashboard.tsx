@@ -27,11 +27,6 @@ const BuyerDashboard = () => {
     additionalInfo: '',
   });
 
-  // M-Pesa payment states
-  const [paymentLoading, setPaymentLoading] = useState(false);
-  const [paymentError, setPaymentError] = useState('');
-  const [paymentSuccess, setPaymentSuccess] = useState('');
-  const [mpesaPhoneNumber, setMpesaPhoneNumber] = useState('');
 
   // Order History state
   const [orderHistory, setOrderHistory] = useState<Delivery[]>([]);
@@ -47,9 +42,6 @@ const BuyerDashboard = () => {
         if (data.deliveryAddress) {
           setDeliveryAddress(data.deliveryAddress);
           // Pre-fill M-Pesa phone number if available in profile
-          if (data.deliveryAddress.phone) {
-            setMpesaPhoneNumber(data.deliveryAddress.phone);
-          }
         }
       } catch (err: any) {
         console.error('Failed to load user profile:', err);
@@ -230,36 +222,7 @@ const BuyerDashboard = () => {
 
       {/* Registration Number Display */}
       {profile?.registrationNumber && (
-        <Alert variant="info" className="mb-3">
-          <Row className="align-items-center">
-            <Col md={8}>
-              <h5 className="mb-0">
-                <strong>{t('your_registration_number')}</strong>{' '}
-                <span className="text-primary" style={{ fontSize: '1.3em', fontWeight: 'bold' }}>
-                  {profile.registrationNumber}
-                </span>
-              </h5>
-              <small className="text-muted">
-                {t('share_registration_number')}
-              </small>
-            </Col>
-            <Col md={4} className="text-md-end">
-              <Button
-                variant="outline-primary"
-                size="sm"
-                onClick={() => {
-                  navigator.clipboard.writeText(profile.registrationNumber || '');
-                  alert(t('registration_number_copied'));
-                }}
-              >
-                📋 {t('copy_number')}
-              </Button>
-            </Col>
-          </Row>
-        </Alert>
-      )}
-
-      <hr />
+        // Payment handling removed
       <Tabs
         id="buyer-dashboard-tabs"
         activeKey={activeTab}

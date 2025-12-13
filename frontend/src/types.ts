@@ -28,7 +28,7 @@ export interface Delivery {
   _id: string;
   trackingNumber: string;
   packageName: string;
-  status: 'pending' | 'assigned' | 'in_transit' | 'delivered' | 'received' | 'paid' | 'payment_failed';
+  status: 'pending' | 'assigned' | 'in_transit' | 'delivered' | 'received';
   price: number;
   buyer: User; // Changed to reference User with new fields
   seller: {
@@ -40,8 +40,7 @@ export interface Delivery {
     name: string;
   };
   riderAccepted?: boolean;
-  mpesaCheckoutRequestId?: string;
-  mpesaReceiptNumber?: string;
+  // ...existing code...
   paidAt?: string;
   createdAt: string;
   updatedAt: string;
@@ -105,7 +104,7 @@ export interface IOrder {
     country?: string;
     phone?: string;
   };
-  paymentStatus: 'pending' | 'paid' | 'failed';
+  // ...existing code...
   createdAt: string;
   updatedAt: string;
 }

@@ -37,8 +37,7 @@ export const updateProfile = (data: UpdateProfileData) => API.patch('/users/me/p
 export const updateRiderAvailability = (isAvailable: boolean) => API.patch('/users/riders/availability', { isAvailable });
 export const deleteAccount = () => API.delete('/users/me');
 
-// M-Pesa Payment API calls
-export const initiateMpesaPayment = (deliveryId: string, phoneNumber: string) => API.post('/payments/mpesa/process', { deliveryId, phoneNumber });
+// ...existing code...
 
 // Product API calls
 export const createProduct = (productData: FormData) => API.post('/products', productData);
