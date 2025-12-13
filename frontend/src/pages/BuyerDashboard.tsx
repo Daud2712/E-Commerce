@@ -33,6 +33,12 @@ const BuyerDashboard = () => {
   const [orderHistoryLoading, setOrderHistoryLoading] = useState(false);
   const [orderHistoryError, setOrderHistoryError] = useState('');
 
+  // Payment state
+  const [mpesaPhoneNumber, setMpesaPhoneNumber] = useState('');
+  const [paymentLoading, setPaymentLoading] = useState(false);
+  const [paymentError, setPaymentError] = useState('');
+  const [paymentSuccess, setPaymentSuccess] = useState('');
+
   // Load user profile on mount to get registration number
   useEffect(() => {
     const loadUserProfile = async () => {
@@ -154,6 +160,35 @@ const BuyerDashboard = () => {
       setDelivery(data); // Update the single delivery
     } catch (err: any) {
       setError(err.response?.data?.message || t('failed_to_undo_received_status'));
+    }
+  };
+
+  const handlePayNow = async (deliveryId: string) => {
+    setPaymentError('');
+    setPaymentSuccess('');
+    
+    // Basic phone number validation
+    const phoneRegex = /^(?:254|\+254|0)?([17]\d{8})$/;
+    if (!phoneRegex.test(mpesaPhoneNumber.replace(/\s+/g, ''))) {
+      setPaymentError(t('invalid_phone_number') || 'Please enter a valid phone number (e.g., 254712345678 or 0712345678)');
+      return;
+    }
+
+    setPaymentLoading(true);
+
+    try {
+      const { data } = await api.processMpesaPayment(deliveryId, mpesaPhoneNumber);
+      setPaymentSuccess(t('payment_initiated_successfully') || 'Payment initiated successfully. Please check your phone to complete the payment.');
+      // Refresh the delivery to get updated status
+      if (trackingNumber) {
+        const { data: updatedDelivery } = await api.getDeliveryByTrackingNumber(trackingNumber);
+        setDelivery(updatedDelivery);
+      }
+      setMpesaPhoneNumber(''); // Clear the phone number
+    } catch (err: any) {
+      setPaymentError(err.response?.data?.message || t('payment_failed') || 'Payment failed. Please try again.');
+    } finally {
+      setPaymentLoading(false);
     }
   };
 

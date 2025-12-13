@@ -54,6 +54,9 @@ export const getAllOrders = () => API.get('/orders');
 export const updateOrderStatus = (id: string, data: { status: string; assignedRider?: string }) => API.put(`/orders/${id}/status`, data);
 export const cancelOrder = (id: string) => API.delete(`/orders/${id}`);
 
+// Payment API calls
+export const processMpesaPayment = (deliveryId: string, phoneNumber: string) => API.post('/payments/mpesa/process', { deliveryId, phoneNumber });
+
 
 API.interceptors.response.use(
   (response) => response,
