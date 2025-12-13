@@ -45,6 +45,8 @@ const ProductDetailPage: React.FC = () => {
       navigate('/login');
       return;
     }
+    if (!product) return;
+
     if (quantity > product.stock) {
       alert(t('quantity_exceeds_stock_detail', { stock: product.stock }));
       return;

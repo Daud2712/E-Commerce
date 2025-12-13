@@ -2,7 +2,7 @@ import axios from 'axios';
 import { RegisterFormData, LoginFormData, Delivery, User, UpdateProfileData } from '../types';
 
 const API = axios.create({
-  baseURL: 'http://localhost:5002/api', // Adjust this if your backend runs on a different port
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5002/api',
 });
 
 API.interceptors.request.use((req) => {
