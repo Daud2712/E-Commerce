@@ -28,7 +28,7 @@ const SettingsPage: React.FC = () => {
         }
     };
 
-    const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const handleLanguageChange = (e: React.ChangeEvent<any>) => {
         changeLanguage(e.target.value); // Use changeLanguage from context
     };
 
@@ -48,6 +48,8 @@ const SettingsPage: React.FC = () => {
                             <option value="es">{t('language_spanish')}</option>
                             <option value="fr">{t('language_french')}</option>
                             <option value="sw">{t('language_swahili')}</option>
+                            <option value="de">{t('language_german')}</option>
+                            <option value="zh">{t('language_chinese')}</option>
                         </Form.Control>
                     </Form.Group>
                     <p className="mt-3 text-muted">

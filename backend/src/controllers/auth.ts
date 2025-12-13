@@ -16,9 +16,9 @@ export const register = async (req: Request, res: Response) => {
     }
 
     let generatedRegistrationNumber: string | undefined;
-    if (role === UserRole.Buyer) {
+    if (role === UserRole.BUYER) {
         // Find the highest existing registration number
-        const lastBuyer = await User.findOne({ role: UserRole.Buyer })
+        const lastBuyer = await User.findOne({ role: UserRole.BUYER })
                                     .sort({ registrationNumber: -1 }) // Sort in descending order to get the highest
                                     .select('registrationNumber');
 
@@ -39,8 +39,8 @@ export const register = async (req: Request, res: Response) => {
       name,
       email,
       password: hashedPassword,
-      role: role || UserRole.Buyer,
-      ...(role === UserRole.Buyer && generatedRegistrationNumber && { registrationNumber: generatedRegistrationNumber }),
+      role: role || UserRole.BUYER,
+      ...(role === UserRole.BUYER && generatedRegistrationNumber && { registrationNumber: generatedRegistrationNumber }),
     });
 
     await user.save();

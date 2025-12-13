@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Alert, Table, Spinner, Button, ButtonGroup, Form } from 'react-bootstrap';
+import { Container, Alert, Table, Spinner, Button, ButtonGroup, Form, Badge } from 'react-bootstrap';
 import * as api from '../services/api';
-import { Delivery, User } from '../types';
+import { Delivery, User, DeliveryAddress } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next'; // Import useTranslation
 
@@ -83,7 +83,7 @@ const DriverDashboard = () => {
     setAvailabilityError('');
     try {
       const newAvailability = !isDriverAvailable;
-      await api.updateDriverAvailability(newAvailability);
+      await api.updateRiderAvailability(newAvailability);
       setIsDriverAvailable(newAvailability);
     } catch (err: any) {
       console.error('Failed to update driver availability:', err);
@@ -93,6 +93,27 @@ const DriverDashboard = () => {
     }
   };
 
+  const formatAddress = (address?: DeliveryAddress) => {
+    if (!address) return t('no_address_provided');
+    const parts = [
+      address.street,
+      address.city,
+      address.state,
+      address.postalCode,
+      address.country
+    ].filter(Boolean);
+
+    if (parts.length === 0) return t('no_address_provided');
+
+    return (
+      <div>
+        <div><strong>{parts.join(', ')}</strong></div>
+        {address.phone && <div><small>{t('phone_with_icon', { phone: address.phone })}</small></div>}
+        {address.additionalInfo && <div><small>{t('additional_info_with_icon', { info: address.additionalInfo })}</small></div>}
+      </div>
+    );
+  };
+
   return (
     <Container>
       <h2>{t('driver_dashboard_title')}</h2>
@@ -100,7 +121,6 @@ const DriverDashboard = () => {
       {/* Removed Tabs and Tab components */}
       <div className="mb-3">
           <h4>{t('your_availability_title')}</h4>
-          {console.log('User in DriverDashboard:', user)}
           {!user?._id && <Alert variant="warning">{t('driver_user_info_not_available')}</Alert>}
           {availabilityLoading && <Spinner animation="border" size="sm" />}
           {availabilityError && <Alert variant="danger">{availabilityError}</Alert>}
@@ -142,15 +162,15 @@ const DriverDashboard = () => {
               <tr key={delivery._id}>
                   <td>{delivery.trackingNumber}</td>
                   <td>{delivery.packageName}</td>
-                  <td>{delivery.status}</td>
-                  <td>{delivery.buyer?.address || 'N/A'}</td>
+                  <td>{delivery.status === 'assigned' ? t('status_assigned_to_rider') : t('status_' + delivery.status)}</td>
+                  <td>{formatAddress(delivery.buyer?.deliveryAddress)}</td>
                   <td>
                   <ButtonGroup>
                       <Button
                       size="sm"
                       variant="info"
-                      disabled={delivery.status === 'in-transit' || updatingId === delivery._id}
-                      onClick={() => handleStatusUpdate(delivery._id, 'in-transit')}
+                      disabled={delivery.status === 'in_transit' || updatingId === delivery._id}
+                      onClick={() => handleStatusUpdate(delivery._id, 'in_transit')}
                       >
                       {updatingId === delivery._id ? t('updating_button') : t('in_transit_button')}
                       </Button>

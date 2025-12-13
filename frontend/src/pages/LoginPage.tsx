@@ -23,16 +23,6 @@ const LoginPage = () => {
     try {
       const { data } = await api.login({ email, password });
       auth.login(data.token, data.userId, data.role);
-      
-      if (data.role === UserRole.Seller) {
-        navigate('/seller-dashboard');
-      } else if (data.role === UserRole.Driver) {
-        navigate('/driver-dashboard');
-      } else if (data.role === UserRole.Buyer) { // Explicitly redirect buyers to their dashboard
-        navigate('/buyer-dashboard');
-      } else {
-        navigate('/');
-      }
     } catch (error: unknown) {
       const err = error as any;
       setError(err.response?.data?.message || t('invalid_credentials_error')); // Translated error
@@ -40,6 +30,18 @@ const LoginPage = () => {
       setLoading(false);
     }
   };
+
+  React.useEffect(() => {
+    if (auth.isAuthenticated && auth.role) {
+      if (auth.role === UserRole.RIDER) {
+        navigate('/rider-dashboard');
+      } else if (auth.role === UserRole.SELLER) {
+        navigate('/'); // Redirect sellers to the main product listing page
+      } else {
+        navigate('/'); // Redirect buyers to the main product listing page
+      }
+    }
+  }, [auth.isAuthenticated, auth.role, navigate]);
 
   return (
     <Container className="d-flex flex-column align-items-center justify-content-center min-vh-100 p-3">

@@ -1,7 +1,17 @@
 export enum UserRole {
-  Buyer = 'buyer',
-  Seller = 'seller',
-  Driver = 'driver',
+  BUYER = 'buyer',
+  SELLER = 'seller',
+  RIDER = 'rider',
+}
+
+export interface DeliveryAddress {
+  street?: string;
+  city?: string;
+  state?: string;
+  postalCode?: string;
+  country?: string;
+  phone?: string;
+  additionalInfo?: string;
 }
 
 export interface User {
@@ -9,25 +19,30 @@ export interface User {
   name: string;
   email: string;
   role: UserRole;
-  registrationNumber?: string; // New field
+  registrationNumber?: string;
   isAvailable?: boolean;
+  deliveryAddress?: DeliveryAddress;
 }
 
 export interface Delivery {
   _id: string;
   trackingNumber: string;
   packageName: string;
-  status: 'pending' | 'in-transit' | 'delivered';
+  status: 'pending' | 'assigned' | 'in_transit' | 'delivered' | 'received' | 'paid' | 'payment_failed';
   price: number;
   buyer: User; // Changed to reference User with new fields
   seller: {
     _id: string;
     name: string;
   };
-  driver?: {
+  rider?: {
     _id: string;
     name: string;
   };
+  riderAccepted?: boolean;
+  mpesaCheckoutRequestId?: string;
+  mpesaReceiptNumber?: string;
+  paidAt?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -45,9 +60,52 @@ export interface LoginFormData {
   password: string;
 }
 
-export interface CreateDeliveryFormData {
-  packageName: string;
-  buyerRegistrationNumber: string; // Changed from buyerEmail
+export interface UpdateProfileData {
+  name?: string;
+  deliveryAddress?: DeliveryAddress;
+}
+
+export interface IProduct {
+  _id: string;
+  name: string;
+  description?: string;
   price: number;
-  quantity?: number; // Optional quantity for bulk creation
+  stock: number;
+  seller: {
+    _id: string;
+    name: string;
+    email: string;
+  };
+  images: string[];
+  category?: string;
+  isAvailable: boolean;
+  deleted: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface IOrderItem {
+  product: string | IProduct;
+  productName: string;
+  quantity: number;
+  price: number;
+}
+
+export interface IOrder {
+  _id: string;
+  buyer: User;
+  items: IOrderItem[];
+  totalAmount: number;
+  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  shippingAddress: {
+    street?: string;
+    city?: string;
+    state?: string;
+    postalCode?: string;
+    country?: string;
+    phone?: string;
+  };
+  paymentStatus: 'pending' | 'paid' | 'failed';
+  createdAt: string;
+  updatedAt: string;
 }

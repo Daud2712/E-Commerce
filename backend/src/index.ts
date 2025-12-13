@@ -1,24 +1,34 @@
 import express from 'express';
-import cors from 'cors'; // Added for CORS
+import cors from 'cors';
 import http from 'http';
 import { Server } from 'socket.io';
 import mongoose from 'mongoose';
+import dotenv from 'dotenv';
 import authRoutes from './routes/auth';
 import deliveryRoutes from './routes/deliveries';
 import userRoutes from './routes/users';
+import paymentRoutes from './routes/payments';
+import productRoutes from './routes/products';
+import orderRoutes from './routes/orders';
+
+dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-app.use(cors()); // Added to enable CORS
+app.use(cors());
 app.use(express.json());
+app.use('/uploads', express.static('public/uploads'));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/deliveries', deliveryRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/payments', paymentRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/orders', orderRoutes);
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5002;
 
 app.get('/', (req, res) => {
     res.send('Freshedtz backend is running.');

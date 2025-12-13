@@ -52,9 +52,9 @@ const TrackingPage = () => {
         <Card className="mt-4">
           <Card.Header>{t('delivery_details_for')} {delivery.trackingNumber}</Card.Header>
           <Card.Body>
-            <Card.Text><strong>{t('status_label')}:</strong> {delivery.status}</Card.Text>
-            <Card.Text><strong>{t('package_label')}:</strong> {delivery.packageName}</Card.Text>
-            <Card.Text><strong>{t('destination_label')}:</strong> {delivery.buyer.address}</Card.Text>
+            <Card.Text><strong>{t('status_label')}{t('colon_separator')}</strong> {delivery.status}</Card.Text>
+            <Card.Text><strong>{t('package_label')}{t('colon_separator')}</strong> {delivery.packageName}</Card.Text>
+            <Card.Text><strong>{t('destination_label')}{t('colon_separator')}</strong> {delivery.buyer.deliveryAddress?.city || t('not_applicable_short')}</Card.Text>
             {/* Add map here later */}
           </Card.Body>
         </Card>

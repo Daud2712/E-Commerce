@@ -6,6 +6,8 @@ import enTranslation from './locales/en/translation.json';
 import esTranslation from './locales/es/translation.json';
 import frTranslation from './locales/fr/translation.json';
 import swTranslation from './locales/sw/translation.json';
+import deTranslation from './locales/de/translation.json'; // New import
+import zhTranslation from './locales/zh/translation.json'; // New import
 
 const resources = {
   en: {
@@ -20,6 +22,12 @@ const resources = {
   sw: {
     translation: swTranslation,
   },
+  de: { // New language resource
+    translation: deTranslation,
+  },
+  zh: { // New language resource
+    translation: zhTranslation,
+  },
 };
 
 i18n
@@ -30,6 +38,8 @@ i18n
     fallbackLng: 'en', // fallback language if translation is not found
     interpolation: {
       escapeValue: false, // react already safes from xss
+      prefix: '{',
+      suffix: '}',
     },
   });
 

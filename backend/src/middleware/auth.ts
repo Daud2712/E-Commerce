@@ -24,7 +24,7 @@ export const auth = (req: Request, res: Response, next: NextFunction) => {
     }
 
     const decodedToken = jwt.verify(token, JWT_SECRET) as { userId: string; role: UserRole }; // Use UserRole
-    
+
     req.user = {
       id: decodedToken.userId,
       role: decodedToken.role,
@@ -33,5 +33,24 @@ export const auth = (req: Request, res: Response, next: NextFunction) => {
     next();
   } catch (error) {
     res.status(401).json({ message: 'Authentication failed.' });
+  }
+};
+
+// Optional auth middleware - tries to authenticate but doesn't fail if no token
+export const optionalAuth = (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (token) {
+      const decodedToken = jwt.verify(token, JWT_SECRET) as { userId: string; role: UserRole };
+      req.user = {
+        id: decodedToken.userId,
+        role: decodedToken.role,
+      };
+    }
+    // Continue even if no token or invalid token
+    next();
+  } catch (error) {
+    // Continue without authentication
+    next();
   }
 };

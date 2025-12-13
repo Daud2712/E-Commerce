@@ -1,14 +1,20 @@
 import { Router } from 'express';
-import { getDrivers, getUserById, updateDriverAvailability, deleteAccount } from '../controllers/users';
+import { getRiders, getUserById, updateRiderAvailability, deleteAccount, getMyProfile, updateProfile } from '../controllers/users';
 import { auth } from '../middleware/auth';
 
 const router = Router();
 
-// Get all drivers (for sellers to assign)
-router.get('/drivers', auth, getDrivers);
+// Get all riders (for sellers to assign)
+router.get('/riders', auth, getRiders);
 
-// Update a driver's availability status (only for drivers)
-router.patch('/drivers/availability', auth, updateDriverAvailability);
+// Update a rider's availability status (only for riders)
+router.patch('/riders/availability', auth, updateRiderAvailability);
+
+// Get current user profile
+router.get('/me/profile', auth, getMyProfile);
+
+// Update current user profile
+router.patch('/me/profile', auth, updateProfile);
 
 // Get a single user by ID
 router.get('/:id', auth, getUserById);

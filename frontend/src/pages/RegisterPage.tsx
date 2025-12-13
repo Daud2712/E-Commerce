@@ -10,7 +10,7 @@ const RegisterPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [role, setRole] = useState(UserRole.Buyer);
+  const [role, setRole] = useState(UserRole.BUYER);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
@@ -98,9 +98,9 @@ const RegisterPage = () => {
           <Form.Group className="mb-3">
             <Form.Label>{t('register_as_label')}</Form.Label>
             <Form.Control as="select" value={role} onChange={(e) => setRole(e.target.value as UserRole)}>
-              <option value={UserRole.Buyer}>{t('buyer_role')}</option>
-              <option value={UserRole.Seller}>{t('seller_role')}</option>
-              <option value={UserRole.Driver}>{t('driver_role')}</option>
+              <option value={UserRole.BUYER}>{t('buyer_role')}</option>
+              <option value={UserRole.SELLER}>{t('seller_role')}</option>
+              <option value={UserRole.RIDER}>{t('rider_role')}</option>
             </Form.Control>
           </Form.Group>
 

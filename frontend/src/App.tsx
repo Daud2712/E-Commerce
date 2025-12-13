@@ -1,23 +1,32 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
-import { Navbar, Container, Nav } from 'react-bootstrap';
+import { BrowserRouter as Router, Route, Routes, Link, Navigate } from 'react-router-dom';
+import { Navbar, Container, Nav, Badge } from 'react-bootstrap';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
-import ProtectedRoute from './components/ProtectedRoute'; // Import ProtectedRoute
+import ProtectedRoute from './components/ProtectedRoute';
 
-import TrackingPage from './pages/TrackingPage';
 import SellerDashboard from './pages/SellerDashboard';
-import DriverDashboard from './pages/DriverDashboard';
-import BuyerDashboard from './pages/BuyerDashboard'; // Import BuyerDashboard
-import SettingsPage from './pages/SettingsPage'; // Import SettingsPage
+import RiderDashboard from './pages/RiderDashboard';
+import BuyerDashboard from './pages/BuyerDashboard';
+import SettingsPage from './pages/SettingsPage';
+import ProductListingPage from './pages/ProductListingPage';
+import ProductDetailPage from './pages/ProductDetailPage';
+import CartPage from './pages/CartPage';
+import CheckoutPage from './pages/CheckoutPage';
+import MyOrdersPage from './pages/MyOrdersPage';
+import ProductsPage from './pages/ProductsPage';
+import ManageProductsPage from './pages/ManageProductsPage';
+import ParcelManagementPage from './pages/ParcelManagementPage';
 
 import { useAuth } from './context/AuthContext';
+import { useCart } from './context/CartContext';
 import { UserRole } from './types';
-import { useTranslation } from 'react-i18next'; // Import useTranslation
+import { useTranslation } from 'react-i18next';
 
 function App() {
   const { isAuthenticated, role, logout } = useAuth();
-  const { t } = useTranslation(); // Initialize useTranslation
+  const { getCartCount } = useCart();
+  const { t } = useTranslation();
 
   return (
     <Router>
@@ -27,18 +36,38 @@ function App() {
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
-              {isAuthenticated && role === UserRole.Seller && (
-                <Nav.Link as={Link} to="/seller-dashboard">{t('dashboard_button')}</Nav.Link>
+              {role !== UserRole.RIDER && (
+                <Nav.Link as={Link} to="/">{t('products_link')}</Nav.Link>
               )}
-              {isAuthenticated && role === UserRole.Driver && (
-                <Nav.Link as={Link} to="/driver-dashboard">{t('dashboard_button')}</Nav.Link>
+
+              {isAuthenticated && (
+                <Nav.Link as={Link} to={
+                  role === UserRole.SELLER ? "/seller/products" :
+                  role === UserRole.RIDER ? "/rider-dashboard" :
+                  "/deliveries"
+                }>
+                  {role === UserRole.SELLER ? t('admin_page_nav_link') :
+                   role === UserRole.RIDER ? t('my_deliveries') :
+                   t('track_parcels')}
+                </Nav.Link>
               )}
-              {isAuthenticated && role === UserRole.Buyer && (
-                <Nav.Link as={Link} to="/buyer-dashboard">{t('dashboard_button')}</Nav.Link>
+
+              {isAuthenticated && role === UserRole.BUYER && (
+                <Nav.Link as={Link} to="/my-orders">{t('my_orders')}</Nav.Link>
               )}
 
             </Nav>
             <Nav>
+              {isAuthenticated && role === UserRole.BUYER && (
+                <Nav.Link as={Link} to="/cart" className="position-relative">
+                  🛒 {t('cart')}
+                  {getCartCount() > 0 && (
+                    <Badge bg="danger" pill className="position-absolute top-0 start-100 translate-middle">
+                      {getCartCount()}
+                    </Badge>
+                  )}
+                </Nav.Link>
+              )}
               {isAuthenticated && <Nav.Link onClick={logout}>{t('logout_button')}</Nav.Link>}
               {!isAuthenticated && <Nav.Link as={Link} to="/login">{t('login_button')}</Nav.Link>}
               {!isAuthenticated && <Nav.Link as={Link} to="/register">{t('register_button')}</Nav.Link>}
@@ -50,32 +79,41 @@ function App() {
       <Container className="mt-4">
         <Routes>
           <Route path="/" element={
-            isAuthenticated && role === UserRole.Buyer ? (
-              <BuyerDashboard />
-            ) : (
-              <h1>{t('welcome_message')}</h1>
-            )
+            role === UserRole.RIDER ? <RiderDashboard /> : <ProductListingPage />
           } />
+
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/settings" element={<SettingsPage />} />
-          
-          {/* Protected Seller Dashboard */}
-          <Route element={<ProtectedRoute allowedRoles={[UserRole.Seller]} />}>
-            <Route path="/seller-dashboard" element={<SellerDashboard />} />
+
+          <Route element={<ProtectedRoute allowedRoles={[UserRole.SELLER]} />}>
+            <Route path="/seller" element={<SellerDashboard />}>
+              <Route path="products" element={<ProductsPage />} />
+              <Route path="manage-products" element={<ManageProductsPage />} />
+              <Route path="parcel-management" element={<ParcelManagementPage />} />
+              <Route index element={<Navigate to="products" />} />
+            </Route>
           </Route>
 
-          {/* Protected Driver Dashboard */}
-          <Route element={<ProtectedRoute allowedRoles={[UserRole.Driver]} />}>
-            <Route path="/driver-dashboard" element={<DriverDashboard />} />
+          <Route element={<ProtectedRoute allowedRoles={[UserRole.RIDER]} />}>
+            <Route path="/rider-dashboard" element={<RiderDashboard />} />
           </Route>
 
-          {/* Protected Buyer Dashboard */}
-          <Route element={<ProtectedRoute allowedRoles={[UserRole.Buyer]} />}>
+          <Route element={<ProtectedRoute allowedRoles={[UserRole.BUYER]} />}>
             <Route path="/buyer-dashboard" element={<BuyerDashboard />} />
+            <Route path="/products/:id" element={<ProductDetailPage />} />
+            <Route path="/cart" element={<CartPage />} />
+            <Route path="/checkout" element={<CheckoutPage />} />
+            <Route path="/my-orders" element={<MyOrdersPage />} />
           </Route>
 
+          <Route path="/products" element={<ProductListingPage />} />
 
+          <Route element={<ProtectedRoute allowedRoles={[UserRole.BUYER, UserRole.RIDER]} />}>
+            <Route path="/deliveries" element={
+              role === UserRole.RIDER ? <RiderDashboard /> : <BuyerDashboard />
+            } />
+          </Route>
         </Routes>
       </Container>
     </Router>

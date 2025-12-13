@@ -23,9 +23,8 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
 
   const changeLanguage = (lang: string) => {
     setLanguage(lang);
-    // i18n.changeLanguage(lang) is implicitly called via the useEffect above.
-    // If we wanted to force it immediately, we could also call it here:
-    // i18n.changeLanguage(lang);
+    localStorage.setItem('language', lang); // Save language preference
+    i18n.changeLanguage(lang); // Change language immediately
   };
 
   // Listen to i18n language changes to update context state
