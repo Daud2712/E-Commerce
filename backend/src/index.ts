@@ -43,6 +43,9 @@ io.on('connection', (socket) => {
 
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/freshedtz';
 
+// Suppress Mongoose strictQuery deprecation warning
+mongoose.set('strictQuery', true);
+
 mongoose.connect(MONGO_URI)
     .then(() => {
         console.log('Connected to MongoDB');
