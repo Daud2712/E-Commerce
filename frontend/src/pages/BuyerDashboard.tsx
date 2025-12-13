@@ -157,39 +157,6 @@ const BuyerDashboard = () => {
     }
   };
 
-  const handlePayNow = async (deliveryId: string) => {
-    setPaymentLoading(true);
-    setPaymentError('');
-    setPaymentSuccess('');
-
-    if (!mpesaPhoneNumber) {
-      setPaymentError(t('please_enter_mpesa_phone_number'));
-      setPaymentLoading(false);
-      return;
-    }
-    // Basic phone number validation (M-Pesa numbers typically start with 254)
-    if (!mpesaPhoneNumber.match(/^2547[0-9]{8}$/)) {
-        setPaymentError(t('invalid_mpesa_phone_number'));
-        setPaymentLoading(false);
-        return;
-    }
-
-    try {
-      const response = await api.initiateMpesaPayment(deliveryId, mpesaPhoneNumber);
-      if (response.data.responseCode === '0') {
-        setPaymentSuccess(t('mpesa_stk_push_initiated'));
-        // Optionally, refresh delivery status after a delay or based on a websocket update
-      } else {
-        setPaymentError(response.data.customerMessage || t('failed_to_initiate_mpesa_payment'));
-      }
-    } catch (err: any) {
-      setPaymentError(err.response?.data?.msg || t('error_initiating_mpesa_payment'));
-      console.error('M-Pesa payment initiation error:', err);
-    } finally {
-      setPaymentLoading(false);
-    }
-  };
-
   return (
     <Container>
       <h2>{t('buyer_dashboard_title')}</h2>
@@ -222,7 +189,36 @@ const BuyerDashboard = () => {
 
       {/* Registration Number Display */}
       {profile?.registrationNumber && (
-        // Payment handling removed
+        <Alert variant="info" className="mb-3">
+          <Row className="align-items-center">
+            <Col md={8}>
+              <h5 className="mb-0">
+                <strong>{t('your_registration_number')}</strong>{' '}
+                <span className="text-primary" style={{ fontSize: '1.3em', fontWeight: 'bold' }}>
+                  {profile.registrationNumber}
+                </span>
+              </h5>
+              <small className="text-muted">
+                {t('share_registration_number')}
+              </small>
+            </Col>
+            <Col md={4} className="text-md-end">
+              <Button
+                variant="outline-primary"
+                size="sm"
+                onClick={() => {
+                  navigator.clipboard.writeText(profile.registrationNumber || '');
+                  alert(t('registration_number_copied'));
+                }}
+              >
+                📋 {t('copy_number')}
+              </Button>
+            </Col>
+          </Row>
+        </Alert>
+      )}
+
+      <hr />
       <Tabs
         id="buyer-dashboard-tabs"
         activeKey={activeTab}
