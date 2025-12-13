@@ -304,42 +304,6 @@ const BuyerDashboard = () => {
                   </Col>
                 </Row>
 
-                {/* M-Pesa Payment Section */}
-                {delivery.status !== 'paid' && delivery.status !== 'received' && (
-                  <Card className="mb-4 bg-light">
-                    <Card.Body>
-                      <h5 className="mb-3">{t('pay_with_mpesa')}</h5>
-                      {paymentError && <Alert variant="danger">{paymentError}</Alert>}
-                      {paymentSuccess && <Alert variant="success">{paymentSuccess}</Alert>}
-                      <Form.Group className="mb-3" controlId="mpesaPhoneNumber">
-                        <Form.Label>{t('mpesa_phone_number')}</Form.Label>
-                        <Form.Control
-                          type="tel"
-                          placeholder={t('enter_mpesa_phone_number')}
-                          value={mpesaPhoneNumber}
-                          onChange={(e) => setMpesaPhoneNumber(e.target.value)}
-                          disabled={paymentLoading}
-                          required
-                        />
-                      </Form.Group>
-                      <Button
-                        variant="primary"
-                        onClick={() => handlePayNow(delivery._id)}
-                        disabled={paymentLoading || !mpesaPhoneNumber}
-                        className="w-100"
-                      >
-                        {paymentLoading ? t('processing_payment') : t('pay', { price: delivery.price.toLocaleString() })}
-                      </Button>
-                    </Card.Body>
-                  </Card>
-                )}
-
-                {delivery.status === 'paid' && (
-                  <Alert variant="info" className="mb-3">
-                    {t('payment_status_paid', { receipt: delivery.mpesaReceiptNumber || 'N/A' })}
-                  </Alert>
-                )}
-
                 {delivery.status === 'delivered' && (
                   <Alert variant="success" className="mb-3">
                     <p className="mb-2">

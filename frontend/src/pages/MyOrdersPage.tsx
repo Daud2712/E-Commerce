@@ -116,7 +116,6 @@ const MyOrdersPage: React.FC = () => {
                       <strong>{t('price_amount', { amount: order.totalAmount.toFixed(2) })}</strong>
                     </td>
                     <td>{getStatusBadge(order.status)}</td>
-                    <td>{getPaymentStatusBadge(order.paymentStatus)}</td>
                     <td>
                       <Button
                         variant="info"
@@ -160,9 +159,6 @@ const MyOrdersPage: React.FC = () => {
               </div>
               <div className="mb-3">
                 <strong>{t('status')}:</strong> {getStatusBadge(selectedOrder.status)}
-              </div>
-              <div className="mb-3">
-                <strong>{t('payment_status')}:</strong> {getPaymentStatusBadge(selectedOrder.paymentStatus)}
               </div>
 
               <h5 className="mt-4">{t('shipping_address')}</h5>

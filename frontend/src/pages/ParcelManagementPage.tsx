@@ -170,7 +170,6 @@ const ParcelManagementPage: React.FC = () => {
                                     )}
                                 </td>
                                 <td>{getStatusBadge(order.status)}</td>
-                                <td>{getPaymentBadge(order.paymentStatus)}</td>
                                 <td>
                                     {order.status === 'pending' && (
                                         <Dropdown>
