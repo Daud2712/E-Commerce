@@ -37,9 +37,9 @@ Your E-Commerce application consists of:
      - **Name:** `ecommerce-backend` (or any name you prefer)
      - **Region:** Choose closest to your users
      - **Branch:** `main`
-     - **Root Directory:** `backend`
-     - **Build Command:** `npm install`
-     - **Start Command:** `npm start`
+   - **Root Directory:** leave blank (or `/` if required)
+   - **Build Command:** `npm install`
+   - **Start Command:** `npm start` (see below)
      - **Instance Type:** Free
 
 3. **Set Environment Variables**
@@ -51,6 +51,17 @@ Your E-Commerce application consists of:
    JWT_SECRET=your-super-secret-jwt-key-change-this
    NODE_ENV=production
    ```
+
+4. **Update the Start Command in package.json**
+   - Open your `package.json` file in the root of your project.
+   - Change the `start` script to:
+     ```json
+     "start": "node server.js"
+     ```
+   - Commit and push this change to GitHub before deploying.
+
+   > **Why?**
+   > The default start command may be set to use TypeScript (`ts-node src/index.ts`), but your project uses JavaScript (`server.js`). This change ensures Render can start your backend correctly.
 
    For M-Pesa (if you're using it):
    ```
