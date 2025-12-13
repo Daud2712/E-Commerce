@@ -58,13 +58,14 @@ const MyOrdersPage: React.FC = () => {
     return <Badge bg={variants[status] || 'secondary'}>{t('status_' + status)}</Badge>;
   };
 
-  const getPaymentStatusBadge = (status: string) => {
+  const getPaymentStatusBadge = (status: string | undefined) => {
     const variants: { [key: string]: string } = {
       pending: 'warning',
       paid: 'success',
       failed: 'danger',
     };
-    return <Badge bg={variants[status] || 'secondary'}>{t('payment_status_' + status)}</Badge>;
+    const statusKey = status || 'pending';
+    return <Badge bg={variants[statusKey] || 'secondary'}>{t('payment_status_' + statusKey)}</Badge>;
   };
 
   if (loading) {

@@ -75,13 +75,14 @@ const ParcelManagementPage: React.FC = () => {
         return <Badge bg={variants[status] || 'secondary'}>{status}</Badge>;
     };
 
-    const getPaymentBadge = (status: string) => {
+    const getPaymentBadge = (status: string | undefined) => {
         const variants: { [key: string]: string } = {
             pending: 'warning',
             paid: 'success',
             failed: 'danger',
         };
-        return <Badge bg={variants[status] || 'secondary'}>{status}</Badge>;
+        const statusKey = status || 'pending';
+        return <Badge bg={variants[statusKey] || 'secondary'}>{statusKey}</Badge>;
     };
 
     return (
