@@ -32,7 +32,16 @@ function App() {
     <Router>
       <Navbar bg="dark" variant="dark" expand="lg">
         <Container>
-          <Navbar.Brand as={Link} to="/">Freshedtz</Navbar.Brand>
+          <Navbar.Brand as={Link} to="/" className="d-flex align-items-center">
+            <img 
+              src="/Logo.jpeg" 
+              alt="Freshedtz Logo" 
+              height="40" 
+              className="me-2"
+              style={{ borderRadius: '4px' }}
+            />
+            Freshedtz
+          </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
