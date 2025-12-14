@@ -81,7 +81,7 @@ const CartPage: React.FC = () => {
                           </div>
                         </div>
                       </td>
-                      <td>{t('price_with_currency_display', { amount: item.product.price.toFixed(2) })}</td>
+                      <td>TZS {item.product.price.toLocaleString()}</td>
                       <td>
                         <Form.Control
                           type="number"
@@ -99,7 +99,7 @@ const CartPage: React.FC = () => {
                         />
                       </td>
                       <td>
-                        <strong>{t('price_with_currency_display', { amount: (item.product.price * item.quantity).toFixed(2) })}</strong>
+                        <strong>TZS {(item.product.price * item.quantity).toLocaleString()}</strong>
                       </td>
                       <td>
                         <Button
@@ -139,12 +139,12 @@ const CartPage: React.FC = () => {
               </div>
               <div className="d-flex justify-content-between mb-2">
                 <span>{t('subtotal')}{t('colon_separator')}</span>
-                <span>{t('price_with_currency_display', { amount: getCartTotal().toFixed(2) })}</span>
+                <span>TZS {getCartTotal().toLocaleString()}</span>
               </div>
               <hr />
               <div className="d-flex justify-content-between mb-3">
                 <strong>{t('total')}{t('colon_separator')}</strong>
-                <strong className="text-primary">{t('price_with_currency_display', { amount: getCartTotal().toFixed(2) })}</strong>
+                <strong className="text-primary">TZS {getCartTotal().toLocaleString()}</strong>
               </div>
               <Button
                 variant="success"

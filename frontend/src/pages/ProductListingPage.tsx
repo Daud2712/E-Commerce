@@ -203,7 +203,7 @@ const ProductListingPage = () => {
                     {product.category && <Card.Subtitle className="mb-2 text-muted">{product.category}</Card.Subtitle>}
                     <Card.Text>{product.description || t('no_description_provided')}</Card.Text>
                     <div className="mt-auto">
-                      <Card.Text><strong>{t('price')}{t('colon_separator')} {t('price_with_currency_display', { amount: product.price.toFixed(2) })}</strong></Card.Text>
+                      <Card.Text><strong>TZS {product.price.toLocaleString()}</strong></Card.Text>
                       <Card.Text>
                         <small className={product.stock > 0 ? 'text-success' : 'text-danger'}>
                           {product.stock > 0 ? `${t('in_stock')}: ${product.stock}` : t('out_of_stock')}

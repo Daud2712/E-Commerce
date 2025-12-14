@@ -153,7 +153,7 @@ const ProductDetailPage: React.FC = () => {
             </Badge>
           )}
 
-          <h3 className="text-primary mb-3">{t('price_with_currency_display', { amount: product.price.toFixed(2) })}</h3>
+          <h3 className="text-primary mb-3">TZS {product.price.toLocaleString()}</h3>
 
           <div className="mb-3">
             {product.stock > 0 ? (

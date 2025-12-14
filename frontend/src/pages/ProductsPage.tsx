@@ -84,7 +84,7 @@ const ProductsPage: React.FC = () => {
                                         )}
                                     </td>
                                     <td>{product.name}</td>
-                                    <td>{t('price_with_currency_display', { amount: product.price.toFixed(2) })}</td>
+                                    <td>TZS {product.price.toLocaleString()}</td>
                                     <td>{product.stock}</td>
                                     <td>{product.category || t('not_applicable_short')}</td>
                                     <td>

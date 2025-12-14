@@ -339,6 +339,7 @@
   "admin_page_nav_link": "Admin Page",
   "status_assigned_to_rider": "Assigned to rider",
   "price_with_currency_display": "TZS {{amount}}",
+  "product_price_display": "Price: TZS {{amount}}",
   "note_prefix": "Note",
   "status_received": "Received",
   "status_delivered": "Delivered",
