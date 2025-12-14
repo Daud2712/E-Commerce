@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Button, Alert, Table, Spinner } from 'react-bootstrap';
 import * as api from '../services/api';
+import { getImageUrl } from '../services/api';
 import { IProduct } from '../types';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -71,7 +72,7 @@ const ProductsPage: React.FC = () => {
                                         {product.images && product.images.length > 0 ? (
                                             <div className="d-flex flex-wrap gap-1">
                                                 {product.images.slice(0, 3).map((img, idx) => (
-                                                    <img key={idx} src={img} alt={`${product.name} ${idx + 1}`} style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px' }} />
+                                                    <img key={idx} src={getImageUrl(img)} alt={`${product.name} ${idx + 1}`} style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px' }} />
                                                 ))}
                                                 {product.images.length > 3 && (
                                                     <div style={{ width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f0f0f0', borderRadius: '4px', fontSize: '0.8em' }}>

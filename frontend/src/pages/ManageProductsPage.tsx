@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Form, Button, Alert, Spinner } from 'react-bootstrap';
 import * as api from '../services/api';
+import { getImageUrl } from '../services/api';
 import { IProduct } from '../types';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -161,7 +162,7 @@ const ManageProductsPage: React.FC = () => {
                             <small className="text-muted">{t('current_images_header')}</small>
                             <div className="d-flex flex-wrap gap-2 mt-1">
                                 {editingProduct.images.map((img, idx) => (
-                                    <img key={idx} src={img} alt={t('product_alt_text', { index: idx + 1 })} style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '4px' }} />
+                                    <img key={idx} src={getImageUrl(img)} alt={t('product_alt_text', { index: idx + 1 })} style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '4px' }} />
                                 ))}
                             </div>
                             <Form.Check

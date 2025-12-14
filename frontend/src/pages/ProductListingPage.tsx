@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { IProduct, UserRole } from '../types';
 import * as api from '../services/api';
+import { getImageUrl } from '../services/api';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -192,7 +193,7 @@ const ProductListingPage = () => {
               <Col key={product._id}>
                 <Card className="h-100">
                   {product.images && product.images.length > 0 ? (
-                    <Card.Img variant="top" src={product.images[0]} style={{ height: '200px', objectFit: 'cover' }} />
+                    <Card.Img variant="top" src={getImageUrl(product.images[0])} style={{ height: '200px', objectFit: 'cover' }} />
                   ) : (
                     <div style={{ height: '200px', backgroundColor: '#e9ecef', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <span className="text-muted">{t('no_image_available')}</span>

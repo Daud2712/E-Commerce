@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import * as api from '../services/api';
+import { getImageUrl } from '../services/api';
 import { useTranslation } from 'react-i18next';
 
 const CheckoutPage: React.FC = () => {
@@ -225,7 +226,7 @@ const CheckoutPage: React.FC = () => {
                           <div className="d-flex align-items-center">
                             {item.product.images && item.product.images.length > 0 && (
                               <img
-                                src={item.product.images[0]}
+                                src={getImageUrl(item.product.images[0])}
                                 alt={item.product.name}
                                 style={{
                                   width: '50px',

@@ -3,6 +3,7 @@ import { Container, Row, Col, Card, Button, Table, Form, Alert } from 'react-boo
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useTranslation } from 'react-i18next';
+import { getImageUrl } from '../services/api';
 
 const CartPage: React.FC = () => {
   const { cartItems, removeFromCart, updateQuantity, getCartTotal, clearCart } = useCart();
@@ -65,7 +66,7 @@ const CartPage: React.FC = () => {
                         <div className="d-flex align-items-center">
                           {item.product.images && item.product.images.length > 0 && (
                             <img
-                              src={item.product.images[0]}
+                              src={getImageUrl(item.product.images[0])}
                               alt={item.product.name}
                               style={{ width: '60px', height: '60px', objectFit: 'cover', marginRight: '10px', borderRadius: '4px' }}
                             />

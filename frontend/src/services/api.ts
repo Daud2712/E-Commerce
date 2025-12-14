@@ -84,4 +84,17 @@ API.interceptors.response.use(
   }
 );
 
+// Helper function to get full image URL
+export const getImageUrl = (imagePath: string): string => {
+  if (!imagePath) return '';
+  // If path already has http/https, return as is
+  if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+    return imagePath;
+  }
+  // Otherwise prepend the backend URL
+  const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5002/api';
+  const backendURL = baseURL.replace('/api', '');
+  return `${backendURL}${imagePath}`;
+};
+
 export default API;

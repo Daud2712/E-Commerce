@@ -5,6 +5,7 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { IProduct, UserRole } from '../types';
 import * as api from '../services/api';
+import { getImageUrl } from '../services/api';
 import { useTranslation } from 'react-i18next';
 
 const ProductDetailPage: React.FC = () => {
@@ -110,7 +111,7 @@ const ProductDetailPage: React.FC = () => {
           {product.images && product.images.length > 0 ? (
             product.images.length === 1 ? (
               <Card.Img
-                src={product.images[0]}
+                src={getImageUrl(product.images[0])}
                 alt={product.name}
                 style={{ width: '100%', maxHeight: '500px', objectFit: 'cover', borderRadius: '8px' }}
               />
@@ -120,7 +121,7 @@ const ProductDetailPage: React.FC = () => {
                   <Carousel.Item key={idx}>
                     <img
                       className="d-block w-100"
-                      src={image}
+                      src={getImageUrl(image)}
                       alt={`${product.name} ${idx + 1}`}
                       style={{ maxHeight: '500px', objectFit: 'cover', borderRadius: '8px' }}
                     />
