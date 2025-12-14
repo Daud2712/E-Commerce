@@ -41,7 +41,6 @@ const BuyerDashboard = () => {
         setProfile(data);
         if (data.deliveryAddress) {
           setDeliveryAddress(data.deliveryAddress);
-          // Pre-fill M-Pesa phone number if available in profile
         }
       } catch (err: any) {
         console.error('Failed to load user profile:', err);
