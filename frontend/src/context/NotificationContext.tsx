@@ -2,17 +2,15 @@ import React, { createContext, useContext, useState, useCallback, useEffect } fr
 import { useAuth } from './AuthContext';
 import socketService from '../services/socket';
 import { UserRole } from '../types';
-import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 
 export interface Notification {
   id: string;
-  type: 'order' | 'delivery' | 'info' | 'success' | 'warning';
+  type: 'order' | 'delivery' | 'success' | 'info' | 'warning';
   title: string;
   message: string;
   timestamp: Date;
   read: boolean;
-  data?: any;
 }
 
 interface NotificationContextType {
@@ -28,9 +26,29 @@ interface NotificationContextType {
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
 export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>(() => {
+    // Load notifications from localStorage on init
+    const saved = localStorage.getItem('notifications');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        // Convert timestamp strings back to Date objects
+        return parsed.map((n: any) => ({
+          ...n,
+          timestamp: new Date(n.timestamp)
+        }));
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  });
   const { isAuthenticated, role, userId } = useAuth();
-  const { t } = useTranslation();
+
+  // Save notifications to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('notifications', JSON.stringify(notifications));
+  }, [notifications]);
 
   const addNotification = useCallback((notification: Omit<Notification, 'id' | 'timestamp' | 'read'>) => {
     const newNotification: Notification = {
@@ -39,124 +57,116 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       timestamp: new Date(),
       read: false,
     };
-
     setNotifications((prev) => [newNotification, ...prev].slice(0, 50));
   }, []);
 
   useEffect(() => {
-    if (isAuthenticated && userId) {
-      const cleanupListeners: (() => void)[] = [];
+    if (!isAuthenticated || !userId || !role) {
+      return;
+    }
 
-      switch (role) {
-        case UserRole.BUYER:
-          console.log('Setting up BUYER notifications for user:', userId);
-          const handleOrderPlaced = (data: any) => {
-            console.log('BUYER received orderPlaced:', data);
-            const message = data.message || 'Your order has been placed successfully!';
-            toast.success(message);
-            addNotification({ type: 'success', title: '✅ Order Placed Successfully', message, data });
-          };
-          const handleOrderUpdate = (data: any) => {
-            console.log('BUYER received orderUpdate:', data);
-            const message = data.message || t('order_update_notification', { orderId: data.orderId.substring(0, 8), status: t('status_' + data.status, data.status) });
-            toast.info(message);
-            addNotification({ type: 'order', title: '📦 Order Updated', message, data });
-          };
-          const handleOrderShipped = (data: any) => {
-            console.log('BUYER received orderShipped:', data);
-            const message = data.message || '📦 Your order has been shipped and is on the way!';
-            toast.info(message);
-            addNotification({ type: 'delivery', title: '🚚 Order Shipped', message, data });
-          };
-          const handleOrderDelivered = (data: any) => {
-            console.log('BUYER received orderDelivered:', data);
-            const message = data.message || '✅ Your order has been delivered!';
-            toast.success(message);
-            addNotification({ type: 'success', title: '✅ Order Delivered', message, data });
-          };
-          const handleRiderAssigned = (data: any) => {
-            console.log('BUYER received riderAssigned:', data);
-            const message = data.message || `Rider ${data.riderName} has been assigned to your delivery`;
-            toast.info(message);
-            addNotification({ type: 'delivery', title: '🚴 Rider Assigned', message, data });
-          };
-          const handleDeliveryUpdateBuyer = (data: any) => {
-            console.log('BUYER received deliveryUpdate:', data);
-            const message = data.message || `Delivery status: ${data.status}`;
-            toast.info(message);
-            addNotification({ type: 'delivery', title: '📍 Delivery Update', message, data });
-          };
+    console.log(`[NOTIFICATION SETUP] User: ${userId}, Role: ${role}`);
 
-          socketService.on('orderPlaced', handleOrderPlaced);
-          socketService.on('orderUpdate', handleOrderUpdate);
-          socketService.on('orderShipped', handleOrderShipped);
-          socketService.on('orderDelivered', handleOrderDelivered);
-          socketService.on('riderAssigned', handleRiderAssigned);
-          socketService.on('deliveryUpdate', handleDeliveryUpdateBuyer);
+    // BUYER notifications - ONLY listen to buyer events
+    if (role === UserRole.BUYER) {
+      console.log('[BUYER] Setting up buyer-only event listeners');
+      
+      const handleOrderPlaced = (data: any) => {
+        console.log(`[BUYER ${userId}] Received orderPlaced:`, data);
+        if (data.buyerId !== userId) {
+          console.log(`[BUYER ${userId}] IGNORING - not my order (buyerId: ${data.buyerId})`);
+          return;
+        }
+        
+        console.log(`[BUYER ${userId}] Processing MY order notification`);
+        const message = data.message || 'Your order has been placed successfully!';
+        toast.success(message);
+        addNotification({ 
+          type: 'success', 
+          title: 'Order Placed', 
+          message 
+        });
+      };
 
-          cleanupListeners.push(() => {
-            socketService.off('orderPlaced', handleOrderPlaced);
-            socketService.off('orderUpdate', handleOrderUpdate);
-            socketService.off('orderShipped', handleOrderShipped);
-            socketService.off('orderDelivered', handleOrderDelivered);
-            socketService.off('riderAssigned', handleRiderAssigned);
-            socketService.off('deliveryUpdate', handleDeliveryUpdateBuyer);
-          });
-          break;
+      const handleOrderUpdate = (data: any) => {
+        if (data.buyerId !== userId) return;
+        
+        const message = data.message || `Order #${data.orderId.substring(0, 8)} status: ${data.status}`;
+        toast.info(message);
+        addNotification({ 
+          type: 'info', 
+          title: 'Order Updated', 
+          message 
+        });
+      };
 
-        case UserRole.RIDER:
-          console.log('Setting up RIDER notifications for user:', userId);
-          const handleDeliveryAssigned = (data: any) => {
-            console.log('RIDER received deliveryAssigned:', data);
-            const detailedMessage = `🚚 New Delivery Assignment\n📍 Tracking: ${data.trackingNumber || 'N/A'}\n👤 Customer: ${data.buyerName || 'N/A'}\n🕒 ${new Date().toLocaleString()}`.trim();
-            toast.info(`🚚 New delivery assigned - ${data.trackingNumber}`, { autoClose: 7000 });
-            addNotification({ type: 'delivery', title: '🚚 New Delivery Assigned', message: detailedMessage, data });
-            const audio = new Audio('/notification.mp3');
-            audio.play().catch(e => console.log('Could not play notification sound'));
-          };
-          const handleDeliveryUpdateRider = (data: any) => {
-            console.log('RIDER received deliveryUpdate:', data);
-            const message = data.message || `Delivery ${data.trackingNumber} status: ${data.status}`;
-            toast.info(message);
-            addNotification({ type: 'delivery', title: '📍 Delivery Status Update', message, data });
-          };
+      socketService.on('orderPlaced', handleOrderPlaced);
+      socketService.on('orderUpdate', handleOrderUpdate);
 
-          socketService.on('deliveryAssigned', handleDeliveryAssigned);
-          socketService.on('deliveryUpdate', handleDeliveryUpdateRider);
-
-          cleanupListeners.push(() => {
-            socketService.off('deliveryAssigned', handleDeliveryAssigned);
-            socketService.off('deliveryUpdate', handleDeliveryUpdateRider);
-          });
-          break;
-
-        case UserRole.SELLER:
-          console.log('Setting up SELLER notifications for user:', userId);
-          const handleNewOrder = (data: any) => {
-            console.log('🎉 SELLER received newOrder:', data);
-            const itemsList = data.items.map((item: any) => `${item.productName} (x${item.quantity})`).join(', ');
-            const detailedMessage = `📦 Order #${data.orderId.toString().substring(0, 8)}\n💰 Total: ${data.totalAmount.toFixed(2)} TZS\n📋 Items: ${itemsList}\n👤 Buyer: ${data.buyerId ? data.buyerId.substring(0, 8) : 'N/A'}\n🕒 ${new Date().toLocaleString()}`.trim();
-            toast.success(`🎉 NEW ORDER! Total: ${data.totalAmount.toFixed(2)} TZS`, { autoClose: 10000, position: 'top-center' });
-            addNotification({ type: 'order', title: '🎉 New Order Received!', message: detailedMessage, data: { ...data, itemDetails: data.items, orderTime: new Date().toISOString() } });
-            const audio = new Audio('/notification.mp3');
-            audio.play().catch(e => console.log('Could not play notification sound'));
-            window.dispatchEvent(new CustomEvent('newOrderReceived', { detail: data }));
-          };
-
-          socketService.on('newOrder', handleNewOrder);
-          
-          cleanupListeners.push(() => {
-            socketService.off('newOrder', handleNewOrder);
-          });
-          break;
-      }
-    
       return () => {
-        console.log('Cleaning up all notifications.');
-        cleanupListeners.forEach(cleanup => cleanup());
+        console.log(`[BUYER ${userId}] Cleaning up event listeners`);
+        socketService.off('orderPlaced', handleOrderPlaced);
+        socketService.off('orderUpdate', handleOrderUpdate);
       };
     }
-  }, [isAuthenticated, userId, role, t, addNotification]);
+
+    // SELLER notifications - ONLY listen to seller events
+    if (role === UserRole.SELLER) {
+      console.log('[SELLER] Setting up seller-only event listeners');
+      
+      const handleNewOrder = (data: any) => {
+        console.log(`[SELLER ${userId}] Received newOrder:`, data);
+        const message = `New order! Total: ${data.totalAmount.toFixed(2)} TZS`;
+        toast.success(message);
+        addNotification({ 
+          type: 'order', 
+          title: 'New Order Received', 
+          message 
+        });
+        
+        const audio = new Audio('/notification.mp3');
+        audio.play().catch(() => {});
+        
+        window.dispatchEvent(new CustomEvent('newOrderReceived', { detail: data }));
+      };
+
+      socketService.on('newOrder', handleNewOrder);
+
+      return () => {
+        console.log(`[SELLER ${userId}] Cleaning up event listeners`);
+        socketService.off('newOrder', handleNewOrder);
+      };
+    }
+
+    // RIDER notifications - ONLY listen to rider events
+    if (role === UserRole.RIDER) {
+      console.log(`[RIDER ${userId}] Setting up rider-only event listeners`);
+      
+      const handleDeliveryAssigned = (data: any) => {
+        console.log(`[RIDER ${userId}] Received deliveryAssigned:`, data);
+        const message = `New delivery assigned: ${data.trackingNumber || 'N/A'}`;
+        toast.info(message);
+        addNotification({ 
+          type: 'delivery', 
+          title: 'Delivery Assigned', 
+          message 
+        });
+        
+        const audio = new Audio('/notification.mp3');
+        audio.play().catch(() => {});
+        
+        // Dispatch event to refresh delivery list
+        window.dispatchEvent(new CustomEvent('deliveryAssigned', { detail: data }));
+      };
+
+      socketService.on('deliveryAssigned', handleDeliveryAssigned);
+
+      return () => {
+        console.log(`[RIDER ${userId}] Cleaning up event listeners`);
+        socketService.off('deliveryAssigned', handleDeliveryAssigned);
+      };
+    }
+  }, [isAuthenticated, userId, role, addNotification]);
 
   const markAsRead = useCallback((id: string) => {
     setNotifications((prev) =>
@@ -174,6 +184,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   const clearAll = useCallback(() => {
     setNotifications([]);
+    localStorage.removeItem('notifications');
   }, []);
 
   const unreadCount = notifications.filter((n) => !n.read).length;

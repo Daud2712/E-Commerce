@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { createProduct, getProducts, getProductById, updateProduct, deleteProduct } from '../controllers/products';
+import { createProduct, getProducts, getProductById, updateProduct, deleteProduct, deleteAllProducts } from '../controllers/products';
 import { auth, optionalAuth } from '../middleware/auth';
 import { UserRole, AuthRequest } from '../types';
 import multer from 'multer';
@@ -68,5 +68,15 @@ router.delete('/:id', auth, (req: AuthRequest, res: Response, next: NextFunction
   }
   next();
 }, deleteProduct);
+
+// @route   DELETE /api/products/all-products
+// @desc    Delete all products
+// @access  Private (Seller only)
+router.delete('/all-products', auth, (req: AuthRequest, res: Response, next: NextFunction) => {
+    if (!req.user || req.user.role !== UserRole.SELLER) {
+        return res.status(403).json({ message: 'Access denied. Only sellers can delete all products.' });
+    }
+    next();
+}, deleteAllProducts);
 
 export default router;

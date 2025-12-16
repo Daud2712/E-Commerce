@@ -50,6 +50,7 @@ class SocketService {
 
   joinRider(riderId: string) {
     if (this.socket) {
+      console.log(`[SOCKET] Rider ${riderId} joining room: rider-${riderId}`);
       this.socket.emit('joinRider', riderId);
     }
   }

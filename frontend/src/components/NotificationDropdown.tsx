@@ -1,126 +1,93 @@
-import React, { useState } from 'react';
-import { Dropdown, Badge, ListGroup, Button } from 'react-bootstrap';
+import React from 'react';
+import { Dropdown, Badge, ListGroup } from 'react-bootstrap';
 import { useNotifications } from '../context/NotificationContext';
 import { formatDistanceToNow } from 'date-fns';
 
 const NotificationDropdown: React.FC = () => {
-  const { notifications, unreadCount, markAsRead, markAllAsRead, clearNotification, clearAll } = useNotifications();
-  const [show, setShow] = useState(false);
+  const { notifications, unreadCount, markAsRead, markAllAsRead, clearAll } = useNotifications();
 
-  const getNotificationIcon = (type: string) => {
+  const getIcon = (type: string) => {
     switch (type) {
-      case 'order':
-        return '🛒';
-      case 'delivery':
-        return '🚚';
-      case 'success':
-        return '✅';
-      case 'warning':
-        return '⚠️';
-      default:
-        return '📢';
+      case 'order': return '🛒';
+      case 'delivery': return '🚚';
+      case 'success': return '✅';
+      case 'warning': return '⚠️';
+      default: return '📢';
     }
   };
 
-  const handleNotificationClick = (id: string) => {
-    markAsRead(id);
-  };
-
   return (
-    <Dropdown show={show} onToggle={(isOpen) => setShow(isOpen)} align="end">
-      <Dropdown.Toggle
-        variant="link"
-        id="notification-dropdown"
-        className="position-relative text-white text-decoration-none p-2"
-        style={{ fontSize: '1.5rem' }}
-      >
+    <Dropdown align="end">
+      <Dropdown.Toggle variant="light" id="notification-dropdown" className="position-relative">
         🔔
         {unreadCount > 0 && (
-          <Badge
-            bg="danger"
-            pill
+          <Badge 
+            bg="danger" 
+            pill 
             className="position-absolute top-0 start-100 translate-middle"
             style={{ fontSize: '0.65rem' }}
           >
-            {unreadCount > 99 ? '99+' : unreadCount}
+            {unreadCount}
           </Badge>
         )}
       </Dropdown.Toggle>
 
-      <Dropdown.Menu style={{ width: '400px', maxHeight: '500px', overflowY: 'auto' }}>
+      <Dropdown.Menu style={{ width: '350px', maxHeight: '500px', overflowY: 'auto' }}>
         <div className="d-flex justify-content-between align-items-center px-3 py-2 border-bottom">
           <h6 className="mb-0">Notifications</h6>
           {notifications.length > 0 && (
             <div>
-              {unreadCount > 0 && (
-                <Button
-                  variant="link"
-                  size="sm"
-                  className="text-decoration-none p-0 me-2"
-                  onClick={markAllAsRead}
-                >
-                  Mark all read
-                </Button>
-              )}
-              <Button
-                variant="link"
-                size="sm"
-                className="text-decoration-none text-danger p-0"
+              <button 
+                className="btn btn-sm btn-link p-0 me-2" 
+                onClick={markAllAsRead}
+                style={{ fontSize: '0.8rem' }}
+              >
+                Mark all read
+              </button>
+              <button 
+                className="btn btn-sm btn-link p-0 text-danger" 
                 onClick={clearAll}
+                style={{ fontSize: '0.8rem' }}
               >
                 Clear all
-              </Button>
+              </button>
             </div>
           )}
         </div>
 
         {notifications.length === 0 ? (
-          <div className="text-center py-5 text-muted">
-            <div style={{ fontSize: '3rem' }}>🔕</div>
-            <p className="mb-0">No notifications</p>
+          <div className="text-center py-4 text-muted">
+            No notifications
           </div>
         ) : (
           <ListGroup variant="flush">
-            {notifications.map((notification) => (
+            {notifications.map((notif) => (
               <ListGroup.Item
-                key={notification.id}
-                className={`border-0 ${!notification.read ? 'bg-light' : ''}`}
+                key={notif.id}
+                className={`py-2 ${!notif.read ? 'bg-light' : ''}`}
                 style={{ cursor: 'pointer' }}
-                onClick={() => handleNotificationClick(notification.id)}
+                onClick={() => markAsRead(notif.id)}
               >
-                <div className="d-flex justify-content-between align-items-start">
-                  <div className="flex-grow-1">
-                    <div className="d-flex align-items-center mb-1">
-                      <span className="me-2" style={{ fontSize: '1.2rem' }}>
-                        {getNotificationIcon(notification.type)}
-                      </span>
-                      <strong className={!notification.read ? 'text-primary' : ''}>
-                        {notification.title}
-                      </strong>
-                      {!notification.read && (
-                        <Badge bg="primary" pill className="ms-2" style={{ fontSize: '0.6rem' }}>
-                          NEW
-                        </Badge>
-                      )}
-                    </div>
-                    <p className="mb-1 small" style={{ whiteSpace: 'pre-line' }}>
-                      {notification.message}
-                    </p>
-                    <small className="text-muted">
-                      {formatDistanceToNow(new Date(notification.timestamp), { addSuffix: true })}
-                    </small>
+                <div className="d-flex">
+                  <div className="me-2" style={{ fontSize: '1.2rem' }}>
+                    {getIcon(notif.type)}
                   </div>
-                  <Button
-                    variant="link"
-                    size="sm"
-                    className="text-muted p-0 ms-2"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      clearNotification(notification.id);
-                    }}
-                  >
-                    ×
-                  </Button>
+                  <div className="flex-grow-1">
+                    <div className="fw-bold" style={{ fontSize: '0.9rem' }}>
+                      {notif.title}
+                    </div>
+                    <div style={{ fontSize: '0.85rem' }}>
+                      {notif.message}
+                    </div>
+                    <div className="text-muted" style={{ fontSize: '0.75rem' }}>
+                      {formatDistanceToNow(notif.timestamp, { addSuffix: true })}
+                    </div>
+                  </div>
+                  {!notif.read && (
+                    <div>
+                      <Badge bg="primary" pill style={{ fontSize: '0.6rem' }}>New</Badge>
+                    </div>
+                  )}
                 </div>
               </ListGroup.Item>
             ))}

@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import Delivery from '../models/Delivery';
 import User from '../models/User'; // Import User model to fetch seller's name
 import { UserRole } from '../types';
-import { emitToUser } from '../utils/socket';
+import { emitToUser, emitToRider } from '../utils/socket';
 
 // Extend the Request interface for authenticated requests
 interface AuthRequest extends Request {
@@ -167,6 +167,7 @@ export const assignRider = async (req: AuthRequest, res: Response) => {
         }
 
         // Allow reassignment - set riderAccepted to null for new assignment
+        console.log(`[ASSIGN RIDER] Updating delivery ${id} with rider ${riderId}`);
         const assignedDelivery = await Delivery.findByIdAndUpdate(
             id,
             {
@@ -180,6 +181,8 @@ export const assignRider = async (req: AuthRequest, res: Response) => {
         if (!assignedDelivery) {
             return res.status(404).json({ message: 'Delivery not found after rider assignment attempt.' });
         }
+        
+        console.log(`[ASSIGN RIDER] Successfully assigned delivery ${assignedDelivery._id} to rider ${assignedDelivery.rider}`);
 
         // Correct Mongoose v6 populate for document instance
         const populatedDelivery = await assignedDelivery.populate([
@@ -190,7 +193,8 @@ export const assignRider = async (req: AuthRequest, res: Response) => {
 
         // Notify the rider about the assignment
         if (riderId) {
-          emitToUser(riderId, 'deliveryAssigned', {
+          console.log(`[DELIVERY] Assigning delivery ${assignedDelivery._id} to rider ${riderId}`);
+          emitToRider(riderId, 'deliveryAssigned', {
             deliveryId: assignedDelivery._id,
             trackingNumber: assignedDelivery.trackingNumber,
             buyerName: (populatedDelivery.buyer as any)?.name,
@@ -476,10 +480,13 @@ export const rejectDelivery = async (req: AuthRequest, res: Response) => {
           }
         
           try {
+            console.log(`[RIDER DELIVERIES] Fetching deliveries for rider: ${userId}`);
             const deliveries = await Delivery.find({ rider: userId, deleted: false })
                                              .populate('seller', 'name')
                                              .populate('rider', 'name')
                                              .populate('buyer', 'name email registrationNumber deliveryAddress');
+            console.log(`[RIDER DELIVERIES] Found ${deliveries.length} deliveries for rider ${userId}`);
+            console.log(`[RIDER DELIVERIES] Delivery IDs:`, deliveries.map(d => d._id));
             res.status(200).json(deliveries);
           } catch (error: any) {
             console.error('Error getting rider deliveries:', error);

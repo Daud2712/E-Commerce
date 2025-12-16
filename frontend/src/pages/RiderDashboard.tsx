@@ -52,9 +52,13 @@ const RiderDashboard = () => {
     try {
       setLoading(true);
       setError(''); // Clear previous errors
+      console.log('[RiderDashboard] Fetching rider deliveries...');
       const { data } = await api.getRiderDeliveries();
+      console.log('[RiderDashboard] Received deliveries:', data);
+      console.log('[RiderDashboard] Number of deliveries:', data.length);
       setDeliveries(data);
     } catch (err: any) { // Type assertion for error handling
+      console.error('[RiderDashboard] Error fetching deliveries:', err);
       setError(err.response?.data?.message || t('rider_fetch_deliveries_error'));
     } finally {
       setLoading(false);
@@ -70,10 +74,12 @@ const RiderDashboard = () => {
   // Listen for delivery notifications to refresh the list
   useEffect(() => {
     const handleDeliveryAssigned = () => {
+      console.log('[RiderDashboard] Received deliveryAssigned event, refreshing deliveries');
       fetchDeliveries();
     };
 
     const handleDeliveryUpdate = () => {
+      console.log('[RiderDashboard] Received deliveryUpdate event, refreshing deliveries');
       fetchDeliveries();
     };
 

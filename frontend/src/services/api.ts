@@ -12,8 +12,20 @@ API.interceptors.request.use((req) => {
       req.headers.Authorization = `Bearer ${localStorage.getItem('token')}`;
     }
   }
+  console.log(`[API] ${req.method?.toUpperCase()} ${req.url}`, req.data || '');
   return req;
 });
+
+API.interceptors.response.use(
+  (response) => {
+    console.log(`[API] Response from ${response.config.url}:`, response.data);
+    return response;
+  },
+  (error) => {
+    console.error(`[API] Error from ${error.config?.url}:`, error.response?.data || error.message);
+    return Promise.reject(error);
+  }
+);
 
 export const register = (formData: RegisterFormData) => API.post('/auth/register', formData);
 export const login = (formData: LoginFormData) => API.post('/auth/login', formData);

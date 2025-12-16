@@ -84,28 +84,23 @@ export const checkout = async (req: AuthRequest, res: Response) => {
       }
     }
 
-    console.log('[ORDER] Created order:', order._id, '| Buyer:', req.user!.id, '| Sellers:', Array.from(sellerIds));
-
-    // Emit real-time notification to each seller
+    // Notify each seller about new order
     sellerIds.forEach(sellerId => {
-      console.log('[ORDER] Notifying seller:', sellerId, 'about new order');
       emitToSeller(sellerId, 'newOrder', {
         orderId: order._id,
         buyerId: req.user!.id,
         totalAmount,
         items: orderItems,
-        timestamp: new Date()
       });
     });
 
-    // Notify buyer that order was placed successfully
-    console.log('[ORDER] Notifying buyer:', req.user!.id, 'about order placed');
+    // Notify buyer that order was placed
     emitToUser(req.user!.id, 'orderPlaced', {
       orderId: order._id,
+      buyerId: req.user!.id,
       totalAmount,
       status: 'pending',
       message: 'Your order has been placed successfully!',
-      timestamp: new Date()
     });
 
     res.status(201).json({
@@ -192,16 +187,16 @@ export const getAllOrders = async (req: AuthRequest, res: Response) => {
   }
 
   try {
-    // 1. Get all product IDs for the current seller
+    // Get all product IDs for the current seller
     const sellerProducts = await Product.find({ seller: req.user.id, deleted: false }).select('_id');
     const sellerProductIds = sellerProducts.map(p => p._id);
 
-    // 2. Find all orders containing at least one of the seller's products
+    // Find all orders containing at least one of the seller's products
     const sellerOrders = await Order.find({
       'items.product': { $in: sellerProductIds },
     })
       .populate('buyer', 'name email')
-      .populate('items.product', 'name')
+      .populate('items.product', 'name seller')
       .sort({ createdAt: -1 });
 
     res.status(200).json(sellerOrders);

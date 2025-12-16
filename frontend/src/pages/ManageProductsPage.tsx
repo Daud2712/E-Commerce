@@ -131,11 +131,16 @@ const ManageProductsPage: React.FC = () => {
                     <Form.Label>{t('product_price_label')}</Form.Label>
                     <Form.Control
                         type="number"
+                        step="0.01"
                         placeholder={t('enter_product_price_placeholder')}
-                        value={productPrice}
-                        onChange={(e) => setProductPrice(parseFloat(e.target.value))}
+                        value={productPrice || ''}
+                        onChange={(e) => {
+                            const value = e.target.value;
+                            setProductPrice(value === '' ? 0 : parseFloat(value));
+                        }}
                         required
                         min="0"
+                        max="999999999"
                     />
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="productStock">

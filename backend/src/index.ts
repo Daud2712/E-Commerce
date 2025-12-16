@@ -46,28 +46,28 @@ app.get('/', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-    console.log('a user connected:', socket.id);
+    console.log('User connected:', socket.id);
     
-    // Join user-specific room (buyers)
+    // Buyer joins their room
     socket.on('join', (userId: string) => {
         socket.join(`user-${userId}`);
-        console.log(`User ${userId} joined their room`);
+        console.log(`Buyer ${userId} joined room: user-${userId}`);
     });
     
-    // Join seller-specific room
+    // Seller joins their room
     socket.on('joinSeller', (sellerId: string) => {
         socket.join(`seller-${sellerId}`);
-        console.log(`Seller ${sellerId} joined their room`);
+        console.log(`Seller ${sellerId} joined room: seller-${sellerId}`);
     });
     
-    // Join rider-specific room
+    // Rider joins their room
     socket.on('joinRider', (riderId: string) => {
         socket.join(`rider-${riderId}`);
-        console.log(`Rider ${riderId} joined their room`);
+        console.log(`Rider ${riderId} joined room: rider-${riderId}`);
     });
     
     socket.on('disconnect', () => {
-        console.log('user disconnected:', socket.id);
+        console.log('User disconnected:', socket.id);
     });
 });
 

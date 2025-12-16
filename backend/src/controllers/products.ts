@@ -177,3 +177,16 @@ export const deleteProduct = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ message: 'Something went wrong.' });
   }
 };
+
+// @desc    Delete all products (hard delete)
+// @route   DELETE /api/products/all-products
+// @access  Private (Admin only - for development)
+export const deleteAllProducts = async (req: AuthRequest, res: Response) => {
+    try {
+        await Product.deleteMany({});
+        res.status(200).json({ message: 'All products permanently deleted.' });
+    } catch (error: any) {
+        console.error('Error deleting all products:', error);
+        res.status(500).json({ message: 'Something went wrong while deleting all products.' });
+    }
+};

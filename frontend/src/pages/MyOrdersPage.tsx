@@ -169,7 +169,11 @@ const MyOrdersPage: React.FC = () => {
                 {selectedOrder.shippingAddress.postalCode && `${selectedOrder.shippingAddress.postalCode}, `}
                 {selectedOrder.shippingAddress.country}
                 <br />
-                {selectedOrder.shippingAddress.phone && t('phone', { phone: selectedOrder.shippingAddress.phone })}
+                {selectedOrder.shippingAddress.phone && (
+                  <>
+                    <strong>Phone:</strong> {selectedOrder.shippingAddress.phone}
+                  </>
+                )}
               </p>
 
               <h5 className="mt-4">{t('order_items')}</h5>

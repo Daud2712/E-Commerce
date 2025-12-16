@@ -10,22 +10,26 @@ export const getSocketIO = (): Server | null => {
   return io;
 };
 
-export const emitToSeller = (sellerId: string, event: string, data: any) => {
-  if (io) {
-    console.log(`[SOCKET] Emitting '${event}' to seller room: seller-${sellerId}`, data);
-    io.to(`seller-${sellerId}`).emit(event, data);
-  }
-};
-
+// Emit to specific buyer
 export const emitToUser = (userId: string, event: string, data: any) => {
   if (io) {
-    console.log(`[SOCKET] Emitting '${event}' to user room: user-${userId}`, data);
+    console.log(`[SOCKET] Emitting '${event}' to buyer room: user-${userId}`);
     io.to(`user-${userId}`).emit(event, data);
   }
 };
 
+// Emit to specific seller
+export const emitToSeller = (sellerId: string, event: string, data: any) => {
+  if (io) {
+    console.log(`[SOCKET] Emitting '${event}' to seller room: seller-${sellerId}`);
+    io.to(`seller-${sellerId}`).emit(event, data);
+  }
+};
+
+// Emit to specific rider
 export const emitToRider = (riderId: string, event: string, data: any) => {
   if (io) {
+    console.log(`[SOCKET] Emitting '${event}' to rider room: rider-${riderId}`);
     io.to(`rider-${riderId}`).emit(event, data);
   }
 };
