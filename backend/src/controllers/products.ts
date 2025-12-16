@@ -6,13 +6,24 @@ import { UserRole, AuthRequest } from '../types';
 // @route   POST /api/products
 // @access  Private (Seller only)
 export const createProduct = async (req: AuthRequest, res: Response) => {
-  const { name, description, stock, category } = req.body;
+  const { name, description, stock, category, imageUrls } = req.body;
   const price = parseFloat(req.body.price as string);
   const images: string[] = [];
 
+  // Handle file uploads
   if (req.files && Array.isArray(req.files)) {
     req.files.forEach((file: Express.Multer.File) => {
-      images.push(`${process.env.BACKEND_URL}/uploads/${file.filename}`);
+      images.push(`/uploads/${file.filename}`);
+    });
+  }
+
+  // Handle image URLs
+  if (imageUrls) {
+    const urls = Array.isArray(imageUrls) ? imageUrls : [imageUrls];
+    urls.forEach((url: string) => {
+      if (url && url.trim()) {
+        images.push(url.trim());
+      }
     });
   }
 
@@ -79,13 +90,24 @@ export const getProductById = async (req: Request, res: Response) => {
 // @route   PUT /api/products/:id
 // @access  Private (Seller only)
 export const updateProduct = async (req: AuthRequest, res: Response) => {
-  const { name, description, stock, category, isAvailable, clearExistingImages } = req.body;
+  const { name, description, stock, category, isAvailable, clearExistingImages, imageUrls } = req.body;
   const price = parseFloat(req.body.price as string);
   const newImages: string[] = [];
 
+  // Handle file uploads
   if (req.files && Array.isArray(req.files)) {
     req.files.forEach((file: Express.Multer.File) => {
-      newImages.push(`${process.env.BACKEND_URL}/uploads/${file.filename}`);
+      newImages.push(`/uploads/${file.filename}`);
+    });
+  }
+
+  // Handle image URLs
+  if (imageUrls) {
+    const urls = Array.isArray(imageUrls) ? imageUrls : [imageUrls];
+    urls.forEach((url: string) => {
+      if (url && url.trim()) {
+        newImages.push(url.trim());
+      }
     });
   }
 

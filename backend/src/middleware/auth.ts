@@ -54,3 +54,6 @@ export const optionalAuth = (req: Request, res: Response, next: NextFunction) =>
     next();
   }
 };
+
+// Export authenticate as alias for auth
+export const authenticate = auth;

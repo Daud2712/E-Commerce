@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import * as api from '../services/api';
 import { getImageUrl } from '../services/api';
 import { useTranslation } from 'react-i18next';
+import LocationPicker from '../components/LocationPicker';
 
 const CheckoutPage: React.FC = () => {
   const { cartItems, getCartTotal, clearCart } = useCart();
@@ -20,8 +21,11 @@ const CheckoutPage: React.FC = () => {
     postalCode: '',
     country: '',
     phone: '',
+    latitude: undefined as number | undefined,
+    longitude: undefined as number | undefined,
   });
 
+  const [paymentMethod, setPaymentMethod] = useState<'cash' | 'azampay'>('cash');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -39,6 +43,8 @@ const CheckoutPage: React.FC = () => {
             postalCode: data.deliveryAddress.postalCode || '',
             country: data.deliveryAddress.country || '',
             phone: data.deliveryAddress.phone || '',
+            latitude: undefined,
+            longitude: undefined,
           });
         }
       } catch (err) {
@@ -63,6 +69,15 @@ const CheckoutPage: React.FC = () => {
     setShippingAddress((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleLocationSelect = (location: { address: string; lat: number; lng: number }) => {
+    setShippingAddress((prev) => ({
+      ...prev,
+      street: location.address,
+      latitude: location.lat,
+      longitude: location.lng,
+    }));
+  };
+
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -80,7 +95,12 @@ const CheckoutPage: React.FC = () => {
         productId: item.product._id,
         quantity: item.quantity,
       })),
-      shippingAddress,
+      shippingAddress: {
+        ...shippingAddress,
+        latitude: shippingAddress.latitude,
+        longitude: shippingAddress.longitude,
+      },
+      paymentMethod,
     };
 
     try {
@@ -136,6 +156,12 @@ const CheckoutPage: React.FC = () => {
                         required
                         placeholder={t('enter_street_address')}
                       />
+                      <div className="mt-2">
+                        <LocationPicker
+                          onLocationSelect={handleLocationSelect}
+                          initialAddress={shippingAddress.street}
+                        />
+                      </div>
                     </Form.Group>
                   </Col>
                   <Col md={6}>
@@ -201,6 +227,55 @@ const CheckoutPage: React.FC = () => {
                     </Form.Group>
                   </Col>
                 </Row>
+              </Card.Body>
+            </Card>
+
+            {/* Payment Method Selection */}
+            <Card className="mb-4">
+              <Card.Header>
+                <h5>{t('payment_method')}</h5>
+              </Card.Header>
+              <Card.Body>
+                <Form.Group>
+                  <div className="mb-3">
+                    <Form.Check
+                      type="radio"
+                      id="payment-cash"
+                      name="paymentMethod"
+                      label={
+                        <div className="d-flex align-items-center">
+                          <span className="fs-5 me-2">💵</span>
+                          <div>
+                            <strong>{t('cash_on_delivery')}</strong>
+                            <div className="small text-muted">{t('pay_when_you_receive')}</div>
+                          </div>
+                        </div>
+                      }
+                      value="cash"
+                      checked={paymentMethod === 'cash'}
+                      onChange={(e) => setPaymentMethod(e.target.value as 'cash' | 'azampay')}
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <Form.Check
+                      type="radio"
+                      id="payment-azampay"
+                      name="paymentMethod"
+                      label={
+                        <div className="d-flex align-items-center">
+                          <span className="fs-5 me-2">📱</span>
+                          <div>
+                            <strong>{t('azam_pay')}</strong>
+                            <div className="small text-muted">{t('pay_via_phone')}</div>
+                          </div>
+                        </div>
+                      }
+                      value="azampay"
+                      checked={paymentMethod === 'azampay'}
+                      onChange={(e) => setPaymentMethod(e.target.value as 'cash' | 'azampay')}
+                    />
+                  </div>
+                </Form.Group>
               </Card.Body>
             </Card>
 

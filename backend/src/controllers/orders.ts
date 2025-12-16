@@ -3,6 +3,7 @@ import Order from '../models/Order';
 import Product from '../models/Product';
 import { AuthRequest, UserRole } from '../types';
 import mongoose from 'mongoose';
+import { emitToSeller } from '../utils/socket';
 
 // @desc    Create new order (checkout)
 // @route   POST /api/orders/checkout
@@ -16,7 +17,7 @@ export const checkout = async (req: AuthRequest, res: Response) => {
     return res.status(403).json({ message: 'Only buyers can place orders.' });
   }
 
-  const { items, shippingAddress } = req.body;
+  const { items, shippingAddress, paymentMethod } = req.body;
 
   if (!items || !Array.isArray(items) || items.length === 0) {
     return res.status(400).json({ message: 'Order must contain at least one item.' });
@@ -27,7 +28,7 @@ export const checkout = async (req: AuthRequest, res: Response) => {
 
   try {
     let totalAmount = 0;
-    const orderItems = [];
+    const orderItems: any[] = [];
 
     for (const item of items) {
       const { productId, quantity } = item;
@@ -65,13 +66,34 @@ export const checkout = async (req: AuthRequest, res: Response) => {
       totalAmount,
       shippingAddress,
       status: 'pending',
-      paymentStatus: 'pending',
+      paymentStatus: paymentMethod === 'cash' ? 'pending' : 'pending',
+      paymentMethod: paymentMethod || 'pending',
     };
 
     const [order] = await Order.create([orderData], { session });
 
     await session.commitTransaction();
     session.endSession();
+
+    // Get unique seller IDs from the order items
+    const sellerIds = new Set<string>();
+    for (const item of orderItems) {
+      const product = await Product.findById(item.product);
+      if (product && product.seller) {
+        sellerIds.add(product.seller.toString());
+      }
+    }
+
+    // Emit real-time notification to each seller
+    sellerIds.forEach(sellerId => {
+      emitToSeller(sellerId, 'newOrder', {
+        orderId: order._id,
+        buyerId: req.user!.id,
+        totalAmount,
+        items: orderItems,
+        timestamp: new Date()
+      });
+    });
 
     res.status(201).json({
       message: 'Order placed successfully!',

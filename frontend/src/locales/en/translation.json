@@ -382,5 +382,10 @@
   "confirm_delete_delivery": "Are you sure you want to delete delivery {{trackingNumber}}",
   "only_buyers_can_add_to_cart": "Only buyers can add products to cart.",
   "quantity_exceeds_stock_detail": "Only {{stock}} items available in stock.",
-  "only_buyers_can_buy_now": "Only buyers can buy products directly."
+  "only_buyers_can_buy_now": "Only buyers can buy products directly.",
+  "payment_method": "Payment Method",
+  "cash_on_delivery": "Cash on Delivery",
+  "pay_when_you_receive": "Pay when you receive the order",
+  "azam_pay": "Azam Pay",
+  "pay_via_phone": "Pay via mobile phone"
 }

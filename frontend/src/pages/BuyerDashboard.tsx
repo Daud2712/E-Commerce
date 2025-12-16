@@ -186,15 +186,15 @@ const BuyerDashboard = () => {
         </Alert>
       )}
 
-      {/* Registration Number Display */}
-      {profile?.registrationNumber && (
+      {/* Registration Number Display - REMOVED per requirements */}
+      {false && profile?.registrationNumber && (
         <Alert variant="info" className="mb-3">
           <Row className="align-items-center">
             <Col md={8}>
               <h5 className="mb-0">
                 <strong>{t('your_registration_number')}</strong>{' '}
                 <span className="text-primary" style={{ fontSize: '1.3em', fontWeight: 'bold' }}>
-                  {profile.registrationNumber}
+                  {profile?.registrationNumber}
                 </span>
               </h5>
               <small className="text-muted">
@@ -206,7 +206,7 @@ const BuyerDashboard = () => {
                 variant="outline-primary"
                 size="sm"
                 onClick={() => {
-                  navigator.clipboard.writeText(profile.registrationNumber || '');
+                  navigator.clipboard.writeText(profile?.registrationNumber || '');
                   alert(t('registration_number_copied'));
                 }}
               >

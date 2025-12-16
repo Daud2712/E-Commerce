@@ -17,6 +17,9 @@ import MyOrdersPage from './pages/MyOrdersPage';
 import ProductsPage from './pages/ProductsPage';
 import ManageProductsPage from './pages/ManageProductsPage';
 import ParcelManagementPage from './pages/ParcelManagementPage';
+import InventoryPage from './pages/InventoryPage';
+import ExpensesPage from './pages/ExpensesPage';
+import ReportsPage from './pages/ReportsPage';
 
 import { useAuth } from './context/AuthContext';
 import { useCart } from './context/CartContext';
@@ -100,6 +103,9 @@ function App() {
               <Route path="products" element={<ProductsPage />} />
               <Route path="manage-products" element={<ManageProductsPage />} />
               <Route path="parcel-management" element={<ParcelManagementPage />} />
+              <Route path="inventory" element={<InventoryPage />} />
+              <Route path="expenses" element={<ExpensesPage />} />
+              <Route path="reports" element={<ReportsPage />} />
               <Route index element={<Navigate to="products" />} />
             </Route>
           </Route>

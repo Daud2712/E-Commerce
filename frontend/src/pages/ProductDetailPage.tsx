@@ -158,7 +158,7 @@ const ProductDetailPage: React.FC = () => {
 
           <div className="mb-3">
             {product.stock > 0 ? (
-              <Badge bg="success">{t('in_stock')}{t('colon_separator')} {product.stock} {t('available')}</Badge>
+              <Badge bg="success">{t('in_stock')}</Badge>
             ) : (
               <Badge bg="danger">{t('out_of_stock')}</Badge>
             )}
@@ -173,15 +173,7 @@ const ProductDetailPage: React.FC = () => {
             </Card.Body>
           </Card>
 
-          <Card className="mb-4">
-            <Card.Body>
-              <Card.Title>{t('seller_information')}</Card.Title>
-              <Card.Text>
-                <strong>{t('seller_name')}{t('colon_separator')}</strong> {product.seller.name}<br />
-                <strong>{t('email')}{t('colon_separator')}</strong> {product.seller.email}
-              </Card.Text>
-            </Card.Body>
-          </Card>
+          {/* Seller information removed per requirements */}
 
           {product.stock > 0 && (
             <div className="mb-4">

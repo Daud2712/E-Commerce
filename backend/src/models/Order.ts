@@ -19,8 +19,11 @@ export interface IOrder extends Document {
     postalCode?: string;
     country?: string;
     phone?: string;
+    latitude?: number;
+    longitude?: number;
   };
   paymentStatus: 'pending' | 'paid' | 'failed';
+  paymentMethod: 'cash' | 'azampay' | 'pending';
   createdAt: Date;
   updatedAt: Date;
 }
@@ -48,10 +51,17 @@ const orderSchema = new Schema({
     postalCode: { type: String },
     country: { type: String },
     phone: { type: String },
+    latitude: { type: Number },
+    longitude: { type: Number },
   },
   paymentStatus: {
     type: String,
     enum: ['pending', 'paid', 'failed'],
+    default: 'pending',
+  },
+  paymentMethod: {
+    type: String,
+    enum: ['cash', 'azampay', 'pending'],
     default: 'pending',
   },
 }, { timestamps: true });

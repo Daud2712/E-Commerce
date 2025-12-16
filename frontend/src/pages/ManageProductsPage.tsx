@@ -15,6 +15,7 @@ const ManageProductsPage: React.FC = () => {
     const [productPrice, setProductPrice] = useState(0);
     const [productStock, setProductStock] = useState(0);
     const [productImageFiles, setProductImageFiles] = useState<File[]>([]);
+    const [productImageUrls, setProductImageUrls] = useState<string>('');
     const [productCategory, setProductCategory] = useState('');
     const [formError, setFormError] = useState('');
     const [formSuccess, setFormSuccess] = useState('');
@@ -63,6 +64,14 @@ const ManageProductsPage: React.FC = () => {
             formData.append('images', file);
         });
 
+        // Add image URLs if provided
+        if (productImageUrls.trim()) {
+            const urls = productImageUrls.split(',').map(url => url.trim()).filter(url => url);
+            urls.forEach((url) => {
+                formData.append('imageUrls', url);
+            });
+        }
+
         // Only send clearExistingImages if it's true and we are editing a product
         if (editingProduct && clearExistingImages) {
             formData.append('clearExistingImages', 'true');
@@ -81,6 +90,7 @@ const ManageProductsPage: React.FC = () => {
             setProductPrice(0);
             setProductStock(0);
             setProductCategory('');
+            setProductImageUrls('');
             setEditingProduct(null);
             setClearExistingImages(false); // Reset state
             navigate('/seller/products');
@@ -140,7 +150,7 @@ const ManageProductsPage: React.FC = () => {
                     />
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="productImage">
-                    <Form.Label>{t('product_image_label_with_count')}</Form.Label>
+                    <Form.Label>{t('product_image_label_with_count')} - Upload Files</Form.Label>
                     <Form.Control
                         type="file"
                         multiple
@@ -185,6 +195,18 @@ const ManageProductsPage: React.FC = () => {
                             )}
                         </div>
                     )}
+                </Form.Group>
+                <Form.Group className="mb-3" controlId="productImageUrls">
+                    <Form.Label>Or Add Image URLs</Form.Label>
+                    <Form.Control
+                        type="text"
+                        placeholder="Enter image URLs separated by commas (e.g., https://example.com/image1.jpg, https://example.com/image2.jpg)"
+                        value={productImageUrls}
+                        onChange={(e) => setProductImageUrls(e.target.value)}
+                    />
+                    <Form.Text className="text-muted">
+                        Separate multiple URLs with commas. These will be added along with uploaded files.
+                    </Form.Text>
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="productCategory">
                     <Form.Label>{t('product_category_label')}</Form.Label>
