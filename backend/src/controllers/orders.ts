@@ -1,9 +1,10 @@
 import { Response } from 'express';
 import Order from '../models/Order';
 import Product from '../models/Product';
+import Delivery from '../models/Delivery';
 import { AuthRequest, UserRole } from '../types';
 import mongoose from 'mongoose';
-import { emitToSeller, emitToUser } from '../utils/socket';
+import { emitToSeller, emitToUser, emitToRider } from '../utils/socket';
 
 // @desc    Create new order (checkout)
 // @route   POST /api/orders/checkout
@@ -210,7 +211,7 @@ export const getAllOrders = async (req: AuthRequest, res: Response) => {
 // @route   PUT /api/orders/:id/status
 // @access  Private (Seller only)
 export const updateOrderStatus = async (req: AuthRequest, res: Response) => {
-  const { status } = req.body;
+  const { status, assignedRider } = req.body;
 
   if (!req.user) {
     return res.status(401).json({ message: 'Not authenticated.' });
@@ -238,6 +239,81 @@ export const updateOrderStatus = async (req: AuthRequest, res: Response) => {
 
     order.status = status;
     await order.save();
+
+    // Create delivery when rider is assigned
+    if (assignedRider) {
+      console.log(`[ORDER] Creating delivery for order ${order._id} with rider ${assignedRider}`);
+      
+      // Check if delivery already exists for this order
+      const existingDelivery = await Delivery.findOne({ order: order._id, deleted: false });
+      
+      if (existingDelivery) {
+        // Update existing delivery with new rider
+        console.log(`[ORDER] Updating existing delivery ${existingDelivery._id} with rider ${assignedRider}`);
+        existingDelivery.rider = assignedRider as any;
+        existingDelivery.status = 'assigned';
+        existingDelivery.riderAccepted = undefined;
+        await existingDelivery.save();
+        
+        // Populate the delivery
+        await existingDelivery.populate([
+          { path: 'seller', select: 'name' },
+          { path: 'rider', select: 'name' },
+          { path: 'buyer', select: 'name email registrationNumber deliveryAddress' }
+        ]);
+        
+        // Notify rider
+        emitToRider(assignedRider, 'deliveryAssigned', {
+          deliveryId: existingDelivery._id,
+          trackingNumber: existingDelivery.trackingNumber,
+          buyerName: (existingDelivery.buyer as any)?.name,
+          message: 'You have been assigned a new delivery',
+          timestamp: new Date()
+        });
+      } else {
+        // Create new delivery
+        const trackingNumber = `TRK${Date.now()}${Math.random().toString(36).substring(7).toUpperCase()}`;
+        
+        const newDelivery = await Delivery.create({
+          order: order._id,
+          seller: req.user.id,
+          rider: assignedRider,
+          buyer: order.buyer,
+          packageName: `Order #${order._id.toString().substring(0, 8)}`,
+          status: 'assigned',
+          trackingNumber,
+          price: order.totalAmount,
+          riderAccepted: null
+        });
+        
+        console.log(`[ORDER] Created new delivery ${newDelivery._id} for order ${order._id}`);
+        
+        // Populate the delivery
+        await newDelivery.populate([
+          { path: 'seller', select: 'name' },
+          { path: 'rider', select: 'name' },
+          { path: 'buyer', select: 'name email registrationNumber deliveryAddress' }
+        ]);
+        
+        // Notify rider
+        emitToRider(assignedRider, 'deliveryAssigned', {
+          deliveryId: newDelivery._id,
+          trackingNumber: newDelivery.trackingNumber,
+          buyerName: (newDelivery.buyer as any)?.name,
+          message: 'You have been assigned a new delivery',
+          timestamp: new Date()
+        });
+        
+        // Notify buyer
+        emitToUser(order.buyer.toString(), 'riderAssigned', {
+          deliveryId: newDelivery._id,
+          trackingNumber: newDelivery.trackingNumber,
+          riderName: (newDelivery.rider as any)?.name,
+          message: 'A rider has been assigned to your delivery',
+          timestamp: new Date()
+        });
+      }
+    }
 
     if (order.buyer) {
       const buyerId = order.buyer.toString();
