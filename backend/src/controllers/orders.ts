@@ -3,7 +3,7 @@ import Order from '../models/Order';
 import Product from '../models/Product';
 import { AuthRequest, UserRole } from '../types';
 import mongoose from 'mongoose';
-import { emitToSeller } from '../utils/socket';
+import { emitToSeller, emitToUser } from '../utils/socket';
 
 // @desc    Create new order (checkout)
 // @route   POST /api/orders/checkout
@@ -84,8 +84,11 @@ export const checkout = async (req: AuthRequest, res: Response) => {
       }
     }
 
+    console.log('[ORDER] Created order:', order._id, '| Buyer:', req.user!.id, '| Sellers:', Array.from(sellerIds));
+
     // Emit real-time notification to each seller
     sellerIds.forEach(sellerId => {
+      console.log('[ORDER] Notifying seller:', sellerId, 'about new order');
       emitToSeller(sellerId, 'newOrder', {
         orderId: order._id,
         buyerId: req.user!.id,
@@ -93,6 +96,16 @@ export const checkout = async (req: AuthRequest, res: Response) => {
         items: orderItems,
         timestamp: new Date()
       });
+    });
+
+    // Notify buyer that order was placed successfully
+    console.log('[ORDER] Notifying buyer:', req.user!.id, 'about order placed');
+    emitToUser(req.user!.id, 'orderPlaced', {
+      orderId: order._id,
+      totalAmount,
+      status: 'pending',
+      message: 'Your order has been placed successfully!',
+      timestamp: new Date()
     });
 
     res.status(201).json({
@@ -179,17 +192,17 @@ export const getAllOrders = async (req: AuthRequest, res: Response) => {
   }
 
   try {
-    const orders = await Order.find()
-      .populate('buyer', 'name email')
-      .populate('items.product', 'name seller')
-      .sort({ createdAt: -1 });
+    // 1. Get all product IDs for the current seller
+    const sellerProducts = await Product.find({ seller: req.user.id, deleted: false }).select('_id');
+    const sellerProductIds = sellerProducts.map(p => p._id);
 
-    // Filter orders that contain products from this seller
-    const sellerOrders = orders.filter(order =>
-      order.items.some((item: any) =>
-        item.product?.seller?.toString() === req.user!.id
-      )
-    );
+    // 2. Find all orders containing at least one of the seller's products
+    const sellerOrders = await Order.find({
+      'items.product': { $in: sellerProductIds },
+    })
+      .populate('buyer', 'name email')
+      .populate('items.product', 'name')
+      .sort({ createdAt: -1 });
 
     res.status(200).json(sellerOrders);
   } catch (error: any) {
@@ -230,6 +243,31 @@ export const updateOrderStatus = async (req: AuthRequest, res: Response) => {
 
     order.status = status;
     await order.save();
+
+    if (order.buyer) {
+      const buyerId = order.buyer.toString();
+      if (status === 'shipped') {
+        emitToUser(buyerId, 'orderShipped', {
+          orderId: order._id,
+          message: 'Your order has been shipped and is on the way!',
+          timestamp: new Date()
+        });
+      } else if (status === 'delivered') {
+        emitToUser(buyerId, 'orderDelivered', {
+          orderId: order._id,
+          message: 'Your order has been delivered!',
+          timestamp: new Date()
+        });
+      } else {
+        // For other status updates like 'processing'
+        emitToUser(buyerId, 'orderUpdate', {
+          orderId: order._id,
+          status: order.status,
+          message: `Your order status has been updated to ${status}`,
+          timestamp: new Date()
+        });
+      }
+    }
 
     res.status(200).json(order);
   } catch (error: any) {

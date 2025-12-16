@@ -381,5 +381,13 @@
   "confirm_delete_delivery": "Je, una uhakika unataka kufuta utoaji {{trackingNumber}}",
   "only_buyers_can_add_to_cart": "Wanunuzi tu ndio wanaweza kuongeza bidhaa kwenye kikapu.",
   "quantity_exceeds_stock_detail": "Vitu {{stock}} tu vinapatikana kwa sasa.",
-  "only_buyers_can_buy_now": "Wanunuzi tu ndio wanaweza kununua bidhaa moja kwa moja."
+  "only_buyers_can_buy_now": "Wanunuzi tu ndio wanaweza kununua bidhaa moja kwa moja.",
+  "new_order_notification": "🎉 Agizo jipya limepokelewa! Kitambulisho cha agizo: {{orderId}}... Jumla: {{total}}",
+  "order_update_notification": "📢 Agizo {{orderId}} limesasishwa kuwa {{status}}.",
+  "order_placed_notification": "✅ Agizo lako {{orderId}} limewekwa kikamilifu!",
+  "order_shipped_notification": "🚚 Agizo lako {{orderId}} limesafirishwa!",
+  "order_delivered_notification": "🎉 Agizo lako {{orderId}} limeletwa!",
+  "rider_assigned_notification": "Msafirishaji {{riderName}} amepewa jukumu la kuleta mzigo wako {{deliveryId}}.",
+  "delivery_update_notification": "ℹ️ Hali ya usafirishaji wako {{deliveryId}} imebadilishwa kuwa {{status}}.",
+  "delivery_assigned_notification": "Hongera, umepewa jukumu la usafirishaji mpya: {{deliveryId}}."
 }

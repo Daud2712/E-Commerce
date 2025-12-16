@@ -1,5 +1,6 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, useMemo } from 'react';
 import { UserRole } from '../types';
+import socketService from '../services/socket';
 
 interface AuthContextType {
   token: string | null;
@@ -7,7 +8,7 @@ interface AuthContextType {
   role: UserRole | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  isLoggingIn: boolean; // Add isLoggingIn to the interface
+  isLoggingIn: boolean;
   login: (token: string, userId: string, role: UserRole) => void;
   logout: () => void;
 }
@@ -19,38 +20,60 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [userId, setUserId] = useState<string | null>(null);
   const [role, setRole] = useState<UserRole | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isLoggingIn, setIsLoggingIn] = useState(false); // New isLoggingIn state
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
     const storedUserId = localStorage.getItem('userId');
     const storedRole = localStorage.getItem('role') as UserRole;
 
-    console.log('AuthContext useEffect: storedToken', storedToken);
-    console.log('AuthContext useEffect: storedUserId', storedUserId);
-    console.log('AuthContext useEffect: storedRole', storedRole);
-
     if (storedToken && storedUserId && storedRole) {
       setToken(storedToken);
       setUserId(storedUserId);
       setRole(storedRole);
-      console.log('AuthContext useEffect: Session restored.');
-    } else {
-      console.log('AuthContext useEffect: No session to restore or incomplete session data.');
+      
+      const socket = socketService.connect();
+      if (socket) {
+        switch (storedRole) {
+          case UserRole.BUYER:
+            socketService.joinUser(storedUserId);
+            break;
+          case UserRole.SELLER:
+            socketService.joinSeller(storedUserId);
+            break;
+          case UserRole.RIDER:
+            socketService.joinRider(storedUserId);
+            break;
+        }
+      }
     }
-    setIsLoading(false); // Set isLoading to false after check
+    setIsLoading(false);
   }, []);
 
   const login = (newToken: string, newUserId: string, newRole: UserRole) => {
-    setIsLoggingIn(true); // Set to true at the start of login
-    console.log('AuthContext: Logging in with:', { newToken, newUserId, newRole });
+    setIsLoggingIn(true);
     setToken(newToken);
     setUserId(newUserId);
     setRole(newRole);
     localStorage.setItem('token', newToken);
     localStorage.setItem('userId', newUserId);
     localStorage.setItem('role', newRole);
-    setIsLoggingIn(false); // Set to false at the end of login
+
+    const socket = socketService.connect();
+    if (socket) {
+      switch (newRole) {
+        case UserRole.BUYER:
+          socketService.joinUser(newUserId);
+          break;
+        case UserRole.SELLER:
+          socketService.joinSeller(newUserId);
+          break;
+        case UserRole.RIDER:
+          socketService.joinRider(newUserId);
+          break;
+      }
+    }
+    setIsLoggingIn(false);
   };
 
   const logout = () => {
@@ -60,6 +83,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.removeItem('token');
     localStorage.removeItem('userId');
     localStorage.removeItem('role');
+    socketService.disconnect();
   };
 
   return (
@@ -74,7 +98,6 @@ export const useAuth = () => {
   if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
-  // Construct the user object from the context state for convenience
-  const user = context.userId && context.role ? { _id: context.userId, role: context.role } : undefined;
+  const user = useMemo(() => (context.userId && context.role ? { _id: context.userId, role: context.role } : undefined), [context.userId, context.role]);
   return { ...context, user };
 };

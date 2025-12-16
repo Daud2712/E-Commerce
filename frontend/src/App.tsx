@@ -23,8 +23,10 @@ import ReportsPage from './pages/ReportsPage';
 
 import { useAuth } from './context/AuthContext';
 import { useCart } from './context/CartContext';
+import NotificationDropdown from './components/NotificationDropdown';
 import { UserRole } from './types';
 import { useTranslation } from 'react-i18next';
+import { ToastContainer } from 'react-toastify';
 
 function App() {
   const { isAuthenticated, role, logout } = useAuth();
@@ -33,6 +35,17 @@ function App() {
 
   return (
     <Router>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
       <Navbar bg="dark" variant="dark" expand="lg">
         <Container>
           <Navbar.Brand as={Link} to="/" className="d-flex align-items-center">
@@ -80,6 +93,7 @@ function App() {
                   )}
                 </Nav.Link>
               )}
+              {isAuthenticated && <NotificationDropdown />}
               {isAuthenticated && <Nav.Link onClick={logout}>{t('logout_button')}</Nav.Link>}
               {!isAuthenticated && <Nav.Link as={Link} to="/login">{t('login_button')}</Nav.Link>}
               {!isAuthenticated && <Nav.Link as={Link} to="/register">{t('register_button')}</Nav.Link>}

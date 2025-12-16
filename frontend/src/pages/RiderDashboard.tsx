@@ -4,6 +4,7 @@ import * as api from '../services/api';
 import { Delivery, User, DeliveryAddress } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next'; // Import useTranslation
+import socketService from '../services/socket';
 
 // Removed: import TrackingPage from './TrackingPage';
 
@@ -65,6 +66,25 @@ const RiderDashboard = () => {
         fetchDeliveries();
     }
   }, [user?._id]);
+
+  // Listen for delivery notifications to refresh the list
+  useEffect(() => {
+    const handleDeliveryAssigned = () => {
+      fetchDeliveries();
+    };
+
+    const handleDeliveryUpdate = () => {
+      fetchDeliveries();
+    };
+
+    socketService.on('deliveryAssigned', handleDeliveryAssigned);
+    socketService.on('deliveryUpdate', handleDeliveryUpdate);
+
+    return () => {
+      socketService.off('deliveryAssigned', handleDeliveryAssigned);
+      socketService.off('deliveryUpdate', handleDeliveryUpdate);
+    };
+  }, []);
 
   const handleStatusUpdate = async (id: string, status: Delivery['status']) => {
     setUpdatingId(id); // Set updating ID

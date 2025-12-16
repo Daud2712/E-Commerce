@@ -2,10 +2,12 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import App from './App'
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'react-toastify/dist/ReactToastify.css';
 import './index.css';
 import { AuthProvider } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { CartProvider } from './context/CartContext'; // Import CartProvider
+import { NotificationProvider } from './context/NotificationContext'; // Import NotificationProvider
 import { I18nextProvider } from 'react-i18next'; // Import I18nextProvider
 import i18n from './i18n'; // Import our i18n configuration
 
@@ -18,9 +20,11 @@ root.render(
     <I18nextProvider i18n={i18n}> {/* Wrap the application with I18nextProvider */}
       <AuthProvider>
         <LanguageProvider>
-          <CartProvider>
-            <App />
-          </CartProvider>
+          <NotificationProvider>
+            <CartProvider>
+              <App />
+            </CartProvider>
+          </NotificationProvider>
         </LanguageProvider>
       </AuthProvider>
     </I18nextProvider>

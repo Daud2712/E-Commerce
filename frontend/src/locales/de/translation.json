@@ -381,5 +381,13 @@
   "confirm_delete_delivery": "Sind Sie sicher, dass Sie die Lieferung {{trackingNumber}} löschen möchten",
   "only_buyers_can_add_to_cart": "Nur Käufer können Produkte zum Warenkorb hinzufügen.",
   "quantity_exceeds_stock_detail": "Nur {{stock}} Artikel auf Lager verfügbar.",
-  "only_buyers_can_buy_now": "Nur Käufer können Produkte direkt kaufen."
+  "only_buyers_can_buy_now": "Nur Käufer können Produkte direkt kaufen.",
+  "new_order_notification": "🎉 Neue Bestellung erhalten! Bestell-ID: {{orderId}}... Gesamt: {{total}}",
+  "order_update_notification": "📢 Bestellung {{orderId}} wurde auf {{status}} aktualisiert.",
+  "order_placed_notification": "✅ Ihre Bestellung {{orderId}} wurde erfolgreich aufgegeben!",
+  "order_shipped_notification": "🚚 Ihre Bestellung {{orderId}} wurde versandt!",
+  "order_delivered_notification": "🎉 Ihre Bestellung {{orderId}} wurde zugestellt!",
+  "rider_assigned_notification": "Fahrer {{riderName}} wurde Ihrer Lieferung {{deliveryId}} zugewiesen.",
+  "delivery_update_notification": "ℹ️ Der Status Ihrer Lieferung {{deliveryId}} wurde auf {{status}} aktualisiert.",
+  "delivery_assigned_notification": "Herzlichen Glückwunsch, Ihnen wurde eine neue Lieferung zugewiesen: {{deliveryId}}."
 }

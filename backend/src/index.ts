@@ -48,7 +48,7 @@ app.get('/', (req, res) => {
 io.on('connection', (socket) => {
     console.log('a user connected:', socket.id);
     
-    // Join user-specific room
+    // Join user-specific room (buyers)
     socket.on('join', (userId: string) => {
         socket.join(`user-${userId}`);
         console.log(`User ${userId} joined their room`);
@@ -58,6 +58,12 @@ io.on('connection', (socket) => {
     socket.on('joinSeller', (sellerId: string) => {
         socket.join(`seller-${sellerId}`);
         console.log(`Seller ${sellerId} joined their room`);
+    });
+    
+    // Join rider-specific room
+    socket.on('joinRider', (riderId: string) => {
+        socket.join(`rider-${riderId}`);
+        console.log(`Rider ${riderId} joined their room`);
     });
     
     socket.on('disconnect', () => {

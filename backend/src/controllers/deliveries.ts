@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import Delivery from '../models/Delivery';
 import User from '../models/User'; // Import User model to fetch seller's name
 import { UserRole } from '../types';
+import { emitToUser } from '../utils/socket';
 
 // Extend the Request interface for authenticated requests
 interface AuthRequest extends Request {
@@ -91,15 +92,45 @@ export const updateDeliveryStatus = async (req: AuthRequest, res: Response) => {
             return res.status(404).json({ message: 'Delivery not found after update attempt.' });
         }
 
-        // TODO: Emit socket event here to notify seller and buyer
-        // req.app.get('io').emit(`delivery-update:${updatedDelivery.id}`, updatedDelivery);
-
         // Correct Mongoose v6 populate for document instance
         const populatedDelivery = await updatedDelivery.populate([
           { path: 'seller', select: 'name' },
           { path: 'rider', select: 'name' },
           { path: 'buyer', select: 'name email registrationNumber deliveryAddress' } // Populate buyer details
         ]);
+
+        // Notify the buyer about delivery status change
+        if (updatedDelivery.buyer) {
+          let message = '';
+          if (status === 'in_transit') {
+            message = 'Your delivery is now in transit';
+          } else if (status === 'delivered') {
+            message = 'Your delivery has been completed!';
+          } else if (status === 'cancelled') {
+            message = 'Your delivery has been cancelled';
+          } else {
+            message = `Your delivery status has been updated to ${status}`;
+          }
+
+          emitToUser(updatedDelivery.buyer.toString(), 'deliveryUpdate', {
+            deliveryId: updatedDelivery._id,
+            trackingNumber: updatedDelivery.trackingNumber,
+            status: status,
+            message: message,
+            timestamp: new Date()
+          });
+        }
+
+        // Notify the rider about delivery status change
+        if (updatedDelivery.rider && (status === 'in_transit' || status === 'delivered')) {
+          emitToUser(updatedDelivery.rider.toString(), 'deliveryUpdate', {
+            deliveryId: updatedDelivery._id,
+            trackingNumber: updatedDelivery.trackingNumber,
+            status: status,
+            message: `Delivery status updated to ${status}`,
+            timestamp: new Date()
+          });
+        }
 
         res.status(200).json(populatedDelivery);
     } catch (error: any) {
@@ -156,6 +187,28 @@ export const assignRider = async (req: AuthRequest, res: Response) => {
           { path: 'rider', select: 'name' },
           { path: 'buyer', select: 'name email registrationNumber deliveryAddress' } // Populate buyer details
         ]);
+
+        // Notify the rider about the assignment
+        if (riderId) {
+          emitToUser(riderId, 'deliveryAssigned', {
+            deliveryId: assignedDelivery._id,
+            trackingNumber: assignedDelivery.trackingNumber,
+            buyerName: (populatedDelivery.buyer as any)?.name,
+            message: 'You have been assigned a new delivery',
+            timestamp: new Date()
+          });
+        }
+
+        // Notify the buyer that a rider has been assigned
+        if (assignedDelivery.buyer) {
+          emitToUser(assignedDelivery.buyer.toString(), 'riderAssigned', {
+            deliveryId: assignedDelivery._id,
+            trackingNumber: assignedDelivery.trackingNumber,
+            riderName: (populatedDelivery.rider as any)?.name,
+            message: 'A rider has been assigned to your delivery',
+            timestamp: new Date()
+          });
+        }
 
         res.status(200).json(populatedDelivery);
     } catch (error: any) {

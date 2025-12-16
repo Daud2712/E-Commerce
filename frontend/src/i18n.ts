@@ -38,8 +38,6 @@ i18n
     fallbackLng: 'en', // fallback language if translation is not found
     interpolation: {
       escapeValue: false, // react already safes from xss
-      prefix: '{',
-      suffix: '}',
     },
   });
 

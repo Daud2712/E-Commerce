@@ -383,9 +383,12 @@
   "only_buyers_can_add_to_cart": "Only buyers can add products to cart.",
   "quantity_exceeds_stock_detail": "Only {{stock}} items available in stock.",
   "only_buyers_can_buy_now": "Only buyers can buy products directly.",
-  "payment_method": "Payment Method",
-  "cash_on_delivery": "Cash on Delivery",
-  "pay_when_you_receive": "Pay when you receive the order",
-  "azam_pay": "Azam Pay",
-  "pay_via_phone": "Pay via mobile phone"
+  "new_order_notification": "🎉 New order received! Order ID: {{orderId}}... Total: {{total}}",
+  "order_update_notification": "📢 Order {{orderId}} has been updated to {{status}}.",
+  "order_placed_notification": "✅ Your order {{orderId}} has been placed successfully!",
+  "order_shipped_notification": "🚚 Your order {{orderId}} has been shipped!",
+  "order_delivered_notification": "🎉 Your order {{orderId}} has been delivered!",
+  "rider_assigned_notification": " rider {{riderName}} has been assigned to your delivery {{deliveryId}}.",
+  "delivery_update_notification": "ℹ️ The status of your delivery {{deliveryId}} has been updated to {{status}}.",
+  "delivery_assigned_notification": " Cngratulations, You have been assigned a new delivery: {{deliveryId}}."
 }

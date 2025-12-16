@@ -40,6 +40,18 @@ const ParcelManagementPage: React.FC = () => {
     useEffect(() => {
         fetchOrders();
         fetchRiders();
+
+        // Listen for new order notifications to refresh list
+        const handleNewOrder = () => {
+            console.log('[ParcelManagement] New order received, refreshing orders list...');
+            fetchOrders();
+        };
+
+        window.addEventListener('newOrderReceived', handleNewOrder);
+
+        return () => {
+            window.removeEventListener('newOrderReceived', handleNewOrder);
+        };
     }, []);
 
     const handleAssignRider = async (orderId: string, riderId: string) => {
@@ -144,14 +156,14 @@ const ParcelManagementPage: React.FC = () => {
                                                 • {item.productName} x {item.quantity}
                                                 <br />
                                                 <small className="text-muted">
-                                                    KSh {item.price.toFixed(2)} each
+                                                    {t('price_with_currency_display', { amount: item.price.toFixed(2) })} each
                                                 </small>
                                             </div>
                                         ))}
                                     </div>
                                 </td>
                                 <td>
-                                    <strong>KSh {order.totalAmount.toFixed(2)}</strong>
+                                    <strong>{t('price_with_currency_display', { amount: order.totalAmount.toFixed(2) })}</strong>
                                 </td>
                                 <td>
                                     {order.shippingAddress?.street ? (

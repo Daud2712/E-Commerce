@@ -48,6 +48,12 @@ class SocketService {
     }
   }
 
+  joinRider(riderId: string) {
+    if (this.socket) {
+      this.socket.emit('joinRider', riderId);
+    }
+  }
+
   on(event: string, callback: (...args: any[]) => void) {
     if (this.socket) {
       this.socket.on(event, callback);

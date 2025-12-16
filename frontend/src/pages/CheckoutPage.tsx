@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Container, Row, Col, Card, Button, Form, Alert, Table, Spinner } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import * as api from '../services/api';
 import { getImageUrl } from '../services/api';
 import { useTranslation } from 'react-i18next';
-import LocationPicker from '../components/LocationPicker';
+import TanzaniaLocationSelector from '../components/TanzaniaLocationSelector';
 
 const CheckoutPage: React.FC = () => {
   const { cartItems, getCartTotal, clearCart } = useCart();
@@ -15,11 +15,11 @@ const CheckoutPage: React.FC = () => {
   const { t } = useTranslation();
 
   const [shippingAddress, setShippingAddress] = useState({
+    region: '',
+    district: '',
+    ward: '',
     street: '',
-    city: '',
-    state: '',
     postalCode: '',
-    country: '',
     phone: '',
     latitude: undefined as number | undefined,
     longitude: undefined as number | undefined,
@@ -29,6 +29,7 @@ const CheckoutPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [addressSaved, setAddressSaved] = useState(false);
 
   // Load user's delivery address if available
   useEffect(() => {
@@ -37,12 +38,12 @@ const CheckoutPage: React.FC = () => {
         const { data } = await api.getMyProfile();
         if (data.deliveryAddress) {
           setShippingAddress({
+            region: data.deliveryAddress.state || '',
+            district: data.deliveryAddress.city || '',
+            ward: '',
             street: data.deliveryAddress.street || '',
-            city: data.deliveryAddress.city || '',
-            state: data.deliveryAddress.state || '',
             postalCode: data.deliveryAddress.postalCode || '',
-            country: data.deliveryAddress.country || '',
-            phone: data.deliveryAddress.phone || '',
+            phone: '', // Don't auto-fill phone number
             latitude: undefined,
             longitude: undefined,
           });
@@ -69,13 +70,63 @@ const CheckoutPage: React.FC = () => {
     setShippingAddress((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleLocationSelect = (location: { address: string; lat: number; lng: number }) => {
-    setShippingAddress((prev) => ({
-      ...prev,
-      street: location.address,
-      latitude: location.lat,
-      longitude: location.lng,
-    }));
+  const handleLocationSelect = useCallback((location: {
+    region: string;
+    district: string;
+    ward: string;
+    street: string;
+    postcode: string;
+    lat: number;
+    lng: number;
+  }) => {
+    setShippingAddress((prev) => {
+      // Only update if something actually changed to avoid re-renders
+      if (
+        prev.region === location.region &&
+        prev.district === location.district &&
+        prev.ward === location.ward &&
+        prev.street === location.street &&
+        prev.postalCode === location.postcode
+      ) {
+        return prev; // No change, don't update
+      }
+      
+      return {
+        region: location.region,
+        district: location.district,
+        ward: location.ward,
+        street: location.street,
+        postalCode: location.postcode,
+        latitude: location.lat,
+        longitude: location.lng,
+        phone: prev.phone, // Explicitly keep the phone number
+      };
+    });
+    // Reset address saved status when location changes
+    setAddressSaved(false);
+  }, []);
+
+  const handleSaveAddress = () => {
+    // Validate all required fields - check for both undefined and empty strings
+    if (!shippingAddress.region || shippingAddress.region.trim() === '' ||
+        !shippingAddress.district || shippingAddress.district.trim() === '' ||
+        !shippingAddress.ward || shippingAddress.ward.trim() === '' ||
+        !shippingAddress.street || shippingAddress.street.trim() === '' ||
+        !shippingAddress.phone || shippingAddress.phone.trim() === '') {
+      const missingFields = [];
+      if (!shippingAddress.region || shippingAddress.region.trim() === '') missingFields.push('Region');
+      if (!shippingAddress.district || shippingAddress.district.trim() === '') missingFields.push('District');
+      if (!shippingAddress.ward || shippingAddress.ward.trim() === '') missingFields.push('Ward/Area');
+      if (!shippingAddress.street || shippingAddress.street.trim() === '') missingFields.push('Street');
+      if (!shippingAddress.phone || shippingAddress.phone.trim() === '') missingFields.push('Phone Number');
+      
+      setError(`Please complete the following fields: ${missingFields.join(', ')}`);
+      return;
+    }
+
+    setAddressSaved(true);
+    setError('');
+    alert('✓ Shipping address saved successfully!');
   };
 
   const handlePlaceOrder = async (e: React.FormEvent) => {
@@ -83,8 +134,23 @@ const CheckoutPage: React.FC = () => {
     setLoading(true);
     setError('');
 
-    if (!shippingAddress.street || !shippingAddress.city || !shippingAddress.phone) {
-      const errorMessage = t('please_complete_shipping_address');
+    // Check if address has been saved
+    if (!addressSaved) {
+      setError('Please save your shipping address before placing the order');
+      setLoading(false);
+      return;
+    }
+
+    // Detailed validation with specific error messages
+    const missingFields = [];
+    if (!shippingAddress.region || shippingAddress.region.trim() === '') missingFields.push('Region');
+    if (!shippingAddress.district || shippingAddress.district.trim() === '') missingFields.push('District');
+    if (!shippingAddress.ward || shippingAddress.ward.trim() === '') missingFields.push('Ward/Area');
+    if (!shippingAddress.street || shippingAddress.street.trim() === '') missingFields.push('Street');
+    if (!shippingAddress.phone || shippingAddress.phone.trim() === '') missingFields.push('Phone Number');
+
+    if (missingFields.length > 0) {
+      const errorMessage = `Please complete the following fields: ${missingFields.join(', ')}`;
       setError(errorMessage);
       setLoading(false);
       return;
@@ -96,7 +162,12 @@ const CheckoutPage: React.FC = () => {
         quantity: item.quantity,
       })),
       shippingAddress: {
-        ...shippingAddress,
+        street: `${shippingAddress.street}, ${shippingAddress.ward}`,
+        city: shippingAddress.district,
+        state: shippingAddress.region,
+        postalCode: shippingAddress.postalCode,
+        country: 'Tanzania',
+        phone: shippingAddress.phone,
         latitude: shippingAddress.latitude,
         longitude: shippingAddress.longitude,
       },
@@ -140,79 +211,21 @@ const CheckoutPage: React.FC = () => {
           <Col md={8}>
             {/* Shipping Address Form */}
             <Card className="mb-4">
-              <Card.Header>
-                <h5>{t('shipping_address')}</h5>
+              <Card.Header className="d-flex justify-content-between align-items-center">
+                <h5 className="mb-0">{t('shipping_address')}</h5>
+                {addressSaved && (
+                  <span className="badge bg-success">✓ Address Saved</span>
+                )}
               </Card.Header>
               <Card.Body>
+                <TanzaniaLocationSelector
+                  onLocationSelect={handleLocationSelect}
+                  initialRegion={shippingAddress.region}
+                  initialDistrict={shippingAddress.district}
+                  initialWard={shippingAddress.ward}
+                  initialStreet={shippingAddress.street}
+                />
                 <Row>
-                  <Col md={12}>
-                    <Form.Group className="mb-3">
-                      <Form.Label>{t('street_address')}{t('required_field_suffix')}</Form.Label>
-                      <Form.Control
-                        type="text"
-                        name="street"
-                        value={shippingAddress.street}
-                        onChange={handleInputChange}
-                        required
-                        placeholder={t('enter_street_address')}
-                      />
-                      <div className="mt-2">
-                        <LocationPicker
-                          onLocationSelect={handleLocationSelect}
-                          initialAddress={shippingAddress.street}
-                        />
-                      </div>
-                    </Form.Group>
-                  </Col>
-                  <Col md={6}>
-                    <Form.Group className="mb-3">
-                      <Form.Label>{t('city')}{t('required_field_suffix')}</Form.Label>
-                      <Form.Control
-                        type="text"
-                        name="city"
-                        value={shippingAddress.city}
-                        onChange={handleInputChange}
-                        required
-                        placeholder={t('enter_city')}
-                      />
-                    </Form.Group>
-                  </Col>
-                  <Col md={6}>
-                    <Form.Group className="mb-3">
-                      <Form.Label>{t('state_province')}</Form.Label>
-                      <Form.Control
-                        type="text"
-                        name="state"
-                        value={shippingAddress.state}
-                        onChange={handleInputChange}
-                        placeholder={t('enter_state_province')}
-                      />
-                    </Form.Group>
-                  </Col>
-                  <Col md={6}>
-                    <Form.Group className="mb-3">
-                      <Form.Label>{t('postal_code')}</Form.Label>
-                      <Form.Control
-                        type="text"
-                        name="postalCode"
-                        value={shippingAddress.postalCode}
-                        onChange={handleInputChange}
-                        placeholder={t('enter_postal_code')}
-                      />
-                    </Form.Group>
-                  </Col>
-                  <Col md={6}>
-                    <Form.Group className="mb-3">
-                      <Form.Label>{t('country')}</Form.Label>
-                      <Form.Control
-                        type="text"
-                        name="country"
-                        value={shippingAddress.country}
-                        onChange={handleInputChange}
-                        placeholder={t('enter_country')}
-                      />
-                    </Form.Group>
-                  </Col>
                   <Col md={12}>
                     <Form.Group className="mb-3">
                       <Form.Label>{t('phone_number')}{t('required_field_suffix')}</Form.Label>
@@ -220,13 +233,44 @@ const CheckoutPage: React.FC = () => {
                         type="tel"
                         name="phone"
                         value={shippingAddress.phone}
-                        onChange={handleInputChange}
+                        onChange={(e) => {
+                          setShippingAddress(prev => ({ ...prev, phone: e.target.value }));
+                          setAddressSaved(false);
+                        }}
                         required
-                        placeholder={t('enter_phone_number')}
+                        placeholder="e.g., +255 712 345 678"
+                        maxLength={15}
                       />
                     </Form.Group>
                   </Col>
                 </Row>
+                <div className="d-grid gap-2">
+                  <Button 
+                    variant={addressSaved ? "success" : "primary"}
+                    onClick={handleSaveAddress}
+                    type="button"
+                    disabled={
+                      !shippingAddress.region || shippingAddress.region.trim() === '' ||
+                      !shippingAddress.district || shippingAddress.district.trim() === '' ||
+                      !shippingAddress.ward || shippingAddress.ward.trim() === '' ||
+                      !shippingAddress.street || shippingAddress.street.trim() === '' ||
+                      !shippingAddress.phone || shippingAddress.phone.trim() === ''
+                    }
+                  >
+                    {addressSaved ? '✓ Address Saved' : 'Save Shipping Address'}
+                  </Button>
+                  {(
+                    !shippingAddress.region || shippingAddress.region.trim() === '' ||
+                    !shippingAddress.district || shippingAddress.district.trim() === '' ||
+                    !shippingAddress.ward || shippingAddress.ward.trim() === '' ||
+                    !shippingAddress.street || shippingAddress.street.trim() === '' ||
+                    !shippingAddress.phone || shippingAddress.phone.trim() === ''
+                  ) && (
+                    <small className="text-muted text-center">
+                      Complete all fields above to save address
+                    </small>
+                  )}
+                </div>
               </Card.Body>
             </Card>
 
@@ -358,12 +402,16 @@ const CheckoutPage: React.FC = () => {
                   className="w-100"
                   size="lg"
                   type="submit"
-                  disabled={loading}
+                  disabled={loading || !addressSaved}
                 >
                   {loading ? (
                     <>
                       <Spinner animation="border" size="sm" className="me-2" />
                       {t('processing')}
+                    </>
+                  ) : !addressSaved ? (
+                    <>
+                      🔒 Save Address First
                     </>
                   ) : (
                     t('place_order')

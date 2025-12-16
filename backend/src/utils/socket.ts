@@ -12,13 +12,21 @@ export const getSocketIO = (): Server | null => {
 
 export const emitToSeller = (sellerId: string, event: string, data: any) => {
   if (io) {
+    console.log(`[SOCKET] Emitting '${event}' to seller room: seller-${sellerId}`, data);
     io.to(`seller-${sellerId}`).emit(event, data);
   }
 };
 
 export const emitToUser = (userId: string, event: string, data: any) => {
   if (io) {
+    console.log(`[SOCKET] Emitting '${event}' to user room: user-${userId}`, data);
     io.to(`user-${userId}`).emit(event, data);
+  }
+};
+
+export const emitToRider = (riderId: string, event: string, data: any) => {
+  if (io) {
+    io.to(`rider-${riderId}`).emit(event, data);
   }
 };
 

@@ -113,7 +113,7 @@ const MyOrdersPage: React.FC = () => {
                     <td>{new Date(order.createdAt).toLocaleDateString()}</td>
                     <td>{order.items.length} {t('items')}</td>
                     <td>
-                      <strong>{t('price_amount', { amount: order.totalAmount.toFixed(2) })}</strong>
+                      <strong>{t('price_with_currency_display', { amount: order.totalAmount.toFixed(2) })}</strong>
                     </td>
                     <td>{getStatusBadge(order.status)}</td>
                     <td>
@@ -187,7 +187,7 @@ const MyOrdersPage: React.FC = () => {
                     <tr key={index}>
                       <td>{item.productName}</td>
                       <td>{item.quantity}</td>
-                      <td>{t('price_amount', { amount: item.price.toFixed(2) })}</td>
+                      <td>{t('price_with_currency_display', { amount: item.price.toFixed(2) })}</td>
                       <td>{t('price_with_currency_display', { amount: (item.price * item.quantity).toFixed(2) })}</td>
                     </tr>
                   ))}
