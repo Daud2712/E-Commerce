@@ -38,24 +38,62 @@ export const checkout = async (req: AuthRequest, res: Response) => {
         throw new Error('Invalid item in cart data.');
       }
 
-      const product = await Product.findById(productId).session(session);
+      // First, fetch the product to validate and get details
+      const product = await Product.findById(productId, null, { session });
 
       if (!product || product.deleted) {
         throw new Error(`Product not found or is unavailable: ${productId}`);
       }
 
+      console.log(`[CHECKOUT] Product: ${product.name}, Current Stock: ${product.stock}, Requested: ${quantity}`);
+
       if (product.stock < quantity) {
         throw new Error(`Insufficient stock for ${product.name}. Available: ${product.stock}, Requested: ${quantity}`);
       }
 
-      product.stock -= quantity;
-      
-      // Mark product as unavailable if stock becomes 0
-      if (product.stock === 0) {
-        product.isAvailable = false;
+      const oldStock = product.stock;
+      const newStock = product.stock - quantity;
+
+      console.log(`[CHECKOUT] Deducting stock for ${product.name}: ${oldStock} -> ${newStock}`);
+
+      // Use atomic update operation to deduct stock and update availability
+      const updateData: any = {
+        $inc: { stock: -quantity }
+      };
+
+      // Mark product as unavailable if stock will become 0
+      if (newStock === 0) {
+        updateData.isAvailable = false;
+        console.log(`[CHECKOUT] Marking ${product.name} as unavailable (sold out)`);
       }
-      
-      await product.save({ session });
+
+      // Perform atomic update
+      const updatedProduct = await Product.findByIdAndUpdate(
+        productId,
+        updateData,
+        {
+          session,
+          new: true,
+          runValidators: true
+        }
+      );
+
+      if (!updatedProduct) {
+        throw new Error(`Failed to update stock for ${product.name}`);
+      }
+
+      console.log(`[CHECKOUT] Stock updated successfully for ${product.name}. New stock: ${updatedProduct.stock}`);
+
+      // Notify seller if product is now out of stock
+      if (newStock === 0 && product.seller) {
+        emitToSeller(product.seller.toString(), 'productOutOfStock', {
+          productId: product._id,
+          productName: product.name,
+          message: `${product.name} is now out of stock`,
+          timestamp: new Date()
+        });
+        console.log(`[CHECKOUT] Notified seller about out-of-stock product: ${product.name}`);
+      }
 
       orderItems.push({
         product: product._id,
@@ -79,8 +117,12 @@ export const checkout = async (req: AuthRequest, res: Response) => {
 
     const [order] = await Order.create([orderData], { session });
 
+    console.log(`[CHECKOUT] Order created: ${order._id}, committing transaction...`);
+
     await session.commitTransaction();
     session.endSession();
+
+    console.log(`[CHECKOUT] Transaction committed successfully for order: ${order._id}`);
 
     // Get unique seller IDs from the order items
     const sellerIds = new Set<string>();
@@ -437,13 +479,22 @@ export const cancelOrder = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ message: 'Can only cancel pending orders.' });
     }
 
-    // Restore stock
+    // Restore stock using atomic operations
     for (const item of order.items) {
-      const product = await Product.findById(item.product).session(session);
-      if (product) {
-        product.stock += item.quantity;
-        product.isAvailable = true;
-        await product.save({ session });
+      const updatedProduct = await Product.findByIdAndUpdate(
+        item.product,
+        {
+          $inc: { stock: item.quantity },
+          isAvailable: true
+        },
+        {
+          session,
+          new: true
+        }
+      );
+
+      if (updatedProduct) {
+        console.log(`[CANCEL] Stock restored for ${item.productName}: +${item.quantity}, New stock: ${updatedProduct.stock}`);
       }
     }
 
