@@ -95,7 +95,7 @@ export interface IOrder {
   buyer: User;
   items: IOrderItem[];
   totalAmount: number;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'received' | 'cancelled';
   shippingAddress: {
     street?: string;
     city?: string;
@@ -104,8 +104,12 @@ export interface IOrder {
     country?: string;
     phone?: string;
   };
+  paymentStatus?: 'pending' | 'paid' | 'failed';
+  paymentMethod?: 'cash' | 'azampay' | 'pending';
   assignedRider?: string; // Rider ID if assigned
   hasDelivery?: boolean; // Whether a delivery record exists
+  deliveryStatus?: 'pending' | 'assigned' | 'in_transit' | 'delivered' | 'received'; // Actual delivery status from rider
+  riderAccepted?: boolean; // Whether rider accepted the delivery
   // ...existing code...
   createdAt: string;
   updatedAt: string;

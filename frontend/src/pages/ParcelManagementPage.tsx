@@ -184,6 +184,7 @@ const ParcelManagementPage: React.FC = () => {
                                     )}
                                 </td>
                                 <td>{getStatusBadge(order.status)}</td>
+                                <td>{getPaymentBadge(order.paymentStatus || 'pending')}</td>
                                 <td>
                                     {order.status === 'pending' && (
                                         <Dropdown>
@@ -230,7 +231,25 @@ const ParcelManagementPage: React.FC = () => {
                                     )}
 
                                     {order.hasDelivery && (
-                                        <Badge bg="secondary">Rider Assigned - Status controlled by rider</Badge>
+                                        <div>
+                                            <Badge bg="secondary" className="mb-1 d-block">
+                                                Rider Managing Delivery
+                                            </Badge>
+                                            {order.deliveryStatus && (
+                                                <small className="text-muted d-block">
+                                                    Delivery: {order.deliveryStatus.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                                                </small>
+                                            )}
+                                            {order.riderAccepted === false && (
+                                                <Badge bg="warning" className="mt-1">Rider Rejected</Badge>
+                                            )}
+                                            {order.riderAccepted === true && (
+                                                <Badge bg="success" className="mt-1">Rider Accepted</Badge>
+                                            )}
+                                            {order.riderAccepted === null && order.deliveryStatus === 'assigned' && (
+                                                <Badge bg="info" className="mt-1">Awaiting Rider Response</Badge>
+                                            )}
+                                        </div>
                                     )}
 
                                     {!order.hasDelivery && order.status === 'shipped' && (

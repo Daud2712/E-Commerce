@@ -200,14 +200,42 @@ export const getAllOrders = async (req: AuthRequest, res: Response) => {
       .populate('items.product', 'name seller')
       .sort({ createdAt: -1 });
 
-    // Check if each order has an assigned delivery
+    // Check if each order has an assigned delivery and get delivery status
     const ordersWithDeliveryInfo = await Promise.all(
       sellerOrders.map(async (order) => {
         const delivery = await Delivery.findOne({ order: order._id, deleted: false });
+        const orderObj = order.toObject();
+        
+        // If delivery exists, use delivery status to determine order display status
+        if (delivery) {
+          // Map delivery status to order status for display
+          let displayStatus = orderObj.status;
+          if (delivery.status === 'in_transit') {
+            displayStatus = 'shipped';
+          } else if (delivery.status === 'delivered') {
+            displayStatus = 'delivered';
+          } else if (delivery.status === 'received') {
+            displayStatus = 'received';
+          } else if (delivery.status === 'assigned') {
+            displayStatus = 'processing';
+          }
+          
+          return {
+            ...orderObj,
+            status: displayStatus, // Override with delivery status
+            hasDelivery: true,
+            assignedRider: delivery.rider?.toString(),
+            deliveryStatus: delivery.status, // Include original delivery status
+            riderAccepted: delivery.riderAccepted
+          };
+        }
+        
         return {
-          ...order.toObject(),
-          hasDelivery: !!delivery,
-          assignedRider: delivery?.rider?.toString()
+          ...orderObj,
+          hasDelivery: false,
+          assignedRider: undefined,
+          deliveryStatus: undefined,
+          riderAccepted: undefined
         };
       })
     );
