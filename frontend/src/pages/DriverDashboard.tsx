@@ -151,6 +151,7 @@ const DriverDashboard = () => {
           <thead>
               <tr>
               <th>Tracking Number</th>
+              <th>Buyer</th>
               <th>Package</th>
               <th>Status</th>
               <th>Destination</th>
@@ -161,6 +162,14 @@ const DriverDashboard = () => {
               {deliveries.map((delivery) => (
               <tr key={delivery._id}>
                   <td>{delivery.trackingNumber}</td>
+                  <td>
+                    <div>
+                      <strong>{delivery.buyer?.name || 'N/A'}</strong>
+                    </div>
+                    {delivery.buyer?.email && (
+                      <small className="text-muted">{delivery.buyer.email}</small>
+                    )}
+                  </td>
                   <td>{delivery.packageName}</td>
                   <td>{delivery.status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</td>
                   <td>{formatAddress(delivery.buyer?.deliveryAddress)}</td>

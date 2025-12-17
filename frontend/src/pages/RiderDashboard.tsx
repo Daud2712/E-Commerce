@@ -206,6 +206,7 @@ const RiderDashboard = () => {
           <thead>
               <tr>
               <th>Tracking Number</th>
+              <th>Buyer</th>
               <th>Parcel</th>
               <th>Status</th>
               <th>Acceptance Status</th>
@@ -217,6 +218,14 @@ const RiderDashboard = () => {
               {deliveries.map((delivery) => (
               <tr key={delivery._id}>
                   <td>{delivery.trackingNumber}</td>
+                  <td>
+                    <div>
+                      <strong>{delivery.buyer?.name || 'N/A'}</strong>
+                    </div>
+                    {delivery.buyer?.email && (
+                      <small className="text-muted">{delivery.buyer.email}</small>
+                    )}
+                  </td>
                   <td>{delivery.packageName}</td>
                   <td>
                     <Badge bg={
