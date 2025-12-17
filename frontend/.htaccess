@@ -1,27 +1,34 @@
 # .htaccess for Frontend (Apache/cPanel)
 
-# Enable rewrite engine
-<IfModule mod_rewrite.c>
-  RewriteEngine On
-  
-  # Serve existing files and directories as-is
-  RewriteCond %{REQUEST_FILENAME} -f [OR]
-  RewriteCond %{REQUEST_FILENAME} -d
-  RewriteRule ^ - [L]
-  
-  # Route all other requests to index.html for React Router
-  RewriteRule ^ index.html [L]
-</IfModule>
-
-# Proper MIME types
+# Proper MIME types - Set this first
 <IfModule mod_mime.c>
   AddType text/css .css
-  AddType application/javascript .js
+  AddType application/javascript .js .mjs
   AddType image/jpeg .jpg .jpeg
   AddType image/png .png
   AddType image/gif .gif
   AddType image/svg+xml .svg
   AddType audio/mpeg .mp3
+</IfModule>
+
+# Enable rewrite engine
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  
+  # Don't rewrite if file exists
+  RewriteCond %{REQUEST_FILENAME} -f
+  RewriteRule ^ - [L]
+  
+  # Don't rewrite if directory exists  
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+  
+  # Don't rewrite assets folder
+  RewriteRule ^assets/ - [L]
+  
+  # Route everything else to index.html for React Router
+  RewriteRule ^ /index.html [L]
 </IfModule>
 
 # Compression
