@@ -106,7 +106,7 @@ export const getImageUrl = (imagePath: string): string => {
     return imagePath;
   }
   // Otherwise prepend the backend URL
-  const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5002/api';
+  const baseURL = import.meta.env.VITE_API_URL || 'https://e-commerce-backend-g1t5.onrender.com/api';
   const backendURL = baseURL.replace('/api', '');
   return `${backendURL}${imagePath}`;
 };
