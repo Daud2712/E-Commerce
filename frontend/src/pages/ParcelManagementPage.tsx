@@ -142,6 +142,7 @@ const ParcelManagementPage: React.FC = () => {
                             <th>Shipping Address</th>
                             <th>Status</th>
                             <th>Payment</th>
+                            <th>Rider Status</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -196,6 +197,23 @@ const ParcelManagementPage: React.FC = () => {
                                 <td>{getStatusBadge(order)}</td>
                                 <td>{getPaymentBadge(order.paymentStatus || 'pending')}</td>
                                 <td>
+                                    {order.hasDelivery ? (
+                                        <div>
+                                            {order.riderAccepted === null && (
+                                                <Badge bg="warning">⏳ Pending</Badge>
+                                            )}
+                                            {order.riderAccepted === true && (
+                                                <Badge bg="success">✓ Accepted</Badge>
+                                            )}
+                                            {order.riderAccepted === false && (
+                                                <Badge bg="danger">✗ Rejected</Badge>
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <span className="text-muted">-</span>
+                                    )}
+                                </td>
+                                <td>
                                     {order.status === 'pending' && (
                                         <Dropdown>
                                             <Dropdown.Toggle variant="primary" size="sm">
@@ -241,9 +259,33 @@ const ParcelManagementPage: React.FC = () => {
                                     )}
 
                                     {order.hasDelivery && (
-                                        <Badge bg="secondary">
-                                            Rider Managing
-                                        </Badge>
+                                        <div>
+                                            <Dropdown>
+                                                <Dropdown.Toggle variant="secondary" size="sm">
+                                                    Change Rider
+                                                </Dropdown.Toggle>
+                                                <Dropdown.Menu>
+                                                    {riders.filter(r => r.isAvailable).length === 0 && (
+                                                        <Dropdown.Item disabled>
+                                                            No available riders
+                                                        </Dropdown.Item>
+                                                    )}
+                                                    {riders.filter(r => r.isAvailable).map(rider => (
+                                                        <Dropdown.Item
+                                                            key={rider._id}
+                                                            onClick={() => handleAssignRider(order._id!, rider._id)}
+                                                        >
+                                                            {rider.name} (Available)
+                                                        </Dropdown.Item>
+                                                    ))}
+                                                    {riders.filter(r => !r.isAvailable).map(rider => (
+                                                        <Dropdown.Item key={rider._id} disabled>
+                                                            {rider.name} (Busy)
+                                                        </Dropdown.Item>
+                                                    ))}
+                                                </Dropdown.Menu>
+                                            </Dropdown>
+                                        </div>
                                     )}
 
                                     {!order.hasDelivery && order.status === 'shipped' && (
