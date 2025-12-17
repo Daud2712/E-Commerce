@@ -6,6 +6,17 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  height: 100vh; /* Ensure body takes full viewport height */
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Ensure root div takes at least full viewport height */
+}
+
+main {
+  flex: 1; /* Allows the main content area to grow and push the footer down */
 }
 
 code {

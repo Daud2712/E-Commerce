@@ -1,8 +1,11 @@
 import axios from 'axios';
 import { RegisterFormData, LoginFormData, Delivery, User, UpdateProfileData } from '../types';
 
+// Single source of truth for the API base URL
+const BASE_URL = import.meta.env.VITE_API_URL || 'https://e-commerce-backend-g1t5.onrender.com/api';
+
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5002/api',
+  baseURL: BASE_URL,
 });
 
 API.interceptors.request.use((req) => {
@@ -101,14 +104,21 @@ API.interceptors.response.use(
 // Helper function to get full image URL
 export const getImageUrl = (imagePath: string): string => {
   if (!imagePath) return '';
-  // If path already has http/https, return as is
+
+  // If the path is already a full URL, return it as is.
   if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
     return imagePath;
   }
-  // Otherwise prepend the backend URL
-  const baseURL = import.meta.env.VITE_API_URL || 'https://e-commerce-backend-g1t5.onrender.com/api';
-  const backendURL = baseURL.replace('/api', '');
-  return `${backendURL}${imagePath}`;
+
+  // Construct the full URL using a base URL that doesn't include the /api path.
+  const backendURL = BASE_URL.replace('/api', '');
+  
+  // Use the URL constructor for robust path joining.
+  // It correctly handles slashes, preventing duplicates or missing ones.
+  const fullUrl = new URL(imagePath, backendURL);
+  
+  return fullUrl.href;
 };
+
 
 export default API;
