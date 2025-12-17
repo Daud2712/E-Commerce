@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Container, Alert, Table, Spinner, Tabs, Tab, Nav, Form, Button, Card, Row, Col } from 'react-bootstrap';
 import * as api from '../services/api';
 import { Delivery, User, DeliveryAddress } from '../types';
-import { useTranslation } from 'react-i18next'; // Import useTranslation
 
 const BuyerDashboard = () => {
   const [delivery, setDelivery] = useState<Delivery | null>(null);
@@ -10,7 +9,6 @@ const BuyerDashboard = () => {
   const [error, setError] = useState('');
   const [trackingNumber, setTrackingNumber] = useState('');
   const [activeTab, setActiveTab] = useState('deliveries'); // New state for active tab
-  const { t } = useTranslation(); // Initialize useTranslation
 
   // Profile state
   const [profile, setProfile] = useState<User | null>(null);
@@ -59,14 +57,14 @@ const BuyerDashboard = () => {
           const { data } = await api.getBuyerDeliveries();
           setOrderHistory(data);
         } catch (err: any) {
-          setOrderHistoryError(err.response?.data?.message || t('buyer_deliveries_fetch_error'));
+          setOrderHistoryError(err.response?.data?.message || 'Failed to fetch deliveries');
         } finally {
           setOrderHistoryLoading(false);
         }
       };
       fetchOrderHistory();
     }
-  }, [activeTab, profile?._id, t]); // Added t to dependencies due to its use in fetchOrderHistory
+  }, [activeTab, profile?._id]);
 
   const handleTrackDelivery = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,7 +72,7 @@ const BuyerDashboard = () => {
     setDelivery(null);
 
     if (!trackingNumber.trim()) {
-      setError(t('please_enter_tracking_number'));
+      setError('Please enter a tracking number');
       return;
     }
 
@@ -84,13 +82,13 @@ const BuyerDashboard = () => {
 
       // Verify this delivery belongs to the current user (buyer)
       if (profile && data.buyer._id !== profile._id) {
-        setError(t('tracking_number_not_yours'));
+        setError('This tracking number does not belong to you');
         setDelivery(null);
       } else {
         setDelivery(data);
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || t('delivery_not_found'));
+      setError(err.response?.data?.message || 'Delivery not found');
       setDelivery(null);
     } finally {
       setLoading(false);
@@ -109,7 +107,7 @@ const BuyerDashboard = () => {
             setDeliveryAddress(data.deliveryAddress);
           }
         } catch (err: any) {
-          setProfileError(err.response?.data?.message || t('failed_to_load_profile'));
+          setProfileError(err.response?.data?.message || 'Failed to load profile');
         } finally {
           setProfileLoading(false);
         }
@@ -130,9 +128,9 @@ const BuyerDashboard = () => {
       setProfileSuccess('');
       const { data } = await api.updateProfile({ deliveryAddress });
       setProfile(data.user);
-      setProfileSuccess(t('profile_updated_successfully'));
+      setProfileSuccess('Profile updated successfully');
     } catch (err: any) {
-      setProfileError(err.response?.data?.message || t('failed_to_update_profile'));
+      setProfileError(err.response?.data?.message || 'Failed to update profile');
     } finally {
       setProfileLoading(false);
     }
@@ -143,7 +141,7 @@ const BuyerDashboard = () => {
       const { data } = await api.receiveDelivery(deliveryId);
       setDelivery(data); // Update the single delivery
     } catch (err: any) {
-      setError(err.response?.data?.message || t('buyer_receive_delivery_error'));
+      setError(err.response?.data?.message || 'Failed to confirm delivery');
     }
   };
 
@@ -152,13 +150,13 @@ const BuyerDashboard = () => {
       const { data } = await api.unreceiveDelivery(deliveryId);
       setDelivery(data); // Update the single delivery
     } catch (err: any) {
-      setError(err.response?.data?.message || t('failed_to_undo_received_status'));
+      setError(err.response?.data?.message || 'Failed to undo received status');
     }
   };
 
   return (
     <Container>
-      <h2>{t('buyer_dashboard_title')}</h2>
+      <h2>Buyer Dashboard</h2>
 
 
       {/* Delivery Address Required Alert */}
@@ -167,10 +165,10 @@ const BuyerDashboard = () => {
           <Row className="align-items-center">
             <Col md={9}>
               <h5 className="mb-2">
-                <strong>⚠️ {t('delivery_address_required')}</strong>
+                <strong>⚠️ Delivery Address Required</strong>
               </h5>
               <p className="mb-0">
-                {t('delivery_address_required_text')}
+                Please add your delivery address to receive orders
               </p>
             </Col>
             <Col md={3} className="text-md-end">
@@ -179,7 +177,7 @@ const BuyerDashboard = () => {
                 size="sm"
                 onClick={() => setActiveTab('profile')}
               >
-                {t('add_address_now')}
+                Add Address Now
               </Button>
             </Col>
           </Row>
@@ -192,13 +190,13 @@ const BuyerDashboard = () => {
           <Row className="align-items-center">
             <Col md={8}>
               <h5 className="mb-0">
-                <strong>{t('your_registration_number')}</strong>{' '}
+                <strong>Your Registration Number</strong>{' '}
                 <span className="text-primary" style={{ fontSize: '1.3em', fontWeight: 'bold' }}>
                   {profile?.registrationNumber}
                 </span>
               </h5>
               <small className="text-muted">
-                {t('share_registration_number')}
+                Share this number with sellers to receive parcels
               </small>
             </Col>
             <Col md={4} className="text-md-end">
@@ -207,10 +205,10 @@ const BuyerDashboard = () => {
                 size="sm"
                 onClick={() => {
                   navigator.clipboard.writeText(profile?.registrationNumber || '');
-                  alert(t('registration_number_copied'));
+                  alert('Registration number copied to clipboard!');
                 }}
               >
-                📋 {t('copy_number')}
+                📋 Copy Number
               </Button>
             </Col>
           </Row>
@@ -224,17 +222,17 @@ const BuyerDashboard = () => {
         onSelect={(k) => setActiveTab(k!)}
         className="mb-3"
       >
-        <Tab eventKey="deliveries" title={t('track_package_tab')}>
-          <h4>{t('track_package_tab')}</h4>
+        <Tab eventKey="deliveries" title="Track Package">
+          <h4>Track Package</h4>
 
           <Form onSubmit={handleTrackDelivery} className="mb-4">
             <Row className="align-items-end">
               <Col md={9}>
                 <Form.Group controlId="trackingNumber">
-                  <Form.Label>{t('enter_tracking_number')}</Form.Label>
+                  <Form.Label>Enter Tracking Number</Form.Label>
                   <Form.Control
                     type="text"
-                    placeholder={t('enter_your_tracking_number')}
+                    placeholder="Enter your tracking number"
                     value={trackingNumber}
                     onChange={(e) => setTrackingNumber(e.target.value)}
                     required
@@ -243,7 +241,7 @@ const BuyerDashboard = () => {
               </Col>
               <Col md={3}>
                 <Button variant="primary" type="submit" className="w-100" disabled={loading}>
-                  {loading ? t('tracking') : t('track_parcel')}
+                  {loading ? 'Tracking...' : 'Track Parcel'}
                 </Button>
               </Col>
             </Row>
@@ -254,12 +252,12 @@ const BuyerDashboard = () => {
           {delivery && (
             <Card className="mb-4">
               <Card.Header>
-                <h5 className="mb-0">{t('delivery_details')}</h5>
+              <h5 className="mb-0">Delivery Details</h5>
               </Card.Header>
               <Card.Body>
                 <Row className="mb-3">
                   <Col md={12}>
-                    <strong>{t('tracking_number')}</strong>
+                    <strong>{'Tracking Number'}</strong>
                     <p className="text-primary" style={{ fontSize: '1.2em', fontWeight: 'bold' }}>
                       {delivery.trackingNumber}
                     </p>
@@ -268,7 +266,7 @@ const BuyerDashboard = () => {
 
                 <Row className="mb-3">
                   <Col md={12}>
-                    <strong>{t('status')}</strong>
+                    <strong>{'Status'}</strong>
                     <p>
                       <span
                         className={`badge ${
@@ -287,18 +285,18 @@ const BuyerDashboard = () => {
 
                 <Row className="mb-3">
                   <Col md={6}>
-                    <strong>{t('parcel_name')}</strong>
+                    <strong>{'Parcel Name'}</strong>
                     <p>{delivery.packageName}</p>
                   </Col>
                   <Col md={6}>
-                    <strong>{t('price')}</strong>
+                    <strong>{'Price'}</strong>
                     <p>{delivery.price ? t('price_with_currency_display', { amount: delivery.price.toLocaleString() }) : 'N/A'}</p>
                   </Col>
                 </Row>
 
                 <Row className="mb-3">
                   <Col md={12}>
-                    <strong>{t('seller')}</strong>
+                    <strong>{'Seller'}</strong>
                     <p>{delivery.seller.name}</p>
                   </Col>
                 </Row>
@@ -306,10 +304,10 @@ const BuyerDashboard = () => {
                 {delivery.status === 'delivered' && (
                   <Alert variant="success" className="mb-3">
                     <p className="mb-2">
-                      <strong>{t('parcel_delivered')}</strong>
+                      <strong>{'Parcel Delivered'}</strong>
                     </p>
                     <p className="mb-0">
-                      {t('confirm_parcel_reception')}
+                      {'Please confirm that you have received your parcel'}
                     </p>
                   </Alert>
                 )}
@@ -320,21 +318,21 @@ const BuyerDashboard = () => {
                     onClick={() => handleReceiveDelivery(delivery._id)}
                     className="w-100"
                   >
-                    {t('mark_as_received')}
+                    {'Mark As Received'}
                   </Button>
                 )}
 
                 {delivery.status === 'received' && (
                   <>
                     <Alert variant="info" className="mb-3">
-                      {t('confirmed_reception')}
+                      {'Confirmed Reception'}
                     </Alert>
                     <Button
                       variant="warning"
                       onClick={() => handleUnreceiveDelivery(delivery._id)}
                       className="w-100"
                     >
-                      {t('undo_received_status')}
+                      {'Undo Received Status'}
                     </Button>
                   </>
                 )}
@@ -342,13 +340,13 @@ const BuyerDashboard = () => {
             </Card>
           )}
         </Tab>
-        <Tab eventKey="profile" title={t('profile_tab')}>
-          <h4>{t('your_profile_title')}</h4>
+        <Tab eventKey="profile" title={'Profile'}>
+          <h4>{'Your Profile'}</h4>
 
           {/* Address Status Indicator */}
           {profile && profile.deliveryAddress?.street && profile.deliveryAddress?.city && profile.deliveryAddress?.phone && !profileLoading && (
             <Alert variant="success" className="mb-3">
-              ✅ {t('delivery_address_set_up')}
+              ✅ Delivery Address Set Up
             </Alert>
           )}
 
@@ -359,8 +357,8 @@ const BuyerDashboard = () => {
           {profile && !profileLoading && (
             <Card className="mb-4">
               <Card.Header>
-                <strong>{t('delivery_address')}</strong>
-                <small className="text-muted ms-2">{t('required_to_receive_deliveries')}</small>
+                <strong>{'Delivery Address'}</strong>
+                <small className="text-muted ms-2">{'Required to receive deliveries'}</small>
               </Card.Header>
               <Card.Body>
                 <Form onSubmit={handleSaveProfile}>
@@ -368,11 +366,11 @@ const BuyerDashboard = () => {
                     <Col md={6}>
                       <Form.Group className="mb-3">
                         <Form.Label>
-                          {t('street_address')} <span className="text-danger">*</span>
+                          {'Street Address'} <span className="text-danger">*</span>
                         </Form.Label>
                         <Form.Control
                           type="text"
-                          placeholder={t('enter_street_address')}
+                          placeholder={'Enter street address'}
                           value={deliveryAddress.street || ''}
                           onChange={(e) => handleAddressChange('street', e.target.value)}
                           required
@@ -382,11 +380,11 @@ const BuyerDashboard = () => {
                     <Col md={6}>
                       <Form.Group className="mb-3">
                         <Form.Label>
-                          {t('city')} <span className="text-danger">*</span>
+                          {'City'} <span className="text-danger">*</span>
                         </Form.Label>
                         <Form.Control
                           type="text"
-                          placeholder={t('enter_city')}
+                          placeholder={'Enter city'}
                           value={deliveryAddress.city || ''}
                           onChange={(e) => handleAddressChange('city', e.target.value)}
                           required
@@ -398,10 +396,10 @@ const BuyerDashboard = () => {
                   <Row>
                     <Col md={6}>
                       <Form.Group className="mb-3">
-                        <Form.Label>{t('state_province')}</Form.Label>
+                        <Form.Label>{'State/Province'}</Form.Label>
                         <Form.Control
                           type="text"
-                          placeholder={t('enter_state_province')}
+                          placeholder={'Enter state/province'}
                           value={deliveryAddress.state || ''}
                           onChange={(e) => handleAddressChange('state', e.target.value)}
                         />
@@ -409,10 +407,10 @@ const BuyerDashboard = () => {
                     </Col>
                     <Col md={6}>
                       <Form.Group className="mb-3">
-                        <Form.Label>{t('postal_code')}</Form.Label>
+                        <Form.Label>{'Postal Code'}</Form.Label>
                         <Form.Control
                           type="text"
-                          placeholder={t('enter_postal_code')}
+                          placeholder={'Enter postal code'}
                           value={deliveryAddress.postalCode || ''}
                           onChange={(e) => handleAddressChange('postalCode', e.target.value)}
                         />
@@ -423,10 +421,10 @@ const BuyerDashboard = () => {
                   <Row>
                     <Col md={6}>
                       <Form.Group className="mb-3">
-                        <Form.Label>{t('country')}</Form.Label>
+                        <Form.Label>{'Country'}</Form.Label>
                         <Form.Control
                           type="text"
-                          placeholder={t('enter_country')}
+                          placeholder={'Enter country'}
                           value={deliveryAddress.country || ''}
                           onChange={(e) => handleAddressChange('country', e.target.value)}
                         />
@@ -435,11 +433,11 @@ const BuyerDashboard = () => {
                     <Col md={6}>
                       <Form.Group className="mb-3">
                         <Form.Label>
-                          {t('phone_number')} <span className="text-danger">*</span>
+                          {'Phone Number'} <span className="text-danger">*</span>
                         </Form.Label>
                         <Form.Control
                           type="tel"
-                          placeholder={t('enter_phone_number')}
+                          placeholder={'Enter phone number'}
                           value={deliveryAddress.phone || ''}
                           onChange={(e) => handleAddressChange('phone', e.target.value)}
                           required
@@ -449,11 +447,11 @@ const BuyerDashboard = () => {
                   </Row>
 
                   <Form.Group className="mb-3">
-                    <Form.Label>{t('additional_information')}</Form.Label>
+                    <Form.Label>Additional Information</Form.Label>
                     <Form.Control
                       as="textarea"
                       rows={3}
-                      placeholder={t('additional_information_placeholder')}
+                      placeholder="e.g., Apartment number, landmarks, special instructions"
                       value={deliveryAddress.additionalInfo || ''}
                       onChange={(e) => handleAddressChange('additionalInfo', e.target.value)}
                     />
@@ -461,20 +459,20 @@ const BuyerDashboard = () => {
 
                   <Alert variant="info" className="mb-3">
                     <small>
-                      <strong>{t('note_prefix')}:</strong> {t('note_required_fields')}
+                      <strong>{'Note'}:</strong> {'Street, City, and Phone Number are required fields'}
                     </small>
                   </Alert>
 
                   <Button variant="primary" type="submit" disabled={profileLoading}>
-                    {profileLoading ? t('saving') : t('save_delivery_address')}
+                    {profileLoading ? 'Saving...' : 'Save Delivery Address'}
                   </Button>
                 </Form>
               </Card.Body>
             </Card>
           )}
         </Tab>
-        <Tab eventKey="orderHistory" title={t('order_history_tab')}>
-          <h4>{t('your_order_history_title')}</h4>
+        <Tab eventKey="orderHistory" title={'Order History'}>
+          <h4>{'Your Order History'}</h4>
           {orderHistoryLoading && <Spinner animation="border" />}
           {orderHistoryError && <Alert variant="danger">{orderHistoryError}</Alert>}
           {!orderHistoryLoading && !orderHistoryError && (
@@ -497,13 +495,13 @@ const BuyerDashboard = () => {
                       <td>{delivery.packageName}</td>
                       <td>{delivery.status.toUpperCase()}</td>
                       <td>{delivery.seller.name}</td>
-                      <td>{delivery.rider ? delivery.rider.name : t('not_yet_assigned_rider')}</td>
+                      <td>{delivery.rider ? delivery.rider.name : 'Not Yet Assigned'}</td>
                       <td>{delivery.price ? t('price_with_currency_display', { amount: delivery.price.toLocaleString() }) : 'N/A'}</td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={6}>{t('no_deliveries_found')}</td>
+                    <td colSpan={6}>{'No deliveries found'}</td>
                   </tr>
                 )}
               </tbody>

@@ -3,7 +3,6 @@ import { Container, Alert, Table, Spinner, Button, ButtonGroup, Form, Badge } fr
 import * as api from '../services/api';
 import { Delivery, User, DeliveryAddress, IOrder } from '../types';
 import { useAuth } from '../context/AuthContext';
-import { useTranslation } from 'react-i18next'; // Import useTranslation
 import socketService from '../services/socket';
 
 // Removed: import TrackingPage from './TrackingPage';
@@ -19,7 +18,6 @@ const RiderDashboard = () => {
   const [isRiderAvailable, setIsRiderAvailable] = useState<boolean | null>(null); // State for rider's availability
   const [availabilityLoading, setAvailabilityLoading] = useState(false); // Loading state for availability update
   const [availabilityError, setAvailabilityError] = useState(''); // Error for availability update
-  const { t } = useTranslation(); // Initialize useTranslation
 
   // Removed: const [activeTab, setActiveTab] = useState('myDeliveries');
 
@@ -36,7 +34,7 @@ const RiderDashboard = () => {
       setIsRiderAvailable(response.data.isAvailable);
     } catch (err: any) {
       console.error('Failed to fetch rider availability:', err);
-      setAvailabilityError(err.response?.data?.message || t('rider_fetch_availability_error'));
+      setAvailabilityError(err.response?.data?.message || 'Failed to fetch rider availability');
     } finally {
       setAvailabilityLoading(false);
     }
@@ -59,7 +57,7 @@ const RiderDashboard = () => {
       setDeliveries(data);
     } catch (err: any) { // Type assertion for error handling
       console.error('[RiderDashboard] Error fetching deliveries:', err);
-      setError(err.response?.data?.message || t('rider_fetch_deliveries_error'));
+      setError(err.response?.data?.message || 'Failed to fetch deliveries');
     } finally {
       setLoading(false);
     }
@@ -99,7 +97,7 @@ const RiderDashboard = () => {
       await api.updateDeliveryStatus(id, status);
       fetchDeliveries(); // Refresh the list
     } catch (err: any) { // Type assertion for error handling
-      setUpdateError(err.response?.data?.message || t('rider_update_status_error'));
+      setUpdateError(err.response?.data?.message || 'Failed to update delivery status');
     } finally {
       setUpdatingId(null); // Clear updating ID
     }
@@ -112,21 +110,21 @@ const RiderDashboard = () => {
       await api.acceptDelivery(id);
       fetchDeliveries(); // Refresh the list
     } catch (err: any) {
-      setUpdateError(err.response?.data?.message || t('failed_to_accept_delivery'));
+      setUpdateError(err.response?.data?.message || 'Failed to accept delivery');
     } finally {
       setUpdatingId(null);
     }
   };
 
   const handleRejectDelivery = async (id: string) => {
-    if (window.confirm(t('confirm_reject_delivery'))) {
+    if (window.confirm('Are you sure you want to reject this delivery?')) {
       setUpdatingId(id);
       setUpdateError('');
       try {
         await api.rejectDelivery(id);
         fetchDeliveries(); // Refresh the list
           } catch (err: any) {
-            setUpdateError(err.response?.data?.message || t('failed_to_reject_delivery'));      } finally {
+            setUpdateError(err.response?.data?.message || 'Failed to reject delivery');      } finally {
         setUpdatingId(null);
       }
     }
@@ -165,14 +163,14 @@ const RiderDashboard = () => {
       setIsRiderAvailable(newAvailability);
     } catch (err: any) {
       console.error('Failed to update rider availability:', err);
-      setAvailabilityError(err.response?.data?.message || t('rider_update_availability_error'));
+      setAvailabilityError(err.response?.data?.message || 'Failed to update availability');
     } finally {
       setAvailabilityLoading(false);
     }
   };
 
   const formatAddress = (address?: DeliveryAddress) => {
-    if (!address) return t('no_address_provided');
+    if (!address) return 'No address provided';
     const parts = [
       address.street,
       address.city,
@@ -181,7 +179,7 @@ const RiderDashboard = () => {
       address.country
     ].filter(Boolean);
 
-    if (parts.length === 0) return t('no_address_provided');
+    if (parts.length === 0) return 'No address provided';
 
     return (
       <div>
@@ -194,12 +192,12 @@ const RiderDashboard = () => {
 
   return (
     <Container>
-      <h2>{t('rider_dashboard_title')}</h2>
+      <h2>Rider Dashboard</h2>
       <hr />
       {/* Removed Tabs and Tab components */}
       <div className="mb-3">
-          <h4>{t('your_availability_title')}</h4>
-          {!user?._id && <Alert variant="warning">{t('rider_user_info_not_available')}</Alert>}
+          <h4>Your Availability</h4>
+          {!user?._id && <Alert variant="warning">User information not available</Alert>}
           {availabilityLoading && <Spinner animation="border" size="sm" />}
           {availabilityError && <Alert variant="danger">{availabilityError}</Alert>}
           {isRiderAvailable !== null ? (
@@ -207,20 +205,20 @@ const RiderDashboard = () => {
               <Form.Check
               type="switch"
               id="rider-availability-switch"
-              label={isRiderAvailable ? t('rider_status_free') : t('rider_status_busy')}
+              label={isRiderAvailable ? 'Available' : 'Busy'}
               checked={isRiderAvailable}
               onChange={handleRiderAvailabilityToggle}
               disabled={availabilityLoading}
               />
           </Form>
           ) : (
-          <p>{t('rider_loading_availability')}</p>
+          <p>Loading availability...</p>
           )}
       </div>
 
       <hr />
 
-      <h4>{t('your_assigned_deliveries_title')}</h4>
+      <h4>Your Assigned Deliveries</h4>
       {loading && <Spinner animation="border" />}
       {error && <Alert variant="danger">{error}</Alert>}
       {updateError && <Alert variant="danger">{updateError}</Alert>} {/* Display update error */}
@@ -294,7 +292,7 @@ const RiderDashboard = () => {
                         disabled={updatingId === delivery._id}
                         onClick={() => handleAcceptDelivery(delivery._id)}
                       >
-                        {updatingId === delivery._id ? t('processing_button') : t('accept_button')}
+                        {updatingId === delivery._id ? 'Processing...' : 'Accept'}
                       </Button>
                       <Button
                         size="sm"
@@ -302,7 +300,7 @@ const RiderDashboard = () => {
                         disabled={updatingId === delivery._id}
                         onClick={() => handleRejectDelivery(delivery._id)}
                       >
-                        {updatingId === delivery._id ? t('processing_button') : t('reject_button')}
+                        {updatingId === delivery._id ? 'Processing...' : 'Reject'}
                       </Button>
                     </ButtonGroup>
                   ) : delivery.riderAccepted === true ? (
@@ -314,7 +312,7 @@ const RiderDashboard = () => {
                           disabled={delivery.status === 'in_transit' || updatingId === delivery._id}
                           onClick={() => handleStatusUpdate(delivery._id, 'in_transit')}
                         >
-                          {updatingId === delivery._id ? t('updating_button') : t('in_transit_button')}
+                          {updatingId === delivery._id ? 'Updating...' : 'In Transit'}
                         </Button>
                         <Button
                           size="sm"
@@ -322,7 +320,7 @@ const RiderDashboard = () => {
                           disabled={delivery.status === 'delivered' || updatingId === delivery._id}
                           onClick={() => handleStatusUpdate(delivery._id, 'delivered')}
                         >
-                          {updatingId === delivery._id ? t('updating_button') : t('delivered_button')}
+                          {updatingId === delivery._id ? 'Updating...' : 'Delivered'}
                         </Button>
                       </ButtonGroup>
                       {(delivery.status === 'delivered' || delivery.status === 'received') && 
@@ -342,7 +340,7 @@ const RiderDashboard = () => {
                       )}
                     </div>
                   ) : (
-                    <span className="text-muted">{t('not_applicable_dash')}</span>
+                    <span className="text-muted">N/A</span>
                   )}
                   </td>
               </tr>

@@ -4,8 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import * as api from '../services/api';
 import { getImageUrl } from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { useTranslation } from 'react-i18next';
-
 interface Product {
   _id: string;
   name: string;
@@ -18,7 +16,6 @@ interface Product {
 }
 
 const InventoryPage: React.FC = () => {
-  const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
@@ -45,7 +42,7 @@ const InventoryPage: React.FC = () => {
       setLoading(false);
     } catch (err: any) {
       console.error('Failed to fetch products:', err);
-      setError(t('failed_to_fetch_products'));
+      setError('Failed to fetch products');
       setLoading(false);
     }
   };
@@ -89,7 +86,7 @@ const InventoryPage: React.FC = () => {
   if (loading) {
     return (
       <Container className="mt-5 text-center">
-        <p>{t('loading_products')}</p>
+        <p>{'Loading products...'}</p>
       </Container>
     );
   }

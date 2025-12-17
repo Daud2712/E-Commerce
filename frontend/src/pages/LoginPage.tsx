@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import * as api from '../services/api';
 import { UserRole } from '../types';
-import { useTranslation } from 'react-i18next'; // Import useTranslation
+// Import useTranslation
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -13,8 +13,6 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const auth = useAuth();
   const navigate = useNavigate();
-  const { t } = useTranslation(); // Initialize useTranslation
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -25,7 +23,7 @@ const LoginPage = () => {
       auth.login(data.token, data.userId, data.role);
     } catch (error: unknown) {
       const err = error as any;
-      setError(err.response?.data?.message || t('invalid_credentials_error')); // Translated error
+      setError(err.response?.data?.message || 'Invalid credentials'); // Translated error
     } finally {
       setLoading(false);
     }
@@ -46,14 +44,14 @@ const LoginPage = () => {
   return (
     <Container className="d-flex flex-column align-items-center justify-content-center min-vh-100 p-3">
       <div className="w-100" style={{ maxWidth: '500px' }}>
-        <h2 className="text-center mb-4">{t('login_title')}</h2>
+        <h2 className="text-center mb-4">Login</h2>
         {error && <Alert variant="danger">{error}</Alert>}
         <Form onSubmit={handleSubmit} className="p-4 border rounded shadow-sm bg-white">
           <Form.Group className="mb-3" controlId="formBasicEmail">
-            <Form.Label>{t('email_address_label')}</Form.Label>
+            <Form.Label>Email Address</Form.Label>
             <Form.Control
               type="email"
-              placeholder={t('enter_email_placeholder')}
+              placeholder="Enter email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -61,10 +59,10 @@ const LoginPage = () => {
           </Form.Group>
 
           <Form.Group className="mb-3" controlId="formBasicPassword">
-            <Form.Label>{t('password_label')}</Form.Label>
+            <Form.Label>Password</Form.Label>
             <Form.Control
               type="password"
-              placeholder={t('password_placeholder')}
+              placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -72,7 +70,7 @@ const LoginPage = () => {
           </Form.Group>
 
           <Button variant="primary" type="submit" className="w-100" disabled={loading}>
-            {loading ? t('logging_in_button') : t('login_button')}
+            {loading ? 'Logging in...' : 'Login'}
           </Button>
         </Form>
       </div>

@@ -5,15 +5,12 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import * as api from '../services/api';
 import { getImageUrl } from '../services/api';
-import { useTranslation } from 'react-i18next';
 import TanzaniaLocationSelector from '../components/TanzaniaLocationSelector';
 
 const CheckoutPage: React.FC = () => {
   const { cartItems, getCartTotal, clearCart } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { t } = useTranslation();
-
   const [shippingAddress, setShippingAddress] = useState({
     region: '',
     district: '',
@@ -181,14 +178,14 @@ const CheckoutPage: React.FC = () => {
 
       // Show success message and redirect
       alert(
-        t('order_placed_successfully', { orderId: data.order._id })
+        `Order placed successfully! Order ID: ${data.order._id}`
       );
       navigate('/buyer-dashboard'); // Redirect to buyer dashboard to view orders
     } catch (err: any) {
       console.error('Checkout error:', err);
       setError(
         err.response?.data?.message ||
-          t('checkout_failed')
+          'Checkout failed. Please try again.'
       );
     } finally {
       setLoading(false);
@@ -202,7 +199,7 @@ const CheckoutPage: React.FC = () => {
 
   return (
     <Container className="mt-5">
-      <h2 className="mb-4">{t('checkout')}</h2>
+      <h2 className="mb-4">Checkout</h2>
 
       {error && <Alert variant="danger">{error}</Alert>}
 
@@ -212,7 +209,7 @@ const CheckoutPage: React.FC = () => {
             {/* Shipping Address Form */}
             <Card className="mb-4">
               <Card.Header className="d-flex justify-content-between align-items-center">
-                <h5 className="mb-0">{t('shipping_address')}</h5>
+                <h5 className="mb-0">Shipping Address</h5>
                 {addressSaved && (
                   <span className="badge bg-success">✓ Address Saved</span>
                 )}
@@ -228,7 +225,7 @@ const CheckoutPage: React.FC = () => {
                 <Row>
                   <Col md={12}>
                     <Form.Group className="mb-3">
-                      <Form.Label>{t('phone_number')}{t('required_field_suffix')}</Form.Label>
+                      <Form.Label>Phone Number *</Form.Label>
                       <Form.Control
                         type="tel"
                         name="phone"
@@ -277,7 +274,7 @@ const CheckoutPage: React.FC = () => {
             {/* Payment Method Selection */}
             <Card className="mb-4">
               <Card.Header>
-                <h5>{t('payment_method')}</h5>
+                <h5>Payment Method</h5>
               </Card.Header>
               <Card.Body>
                 <Form.Group>
@@ -290,8 +287,8 @@ const CheckoutPage: React.FC = () => {
                         <div className="d-flex align-items-center">
                           <span className="fs-5 me-2">💵</span>
                           <div>
-                            <strong>{t('cash_on_delivery')}</strong>
-                            <div className="small text-muted">{t('pay_when_you_receive')}</div>
+                            <strong>Cash on Delivery</strong>
+                            <div className="small text-muted">Pay when you receive your order</div>
                           </div>
                         </div>
                       }
@@ -309,8 +306,8 @@ const CheckoutPage: React.FC = () => {
                         <div className="d-flex align-items-center">
                           <span className="fs-5 me-2">📱</span>
                           <div>
-                            <strong>{t('azam_pay')}</strong>
-                            <div className="small text-muted">{t('pay_via_phone')}</div>
+                            <strong>Azam Pay</strong>
+                            <div className="small text-muted">Pay via mobile money</div>
                           </div>
                         </div>
                       }
@@ -326,7 +323,7 @@ const CheckoutPage: React.FC = () => {
             {/* Order Items Review */}
             <Card className="mb-4">
               <Card.Header>
-                <h5>{t('review_items')}</h5>
+                <h5>Review Items</h5>
               </Card.Header>
               <Card.Body>
                 <Table responsive>
@@ -360,9 +357,9 @@ const CheckoutPage: React.FC = () => {
                           </div>
                         </td>
                         <td>{item.quantity}</td>
-                        <td>{t('price_with_currency_display', { amount: item.product.price.toFixed(2) })}</td>
+                        <td>TZS {item.product.price.toFixed(2)}</td>
                         <td>
-                          <strong>{t('price_with_currency_display', { amount: (item.product.price * item.quantity).toFixed(2) })}</strong>
+                          <strong>TZS {(item.product.price * item.quantity).toFixed(2)}</strong>
                         </td>
                       </tr>
                     ))}
@@ -376,25 +373,25 @@ const CheckoutPage: React.FC = () => {
             {/* Order Summary */}
             <Card className="mb-4" style={{ position: 'sticky', top: '20px' }}>
               <Card.Header>
-                <h5>{t('order_summary')}</h5>
+                <h5>Order Summary</h5>
               </Card.Header>
               <Card.Body>
                 <div className="d-flex justify-content-between mb-2">
-                  <span>{t('items')}{t('colon_separator')}</span>
+                  <span>Items:</span>
                   <span>{cartItems.reduce((total, item) => total + item.quantity, 0)}</span>
                 </div>
                 <div className="d-flex justify-content-between mb-2">
-                  <span>{t('subtotal')}{t('colon_separator')}</span>
-                  <span>{t('price_with_currency_display', { amount: getCartTotal().toFixed(2) })}</span>
+                  <span>Subtotal:</span>
+                  <span>TZS {getCartTotal().toFixed(2)}</span>
                 </div>
                 <div className="d-flex justify-content-between mb-2">
-                  <span>{t('shipping')}{t('colon_separator')}</span>
-                  <span className="text-success">{t('free')}</span>
+                  <span>Shipping:</span>
+                  <span className="text-success">Free</span>
                 </div>
                 <hr />
                 <div className="d-flex justify-content-between mb-3">
-                  <strong>{t('total')}{t('colon_separator')}</strong>
-                  <strong className="text-primary">{t('price_with_currency_display', { amount: getCartTotal().toFixed(2) })}</strong>
+                  <strong>Total:</strong>
+                  <strong className="text-primary">TZS {getCartTotal().toFixed(2)}</strong>
                 </div>
 
                 <Button
@@ -407,14 +404,14 @@ const CheckoutPage: React.FC = () => {
                   {loading ? (
                     <>
                       <Spinner animation="border" size="sm" className="me-2" />
-                      {t('processing')}
+                      Processing...
                     </>
                   ) : !addressSaved ? (
                     <>
                       🔒 Save Address First
                     </>
                   ) : (
-                    t('place_order')
+                    'Place Order'
                   )}
                 </Button>
 
@@ -424,7 +421,7 @@ const CheckoutPage: React.FC = () => {
                   onClick={() => navigate('/cart')}
                   disabled={loading}
                 >
-                  {t('back_to_cart')}
+                  Back to Cart
                 </Button>
               </Card.Body>
             </Card>
@@ -433,10 +430,10 @@ const CheckoutPage: React.FC = () => {
             <Card>
               <Card.Body className="small">
                 <p className="mb-2">
-                  <strong>🔒 {t('secure_checkout')}</strong>
+                  <strong>🔒 Secure Checkout</strong>
                 </p>
                 <p className="mb-0 text-muted">
-                  {t('secure_checkout_message')}
+                  Your information is protected and secure. We never share your personal details.
                 </p>
               </Card.Body>
             </Card>

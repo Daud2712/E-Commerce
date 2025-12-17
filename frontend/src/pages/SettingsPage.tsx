@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { deleteAccount } from '../services/api';
 import { useLanguage } from '../context/LanguageContext'; // Import useLanguage
-import { useTranslation } from 'react-i18next'; // Import useTranslation
+// Import useTranslation
 
 const SettingsPage: React.FC = () => {
     console.log("SettingsPage rendering...");
@@ -13,16 +13,14 @@ const SettingsPage: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
     const { language, changeLanguage } = useLanguage(); // Use useLanguage hook
-    const { t } = useTranslation(); // Initialize useTranslation
-
     const handleDeleteAccount = async () => {
         try {
             await deleteAccount();
             logout(); // Log out the user after successful deletion
             navigate('/'); // Redirect to home or login page
-            alert(t('your_account_deleted_alert')); // Translated alert
+            alert('Your account has been deleted'); // Translated alert
         } catch (err: any) {
-            setError(err.response?.data?.message || t('failed_to_delete_account_error')); // Translated error
+            setError(err.response?.data?.message || 'Failed to delete account'); // Translated error
         } finally {
             setShowDeleteModal(false);
         }
@@ -34,42 +32,42 @@ const SettingsPage: React.FC = () => {
 
     return (
         <Container className="my-5">
-            <h2 className="mb-4">{t('settings_title')}</h2>
+            <h2 className="mb-4">{'Settings'}</h2>
 
             {error && <Alert variant="danger">{error}</Alert>}
 
             <Card className="mb-4">
-                <Card.Header>{t('language_settings_header')}</Card.Header>
+                <Card.Header>{'Language Settings'}</Card.Header>
                 <Card.Body>
                     <Form.Group controlId="languageSelect">
-                        <Form.Label>{t('select_language_label')}</Form.Label>
+                        <Form.Label>{'Select Language'}</Form.Label>
                         <Form.Control as="select" value={language} onChange={handleLanguageChange}>
-                            <option value="en">{t('language_english')}</option>
-                            <option value="es">{t('language_spanish')}</option>
-                            <option value="fr">{t('language_french')}</option>
-                            <option value="sw">{t('language_swahili')}</option>
-                            <option value="de">{t('language_german')}</option>
-                            <option value="zh">{t('language_chinese')}</option>
+                            <option value="en">{'English'}</option>
+                            <option value="es">{'Spanish'}</option>
+                            <option value="fr">{'French'}</option>
+                            <option value="sw">{'Swahili'}</option>
+                            <option value="de">{'German'}</option>
+                            <option value="zh">{'Chinese'}</option>
                         </Form.Control>
                     </Form.Group>
                     <p className="mt-3 text-muted">
-                        {t('language_selection_note')}
+                        {'Select your preferred language for the interface'}
                     </p>
                 </Card.Body>
             </Card>
 
             {isAuthenticated && (
                 <Card border="danger">
-                    <Card.Header className="bg-danger text-white">{t('danger_zone_header')}</Card.Header>
+                    <Card.Header className="bg-danger text-white">{'Danger Zone'}</Card.Header>
                     <Card.Body>
-                        <Card.Title>{t('delete_account_title')}</Card.Title>
+                        <Card.Title>{'Delete Account'}</Card.Title>
                         <Card.Text>
-                            {t('delete_account_text')}
+                            {'Permanently delete your account and all data'}
                         </Card.Text>
                         <Button variant="outline-danger" onClick={() => {
                             setShowDeleteModal(true);
                         }}>
-                            {t('delete_my_account_button')}
+                            {'Delete My Account'}
                         </Button>
                     </Card.Body>
                 </Card>
@@ -77,17 +75,17 @@ const SettingsPage: React.FC = () => {
 
             <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
                 <Modal.Header closeButton>
-                    <Modal.Title>{t('confirm_account_deletion_title')}</Modal.Title>
+                    <Modal.Title>{'Confirm Account Deletion'}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    {t('confirm_account_deletion_body')}
+                    {'Are you sure you want to delete your account? This action cannot be undone.'}
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-                        {t('cancel_button')}
+                        {'Cancel'}
                     </Button>
                     <Button variant="danger" onClick={handleDeleteAccount}>
-                        {t('delete_account_button')}
+                        {'Delete Account'}
                     </Button>
                 </Modal.Footer>
             </Modal>

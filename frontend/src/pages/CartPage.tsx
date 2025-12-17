@@ -2,18 +2,15 @@ import React from 'react';
 import { Container, Row, Col, Card, Button, Table, Form, Alert } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
-import { useTranslation } from 'react-i18next';
 import { getImageUrl } from '../services/api';
 
 const CartPage: React.FC = () => {
   const { cartItems, removeFromCart, updateQuantity, getCartTotal, clearCart } = useCart();
   const navigate = useNavigate();
-  const { t } = useTranslation();
-
   const handleQuantityChange = (productId: string, newQuantity: number, maxStock: number) => {
     if (newQuantity < 1) return;
     if (newQuantity > maxStock) {
-      alert(t('quantity_exceeds_stock'));
+      alert('Quantity exceeds available stock');
       return;
     }
     updateQuantity(productId, newQuantity);
@@ -21,7 +18,7 @@ const CartPage: React.FC = () => {
 
   const handleCheckout = () => {
     if (cartItems.length === 0) {
-      alert(t('cart_is_empty'));
+      alert('Cart is empty');
       return;
     }
     navigate('/checkout');
@@ -31,11 +28,11 @@ const CartPage: React.FC = () => {
     return (
       <Container className="mt-5">
         <Alert variant="info">
-          <h4>{t('cart_is_empty')}</h4>
-          <p>{t('cart_empty_message')}</p>
+          <h4>Cart is Empty</h4>
+          <p>Your shopping cart is empty. Browse our products and add items to your cart.</p>
         </Alert>
         <Button variant="primary" onClick={() => navigate('/products')}>
-          {t('continue_shopping')}
+          Continue Shopping
         </Button>
       </Container>
     );
@@ -43,7 +40,7 @@ const CartPage: React.FC = () => {
 
   return (
     <Container className="mt-5">
-      <h2 className="mb-4">{t('shopping_cart')}</h2>
+      <h2 className="mb-4">Shopping Cart</h2>
 
       <Row>
         <Col md={8}>
@@ -77,7 +74,7 @@ const CartPage: React.FC = () => {
                               <div className="text-muted small">{item.product.category}</div>
                             )}
                             <div className="text-muted small">
-                              {t('available')}: {item.product.stock}
+                              Available: {item.product.stock}
                             </div>
                           </div>
                         </div>
@@ -108,7 +105,7 @@ const CartPage: React.FC = () => {
                           size="sm"
                           onClick={() => removeFromCart(item.product._id)}
                         >
-                          {t('remove')}
+                          Remove
                         </Button>
                       </td>
                     </tr>
@@ -120,10 +117,10 @@ const CartPage: React.FC = () => {
 
           <div className="mt-3">
             <Button variant="outline-secondary" onClick={() => navigate('/products')}>
-              {t('continue_shopping')}
+              {'Continue Shopping'}
             </Button>
             <Button variant="outline-danger" className="ms-2" onClick={clearCart}>
-              {t('clear_cart')}
+              Clear Cart
             </Button>
           </div>
         </Col>
@@ -131,20 +128,20 @@ const CartPage: React.FC = () => {
         <Col md={4}>
           <Card>
             <Card.Header>
-              <h5>{t('order_summary')}</h5>
+              <h5>Order Summary</h5>
             </Card.Header>
             <Card.Body>
               <div className="d-flex justify-content-between mb-2">
-                <span>{t('items')}{t('colon_separator')}</span>
+                <span>Items:</span>
                 <span>{cartItems.reduce((total, item) => total + item.quantity, 0)}</span>
               </div>
               <div className="d-flex justify-content-between mb-2">
-                <span>{t('subtotal')}{t('colon_separator')}</span>
+                <span>Subtotal:</span>
                 <span>TZS {getCartTotal().toLocaleString()}</span>
               </div>
               <hr />
               <div className="d-flex justify-content-between mb-3">
-                <strong>{t('total')}{t('colon_separator')}</strong>
+                <strong>Total:</strong>
                 <strong className="text-primary">TZS {getCartTotal().toLocaleString()}</strong>
               </div>
               <Button
@@ -153,18 +150,18 @@ const CartPage: React.FC = () => {
                 size="lg"
                 onClick={handleCheckout}
               >
-                {t('proceed_to_checkout')}
+                Proceed to Checkout
               </Button>
             </Card.Body>
           </Card>
 
           <Card className="mt-3">
             <Card.Body>
-              <h6>{t('cart_tips_title')}</h6>
+              <h6>Shopping Tips</h6>
               <ul className="small">
-                <li>{t('cart_tip_1')}</li>
-                <li>{t('cart_tip_2')}</li>
-                <li>{t('cart_tip_3')}</li>
+                <li>Free shipping on all orders</li>
+                <li>Cash on delivery available</li>
+                <li>Contact seller for product inquiries</li>
               </ul>
             </Card.Body>
           </Card>

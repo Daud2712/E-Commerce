@@ -6,15 +6,11 @@ import { useAuth } from '../context/AuthContext';
 import { IProduct, UserRole } from '../types';
 import * as api from '../services/api';
 import { getImageUrl } from '../services/api';
-import { useTranslation } from 'react-i18next';
-
 const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const { user } = useAuth(); // Import useAuth to access user role
-  const { t } = useTranslation();
-
   const [product, setProduct] = useState<IProduct | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -31,7 +27,7 @@ const ProductDetailPage: React.FC = () => {
         const { data } = await api.getProductById(id);
         setProduct(data);
       } catch (err: any) {
-        setError(err.response?.data?.message || t('failed_to_fetch_product_details'));
+        setError(err.response?.data?.message || 'Failed to fetch product details');
       } finally {
         setLoading(false);
       }
@@ -42,7 +38,7 @@ const ProductDetailPage: React.FC = () => {
 
   const handleAddToCart = () => {
     if (!user) {
-      alert(t('please_login_to_continue'));
+      alert('Please login to continue');
       navigate('/login');
       return;
     }
@@ -54,17 +50,17 @@ const ProductDetailPage: React.FC = () => {
     }
 
     addToCart(product, quantity);
-    alert(`${t('added_to_cart')}: ${quantity} x ${product.name}`);
+    alert(`${'Added to cart'}: ${quantity} x ${product.name}`);
   };
 
   const handleBuyNow = () => {
     if (!user) {
-      alert(t('please_login_to_continue'));
+      alert('Please login to continue');
       navigate('/login');
       return;
     }
     if (user.role !== UserRole.BUYER) {
-      alert(t('only_buyers_can_buy_now'));
+      alert('Only buyers can buy now');
       return;
     }
     if (!product || product.stock === 0) return;
@@ -82,9 +78,9 @@ const ProductDetailPage: React.FC = () => {
     return (
       <Container className="text-center mt-5">
         <Spinner animation="border" role="status">
-          <span className="visually-hidden">{t('loading')}</span>
+          <span className="visually-hidden">{'Loading...'}</span>
         </Spinner>
-        <p className="mt-2">{t('loading_product_details')}</p>
+        <p className="mt-2">{'Loading product details...'}</p>
       </Container>
     );
   }
@@ -92,9 +88,9 @@ const ProductDetailPage: React.FC = () => {
   if (error || !product) {
     return (
       <Container className="mt-5">
-        <Alert variant="danger">{error || t('product_not_found')}</Alert>
+        <Alert variant="danger">{error || 'Product not found'}</Alert>
         <Button variant="primary" onClick={() => navigate('/products')}>
-          {t('back_to_products')}
+          {'Back to Products'}
         </Button>
       </Container>
     );
@@ -103,7 +99,7 @@ const ProductDetailPage: React.FC = () => {
   return (
     <Container className="mt-5">
       <Button variant="link" onClick={() => navigate('/products')} className="mb-3">
-        ← {t('back_to_products')}
+        ← {'Back to Products'}
       </Button>
 
       <Row>
@@ -141,7 +137,7 @@ const ProductDetailPage: React.FC = () => {
                 borderRadius: '8px',
               }}
             >
-              <p className="text-muted">{t('no_image_available')}</p>
+              <p className="text-muted">{'No image available'}</p>
             </div>
           )}
         </Col>
@@ -158,17 +154,17 @@ const ProductDetailPage: React.FC = () => {
 
           <div className="mb-3">
             {product.stock > 0 ? (
-              <Badge bg="success">{t('in_stock')}</Badge>
+              <Badge bg="success">{'In Stock'}</Badge>
             ) : (
-              <Badge bg="danger">{t('out_of_stock')}</Badge>
+              <Badge bg="danger">{'Out of Stock'}</Badge>
             )}
           </div>
 
           <Card className="mb-4">
             <Card.Body>
-              <Card.Title>{t('description')}</Card.Title>
+              <Card.Title>{'Description'}</Card.Title>
               <Card.Text>
-                {product.description || t('no_description_available')}
+                {product.description || 'No description available'}
               </Card.Text>
             </Card.Body>
           </Card>
@@ -178,7 +174,7 @@ const ProductDetailPage: React.FC = () => {
           {product.stock > 0 && (
             <div className="mb-4">
               <Form.Group className="mb-3">
-                <Form.Label><strong>{t('quantity')}</strong></Form.Label>
+                <Form.Label><strong>{'Quantity'}</strong></Form.Label>
                 <Form.Control
                   type="number"
                   min="1"
@@ -195,14 +191,14 @@ const ProductDetailPage: React.FC = () => {
                   size="lg"
                   onClick={handleAddToCart}
                 >
-                  {t('add_to_cart')}
+                  {'Add to Cart'}
                 </Button>
                 <Button
                   variant="success"
                   size="lg"
                   onClick={handleBuyNow}
                 >
-                  {t('buy_now')}
+                  {'Buy Now'}
                 </Button>
               </div>
             </div>
@@ -210,7 +206,7 @@ const ProductDetailPage: React.FC = () => {
 
           {product.stock === 0 && (
             <Alert variant="warning">
-              {t('product_out_of_stock')} {t('check_back_later')}
+              {'Product out of stock'} {'Check back later'}
             </Alert>
           )}
         </Col>

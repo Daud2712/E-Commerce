@@ -5,12 +5,10 @@ import { useCart } from '../context/CartContext';
 import { IProduct, UserRole } from '../types';
 import * as api from '../services/api';
 import { getImageUrl } from '../services/api';
-import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const ProductListingPage = () => {
   const { user } = useAuth();
-  const { t } = useTranslation();
   const { addToCart } = useCart();
   const navigate = useNavigate();
   const location = useLocation(); // Add useLocation hook
@@ -34,7 +32,7 @@ const ProductListingPage = () => {
       setProducts(data);
       setFilteredProducts(data);
     } catch (err: any) {
-      setError(err.response?.data?.message || t('failed_to_fetch_products'));
+      setError(err.response?.data?.message || 'Failed to fetch products');
     } finally {
       setLoading(false);
     }
@@ -75,34 +73,34 @@ const ProductListingPage = () => {
   // Buyer actions
   const handleAddToCart = (product: IProduct) => {
     if (!user) {
-      alert(t('please_login_to_continue'));
+      alert('Please login to continue');
       navigate('/login');
       return;
     }
     if (user.role !== UserRole.BUYER) {
-      alert(t('only_buyers_can_add_to_cart'));
+      alert('Only buyers can add items to cart');
       return;
     }
     if (product.stock === 0) {
-      alert(t('product_out_of_stock'));
+      alert('Product is out of stock');
       return;
     }
     addToCart(product, 1);
-    alert(`${t('added_to_cart')}: ${product.name}`);
+    alert(`Added to cart: ${product.name}`);
   };
 
   const handleBuyNow = (product: IProduct) => {
     if (!user) {
-      alert(t('please_login_to_continue'));
+      alert('Please login to continue');
       navigate('/login');
       return;
     }
     if (user.role !== UserRole.BUYER) {
-      alert(t('only_buyers_can_buy_now'));
+      alert('Only buyers can buy now');
       return;
     }
     if (product.stock === 0) {
-      alert(t('product_out_of_stock'));
+      alert('Product is out of stock');
       return;
     }
     addToCart(product, 1);
@@ -118,9 +116,9 @@ const ProductListingPage = () => {
     return (
       <Container className="text-center mt-5">
         <Spinner animation="border" role="status">
-          <span className="visually-hidden">{t('loading_products')}</span>
+          <span className="visually-hidden">Loading products...</span>
         </Spinner>
-        <p className="mt-2">{t('fetching_products_message')}</p>
+        <p className="mt-2">Fetching products, please wait...</p>
       </Container>
     );
   }
@@ -129,7 +127,7 @@ const ProductListingPage = () => {
     return (
       <Container className="mt-5">
         <Alert variant="danger">{error}</Alert>
-      <p className="mt-3">{t('failed_to_load_products_suggestion')}</p>
+      <p className="mt-3">Please try again later or contact support if the problem persists.</p>
       </Container>
     );
   }
@@ -138,7 +136,7 @@ const ProductListingPage = () => {
     <Container className="mt-4">
       <Row className="mb-4 align-items-center">
         <Col>
-          <h2>{t('product_listing_page_title')}</h2>
+          <h2>Products</h2>
         </Col>
       </Row>
 
@@ -148,7 +146,7 @@ const ProductListingPage = () => {
             <InputGroup>
               <Form.Control
                 type="text"
-                placeholder={t('search_products_placeholder')}
+                placeholder="Search products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -156,7 +154,7 @@ const ProductListingPage = () => {
           </Col>
           <Col md={3}>
             <Form.Select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
-              <option value="">{t('all_categories')}</option>
+              <option value="">All Categories</option>
               {categories.map(category => (
                 <option key={category} value={category}>{category}</option>
               ))}
@@ -172,21 +170,21 @@ const ProductListingPage = () => {
               else if (value === 'high') setPriceRange({ min: 200000, max: 10000000 }); // Adjusted high range, increased max to accommodate
               else setPriceRange({ min: 0, max: 10000000 });
             }}>
-              <option value="">{t('all_prices')}</option>
-              <option value="low">{t('under_5000')}</option>
-              <option value="mid">{t('5000_to_20000')}</option>
-              <option value="high_mid">{t('20000_to_50000')}</option>
-              <option value="high_high">{t('50000_to_200000')}</option>
-              <option value="high">{t('over_200000')}</option>
+              <option value="">All Prices</option>
+              <option value="low">Under 5,000</option>
+              <option value="mid">5,000 - 20,000</option>
+              <option value="high_mid">20,000 - 50,000</option>
+              <option value="high_high">50,000 - 200,000</option>
+              <option value="high">Over 200,000</option>
           </Form.Select>
         </Col>
       </Row>
 
       {/* Buyer View */}
       <div>
-        <h4>{t('available_products')}</h4>
+        <h4>Available Products</h4>
         {filteredProducts.length === 0 && !loading && !error ? (
-          <Alert variant="info">{t('no_products_found')}</Alert>
+          <Alert variant="info">No products found</Alert>
         ) : (
           <Row xs={1} md={2} lg={3} className="g-4">
             {filteredProducts.map((product) => (
@@ -196,18 +194,18 @@ const ProductListingPage = () => {
                     <Card.Img variant="top" src={getImageUrl(product.images[0])} style={{ height: '200px', objectFit: 'cover' }} />
                   ) : (
                     <div style={{ height: '200px', backgroundColor: '#e9ecef', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <span className="text-muted">{t('no_image_available')}</span>
+                      <span className="text-muted">No image available</span>
                     </div>
                   )}
                   <Card.Body className="d-flex flex-column">
                     <Card.Title>{product.name}</Card.Title>
                     {product.category && <Card.Subtitle className="mb-2 text-muted">{product.category}</Card.Subtitle>}
-                    <Card.Text>{product.description || t('no_description_provided')}</Card.Text>
+                    <Card.Text>{product.description || 'No description provided'}</Card.Text>
                     <div className="mt-auto">
                       <Card.Text><strong>TZS {product.price.toLocaleString()}</strong></Card.Text>
                       <Card.Text>
                         <small className={product.stock > 0 ? 'text-success' : 'text-danger'}>
-                          {product.stock > 0 ? `${t('in_stock')} (${product.stock})` : t('sold_out')}
+                          {product.stock > 0 ? `In Stock (${product.stock})` : 'Sold Out'}
                         </small>
                       </Card.Text>
                       <Button
@@ -215,7 +213,7 @@ const ProductListingPage = () => {
                         className="w-100 mb-2"
                         onClick={() => handleViewDetails(product._id)}
                         >
-                          {t('view_details')}
+                          View Details
                         </Button>
                         <Button
                           variant="primary"
@@ -223,7 +221,7 @@ const ProductListingPage = () => {
                           onClick={() => handleAddToCart(product)}
                           disabled={product.stock === 0}
                         >
-                          {t('add_to_cart')}
+                          Add to Cart
                         </Button>
                         <Button
                           variant="success"
@@ -231,7 +229,7 @@ const ProductListingPage = () => {
                           onClick={() => handleBuyNow(product)}
                           disabled={product.stock === 0}
                         >
-                          {t('buy_now')}
+                          Buy Now
                         </Button>
                       </div>
                     </Card.Body>

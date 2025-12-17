@@ -2,10 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Card, Table, Badge, Spinner, Alert, Button, Modal } from 'react-bootstrap';
 import * as api from '../services/api';
 import { IOrder } from '../types';
-import { useTranslation } from 'react-i18next';
-
 const MyOrdersPage: React.FC = () => {
-  const { t } = useTranslation();
   const [orders, setOrders] = useState<IOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -23,23 +20,23 @@ const MyOrdersPage: React.FC = () => {
       const { data } = await api.getBuyerOrders();
       setOrders(data);
     } catch (err: any) {
-      setError(err.response?.data?.message || t('failed_to_fetch_orders'));
+      setError(err.response?.data?.message || 'Failed to fetch orders');
     } finally {
       setLoading(false);
     }
   };
 
   const handleCancelOrder = async (orderId: string) => {
-    if (!window.confirm(t('confirm_cancel_order'))) {
+    if (!window.confirm('Are you sure you want to cancel this order?')) {
       return;
     }
 
     try {
       await api.cancelOrder(orderId);
-      alert(t('order_cancelled_successfully'));
+      alert('Order cancelled successfully');
       fetchOrders(); // Refresh orders
     } catch (err: any) {
-      alert(err.response?.data?.message || t('failed_to_cancel_order'));
+      alert(err.response?.data?.message || 'Failed to cancel order');
     }
   };
 
@@ -110,23 +107,23 @@ const MyOrdersPage: React.FC = () => {
     return (
       <Container className="text-center mt-5">
         <Spinner animation="border" role="status">
-          <span className="visually-hidden">{t('loading')}</span>
+          <span className="visually-hidden">Loading...</span>
         </Spinner>
-        <p className="mt-2">{t('loading_orders')}</p>
+        <p className="mt-2">Loading orders...</p>
       </Container>
     );
   }
 
   return (
     <Container className="mt-5">
-      <h2 className="mb-4">{t('my_orders')}</h2>
+      <h2 className="mb-4">My Orders</h2>
 
       {error && <Alert variant="danger">{error}</Alert>}
 
       {orders.length === 0 ? (
         <Alert variant="info">
-          <h5>{t('no_orders_yet')}</h5>
-          <p>{t('no_orders_message')}</p>
+          <h5>No Orders Yet</h5>
+          <p>You haven't placed any orders yet. Start shopping to see your orders here!</p>
         </Alert>
       ) : (
         <Card>
@@ -147,12 +144,12 @@ const MyOrdersPage: React.FC = () => {
                 {orders.map((order) => (
                   <tr key={order._id}>
                     <td>
-                      <small className="font-monospace">{order._id.substring(0, 8)}{t('ellipsis')}</small>
+                      <small className="font-monospace">{order._id.substring(0, 8)}...</small>
                     </td>
                     <td>{new Date(order.createdAt).toLocaleDateString()}</td>
-                    <td>{order.items.length} {t('items')}</td>
+                    <td>{order.items.length} items</td>
                     <td>
-                      <strong>{t('price_with_currency_display', { amount: order.totalAmount.toFixed(2) })}</strong>
+                      <strong>TZS {order.totalAmount.toFixed(2)}</strong>
                     </td>
                     <td>{getStatusBadge(order)}</td>
                     <td>{getPaymentStatusBadge(order.paymentStatus || 'pending')}</td>
@@ -163,7 +160,7 @@ const MyOrdersPage: React.FC = () => {
                         className="me-2"
                         onClick={() => handleViewDetails(order)}
                       >
-                        {t('view')}
+                        View
                       </Button>
                       {order.status === 'pending' && (
                         <Button
@@ -171,7 +168,7 @@ const MyOrdersPage: React.FC = () => {
                           size="sm"
                           onClick={() => handleCancelOrder(order._id)}
                         >
-                          {t('cancel')}
+                          Cancel
                         </Button>
                       )}
                       {order.status === 'delivered' && (
@@ -196,7 +193,7 @@ const MyOrdersPage: React.FC = () => {
       {/* Order Details Modal */}
       <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
         <Modal.Header closeButton>
-          <Modal.Title>{t('order_details') || 'Order Details'}</Modal.Title>
+          <Modal.Title>Order Details</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {selectedOrder && (
@@ -211,16 +208,16 @@ const MyOrdersPage: React.FC = () => {
               )}
               
               <div className="mb-3">
-                <strong>{t('order_id')}:</strong> {selectedOrder._id}
+                <strong>Order ID:</strong> {selectedOrder._id}
               </div>
               <div className="mb-3">
-                <strong>{t('date')}:</strong> {new Date(selectedOrder.createdAt).toLocaleString()}
+                <strong>Date:</strong> {new Date(selectedOrder.createdAt).toLocaleString()}
               </div>
               <div className="mb-3">
-                <strong>{t('status')}:</strong> {getStatusBadge(selectedOrder)}
+                <strong>Status:</strong> {getStatusBadge(selectedOrder)}
               </div>
 
-              <h5 className="mt-4">{t('shipping_address')}</h5>
+              <h5 className="mt-4">Shipping Address</h5>
               <p>
                 {selectedOrder.shippingAddress.street && `${selectedOrder.shippingAddress.street}, `}
                 {selectedOrder.shippingAddress.city && `${selectedOrder.shippingAddress.city}, `}
@@ -235,14 +232,14 @@ const MyOrdersPage: React.FC = () => {
                 )}
               </p>
 
-              <h5 className="mt-4">{t('order_items')}</h5>
+              <h5 className="mt-4">Order Items</h5>
               <Table>
                 <thead>
                   <tr>
-                    <th>{t('product')}</th>
-                    <th>{t('quantity')}</th>
-                    <th>{t('price')}</th>
-                    <th>{t('subtotal')}</th>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Subtotal</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -250,15 +247,15 @@ const MyOrdersPage: React.FC = () => {
                     <tr key={index}>
                       <td>{item.productName}</td>
                       <td>{item.quantity}</td>
-                      <td>{t('price_with_currency_display', { amount: item.price.toFixed(2) })}</td>
-                      <td>{t('price_with_currency_display', { amount: (item.price * item.quantity).toFixed(2) })}</td>
+                      <td>TZS {item.price.toFixed(2)}</td>
+                      <td>TZS {(item.price * item.quantity).toFixed(2)}</td>
                     </tr>
                   ))}
                 </tbody>
               </Table>
 
               <div className="text-end">
-                <h5>{t('total')}{t('colon_separator')} {t('price_with_currency_display', { amount: selectedOrder.totalAmount.toFixed(2) })}</h5>
+                <h5>Total: TZS {selectedOrder.totalAmount.toFixed(2)}</h5>
               </div>
             </>
           )}
@@ -276,7 +273,7 @@ const MyOrdersPage: React.FC = () => {
             </Button>
           )}
           <Button variant="secondary" onClick={() => setShowModal(false)}>
-            {t('close')}
+            Close
           </Button>
         </Modal.Footer>
       </Modal>

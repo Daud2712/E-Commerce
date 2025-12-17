@@ -2,15 +2,13 @@ import React, { useState } from 'react';
 import { Form, Button, Container, Card, Spinner, Alert } from 'react-bootstrap';
 import * as api from '../services/api';
 import { Delivery } from '../types';
-import { useTranslation } from 'react-i18next'; // Import useTranslation
+// Import useTranslation
 
 const TrackingPage = () => {
   const [trackingNumber, setTrackingNumber] = useState('');
   const [delivery, setDelivery] = useState<Delivery | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const { t } = useTranslation(); // Initialize useTranslation
-
   const handleTrack = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -21,7 +19,7 @@ const TrackingPage = () => {
       const { data } = await api.getDeliveryByTrackingNumber(trackingNumber);
       setDelivery(data);
     } catch (err: any) {
-      setError(err.response?.data?.message || t('tracking_error_message'));
+      setError(err.response?.data?.message || 'Tracking error occurred');
     } finally {
       setLoading(false);
     }
@@ -29,20 +27,20 @@ const TrackingPage = () => {
 
   return (
     <Container>
-      <h2>{t('track_your_package_title')}</h2>
+      <h2>{'Track Your Package'}</h2>
       <Form onSubmit={handleTrack}>
         <Form.Group className="mb-3">
-          <Form.Label>{t('enter_tracking_number_label')}</Form.Label>
+          <Form.Label>{'Enter Tracking Number'}</Form.Label>
           <Form.Control
             type="text"
-            placeholder={t('tracking_number_placeholder')}
+            placeholder={'Enter your tracking number'}
             value={trackingNumber}
             onChange={(e) => setTrackingNumber(e.target.value)}
             required
           />
         </Form.Group>
         <Button type="submit" disabled={loading}>
-          {loading ? <Spinner as="span" animation="border" size="sm" /> : t('track_button')}
+          {loading ? <Spinner as="span" animation="border" size="sm" /> : 'Track'}
         </Button>
       </Form>
 
@@ -50,11 +48,11 @@ const TrackingPage = () => {
 
       {delivery && (
         <Card className="mt-4">
-          <Card.Header>{t('delivery_details_for')} {delivery.trackingNumber}</Card.Header>
+          <Card.Header>{'Delivery Details for'} {delivery.trackingNumber}</Card.Header>
           <Card.Body>
-            <Card.Text><strong>{t('status_label')}{t('colon_separator')}</strong> {delivery.status}</Card.Text>
-            <Card.Text><strong>{t('package_label')}{t('colon_separator')}</strong> {delivery.packageName}</Card.Text>
-            <Card.Text><strong>{t('destination_label')}{t('colon_separator')}</strong> {delivery.buyer.deliveryAddress?.city || t('not_applicable_short')}</Card.Text>
+            <Card.Text><strong>{'Status'}{':'}</strong> {delivery.status}</Card.Text>
+            <Card.Text><strong>{'Package'}{':'}</strong> {delivery.packageName}</Card.Text>
+            <Card.Text><strong>{'Destination'}{':'}</strong> {delivery.buyer.deliveryAddress?.city || 'N/A'}</Card.Text>
             {/* Add map here later */}
           </Card.Body>
         </Card>

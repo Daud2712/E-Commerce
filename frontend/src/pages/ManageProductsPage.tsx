@@ -3,11 +3,9 @@ import { Container, Form, Button, Alert, Spinner } from 'react-bootstrap';
 import * as api from '../services/api';
 import { getImageUrl } from '../services/api';
 import { IProduct } from '../types';
-import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 const ManageProductsPage: React.FC = () => {
-    const { t } = useTranslation();
     const navigate = useNavigate();
     const location = useLocation();
     const [productName, setProductName] = useState('');
@@ -40,7 +38,7 @@ const ManageProductsPage: React.FC = () => {
                 setClearExistingImages(false); // Reset on product load
             } catch (error) {
                 console.error('ManageProductsPage: Error processing product from location.state', error);
-                setFormError(t('error_loading_product_details')); // A new translation key for this error
+                setFormError('Error loading product details'); // A new translation key for this error
             }
         } else {
             console.log('ManageProductsPage: No product data in location.state, assuming add mode.');
@@ -80,10 +78,10 @@ const ManageProductsPage: React.FC = () => {
         try {
             if (editingProduct) {
                 await api.updateProduct(editingProduct._id, formData);
-                setFormSuccess(t('product_updated_success_message'));
+                setFormSuccess('Product updated successfully');
             } else {
                 await api.createProduct(formData);
-                setFormSuccess(t('product_created_success_message'));
+                setFormSuccess('Product created successfully');
             }
             setProductName('');
             setProductDescription('');
@@ -95,7 +93,7 @@ const ManageProductsPage: React.FC = () => {
             setClearExistingImages(false); // Reset state
             navigate('/seller/products');
         } catch (err: any) {
-            setFormError(err.response?.data?.message || t('product_action_error'));
+            setFormError(err.response?.data?.message || 'Failed to save product');
         } finally {
             setLoading(false);
         }
@@ -103,36 +101,36 @@ const ManageProductsPage: React.FC = () => {
 
     return (
         <Container>
-            <h4>{editingProduct ? t('edit_product_title') : t('add_new_product_title')}</h4>
+            <h4>{editingProduct ? 'Edit Product' : 'Add New Product'}</h4>
             {formError && <Alert variant="danger">{formError}</Alert>}
             {formSuccess && <Alert variant="success">{formSuccess}</Alert>}
             <Form onSubmit={handleAddUpdateProduct}>
                 <Form.Group className="mb-3" controlId="productName">
-                    <Form.Label>{t('product_name_label')}</Form.Label>
+                    <Form.Label>Product Name</Form.Label>
                     <Form.Control
                         type="text"
-                        placeholder={t('enter_product_name_placeholder')}
+                        placeholder="Enter product name"
                         value={productName}
                         onChange={(e) => setProductName(e.target.value)}
                         required
                     />
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="productDescription">
-                    <Form.Label>{t('product_description_label')}</Form.Label>
+                    <Form.Label>Product Description</Form.Label>
                     <Form.Control
                         as="textarea"
                         rows={3}
-                        placeholder={t('enter_product_description_placeholder')}
+                        placeholder="Enter product description"
                         value={productDescription}
                         onChange={(e) => setProductDescription(e.target.value)}
                     />
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="productPrice">
-                    <Form.Label>{t('product_price_label')}</Form.Label>
+                    <Form.Label>Product Price (TZS)</Form.Label>
                     <Form.Control
                         type="number"
                         step="0.01"
-                        placeholder={t('enter_product_price_placeholder')}
+                        placeholder="Enter product price"
                         value={productPrice || ''}
                         onChange={(e) => {
                             const value = e.target.value;
@@ -144,10 +142,10 @@ const ManageProductsPage: React.FC = () => {
                     />
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="productStock">
-                    <Form.Label>{t('product_stock_label')}</Form.Label>
+                    <Form.Label>{'Stock'}</Form.Label>
                     <Form.Control
                         type="number"
-                        placeholder={t('enter_product_stock_placeholder')}
+                        placeholder={'Enter stock quantity'}
                         value={productStock}
                         onChange={(e) => setProductStock(parseInt(e.target.value))}
                         required
@@ -155,7 +153,7 @@ const ManageProductsPage: React.FC = () => {
                     />
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="productImage">
-                    <Form.Label>{t('product_image_label_with_count')} - Upload Files</Form.Label>
+                    <Form.Label>{'Product Images'} - Upload Files</Form.Label>
                     <Form.Control
                         type="file"
                         multiple
@@ -174,7 +172,7 @@ const ManageProductsPage: React.FC = () => {
                     )}
                     {editingProduct && editingProduct.images.length > 0 && (
                         <div className="mt-2">
-                            <small className="text-muted">{t('current_images_header')}</small>
+                            <small className="text-muted">{'Current Images'}</small>
                             <div className="d-flex flex-wrap gap-2 mt-1">
                                 {editingProduct.images.map((img, idx) => (
                                     <img key={idx} src={getImageUrl(img)} alt={t('product_alt_text', { index: idx + 1 })} style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '4px' }} />
@@ -183,19 +181,19 @@ const ManageProductsPage: React.FC = () => {
                             <Form.Check
                                 type="checkbox"
                                 id="clearExistingImagesCheck"
-                                label={t('clear_existing_images')}
+                                label={'Clear existing images'}
                                 checked={clearExistingImages}
                                 onChange={(e) => setClearExistingImages(e.target.checked)}
                                 className="mt-2"
                             />
                             {clearExistingImages && productImageFiles.length > 0 && (
                                 <Alert variant="info" className="mt-2">
-                                    {t('clear_images_warning')}
+                                    {'This will remove all existing images'}
                                 </Alert>
                             )}
                             {clearExistingImages && productImageFiles.length === 0 && (
                                 <Alert variant="warning" className="mt-2">
-                                    {t('clear_images_only_warning')}
+                                    {'Images will only be cleared if you upload new ones'}
                                 </Alert>
                             )}
                         </div>
@@ -214,10 +212,10 @@ const ManageProductsPage: React.FC = () => {
                     </Form.Text>
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="productCategory">
-                    <Form.Label>{t('product_category_label')}</Form.Label>
+                    <Form.Label>{'Category'}</Form.Label>
                     <Form.Control
                         type="text"
-                        placeholder={t('enter_product_category_placeholder')}
+                        placeholder={'Enter product category'}
                         value={productCategory}
                         onChange={(e) => setProductCategory(e.target.value)}
                     />
@@ -225,11 +223,11 @@ const ManageProductsPage: React.FC = () => {
                 <Button variant="primary" type="submit" className="w-100" disabled={loading}>
                     {loading ? (
                         <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
-                    ) : editingProduct ? t('update_product_button') : t('add_product_button')}
+                    ) : editingProduct ? 'Update Product' : 'Add Product'}
                 </Button>
                 {editingProduct && (
                     <Button variant="secondary" className="w-100 mt-2" onClick={() => navigate('/seller/products')}>
-                        {t('cancel_edit_button')}
+                        {'Cancel Edit'}
                     </Button>
                 )}
             </Form>

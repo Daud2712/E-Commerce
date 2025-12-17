@@ -2,10 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Container, Alert, Table, Spinner, Dropdown, Badge } from 'react-bootstrap';
 import * as api from '../services/api';
 import { IOrder, User } from '../types';
-import { useTranslation } from 'react-i18next';
 
 const ParcelManagementPage: React.FC = () => {
-    const { t } = useTranslation();
     const [orders, setOrders] = useState<IOrder[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -110,7 +108,7 @@ const ParcelManagementPage: React.FC = () => {
 
     return (
         <Container>
-            <h3>{t('my_deliveries')}</h3>
+            <h3>My Deliveries</h3>
             <p className="text-muted">
                 View and manage orders from your products. Assign riders to deliver orders to customers.
             </p>

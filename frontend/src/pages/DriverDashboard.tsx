@@ -3,7 +3,7 @@ import { Container, Alert, Table, Spinner, Button, ButtonGroup, Form, Badge } fr
 import * as api from '../services/api';
 import { Delivery, User, DeliveryAddress } from '../types';
 import { useAuth } from '../context/AuthContext';
-import { useTranslation } from 'react-i18next'; // Import useTranslation
+// Import useTranslation
 
 // Removed: import TrackingPage from './TrackingPage';
 
@@ -18,8 +18,6 @@ const DriverDashboard = () => {
   const [isDriverAvailable, setIsDriverAvailable] = useState<boolean | null>(null); // State for driver's availability
   const [availabilityLoading, setAvailabilityLoading] = useState(false); // Loading state for availability update
   const [availabilityError, setAvailabilityError] = useState(''); // Error for availability update
-  const { t } = useTranslation(); // Initialize useTranslation
-
   // Removed: const [activeTab, setActiveTab] = useState('myDeliveries');
 
   console.log('DriverDashboard: user', user);
@@ -35,7 +33,7 @@ const DriverDashboard = () => {
       setIsDriverAvailable(response.data.isAvailable);
     } catch (err: any) {
       console.error('Failed to fetch driver availability:', err);
-      setAvailabilityError(err.response?.data?.message || t('driver_fetch_availability_error'));
+      setAvailabilityError(err.response?.data?.message || 'Failed to fetch availability');
     } finally {
       setAvailabilityLoading(false);
     }
@@ -54,7 +52,7 @@ const DriverDashboard = () => {
       const { data } = await api.getDeliveries(); // Same API call as seller
       setDeliveries(data);
     } catch (err: any) { // Type assertion for error handling
-      setError(err.response?.data?.message || t('driver_fetch_deliveries_error'));
+      setError(err.response?.data?.message || 'Failed to fetch deliveries');
     } finally {
       setLoading(false);
     }
@@ -71,7 +69,7 @@ const DriverDashboard = () => {
       await api.updateDeliveryStatus(id, status);
       fetchDeliveries(); // Refresh the list
     } catch (err: any) { // Type assertion for error handling
-      setUpdateError(err.response?.data?.message || t('driver_update_status_error'));
+      setUpdateError(err.response?.data?.message || 'Failed to update status');
     } finally {
       setUpdatingId(null); // Clear updating ID
     }
@@ -87,14 +85,14 @@ const DriverDashboard = () => {
       setIsDriverAvailable(newAvailability);
     } catch (err: any) {
       console.error('Failed to update driver availability:', err);
-      setAvailabilityError(err.response?.data?.message || t('driver_update_availability_error'));
+      setAvailabilityError(err.response?.data?.message || 'Failed to update availability');
     } finally {
       setAvailabilityLoading(false);
     }
   };
 
   const formatAddress = (address?: DeliveryAddress) => {
-    if (!address) return t('no_address_provided');
+    if (!address) return 'No address provided';
     const parts = [
       address.street,
       address.city,
@@ -103,7 +101,7 @@ const DriverDashboard = () => {
       address.country
     ].filter(Boolean);
 
-    if (parts.length === 0) return t('no_address_provided');
+    if (parts.length === 0) return 'No address provided';
 
     return (
       <div>
@@ -116,12 +114,12 @@ const DriverDashboard = () => {
 
   return (
     <Container>
-      <h2>{t('driver_dashboard_title')}</h2>
+      <h2>{'Driver Dashboard'}</h2>
       <hr />
       {/* Removed Tabs and Tab components */}
       <div className="mb-3">
-          <h4>{t('your_availability_title')}</h4>
-          {!user?._id && <Alert variant="warning">{t('driver_user_info_not_available')}</Alert>}
+          <h4>{'Your Availability'}</h4>
+          {!user?._id && <Alert variant="warning">{'User information not available'}</Alert>}
           {availabilityLoading && <Spinner animation="border" size="sm" />}
           {availabilityError && <Alert variant="danger">{availabilityError}</Alert>}
           {isDriverAvailable !== null ? (
@@ -129,20 +127,20 @@ const DriverDashboard = () => {
               <Form.Check
               type="switch"
               id="driver-availability-switch"
-              label={isDriverAvailable ? t('driver_status_free') : t('driver_status_busy')}
+              label={isDriverAvailable ? 'Available' : 'Busy'}
               checked={isDriverAvailable}
               onChange={handleDriverAvailabilityToggle}
               disabled={availabilityLoading}
               />
           </Form>
           ) : (
-          <p>{t('driver_loading_availability')}</p>
+          <p>{'Loading availability...'}</p>
           )}
       </div>
 
       <hr />
 
-      <h4>{t('your_assigned_deliveries_title')}</h4>
+      <h4>{'Your Assigned Deliveries'}</h4>
       {loading && <Spinner animation="border" />}
       {error && <Alert variant="danger">{error}</Alert>}
       {updateError && <Alert variant="danger">{updateError}</Alert>} {/* Display update error */}
@@ -181,7 +179,7 @@ const DriverDashboard = () => {
                       disabled={delivery.status === 'in_transit' || updatingId === delivery._id}
                       onClick={() => handleStatusUpdate(delivery._id, 'in_transit')}
                       >
-                      {updatingId === delivery._id ? t('updating_button') : t('in_transit_button')}
+                      {updatingId === delivery._id ? 'Updating...' : 'In Transit'}
                       </Button>
                       <Button
                       size="sm"
@@ -189,7 +187,7 @@ const DriverDashboard = () => {
                       disabled={delivery.status === 'delivered' || updatingId === delivery._id}
                       onClick={() => handleStatusUpdate(delivery._id, 'delivered')}
                       >
-                      {updatingId === delivery._id ? t('updating_button') : t('delivered_button')}
+                      {updatingId === delivery._id ? 'Updating...' : 'Delivered'}
                       </Button>
                   </ButtonGroup>
                   </td>

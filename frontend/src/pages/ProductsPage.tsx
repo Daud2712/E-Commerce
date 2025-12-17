@@ -3,11 +3,9 @@ import { Container, Button, Alert, Table, Spinner } from 'react-bootstrap';
 import * as api from '../services/api';
 import { getImageUrl } from '../services/api';
 import { IProduct } from '../types';
-import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 const ProductsPage: React.FC = () => {
-    const { t } = useTranslation();
     const navigate = useNavigate();
     const [products, setProducts] = useState<IProduct[]>([]);
     const [loading, setLoading] = useState(true);
@@ -20,7 +18,7 @@ const ProductsPage: React.FC = () => {
             const { data } = await api.getProducts();
             setProducts(data);
         } catch (err: any) {
-            setError(err.response?.data?.message || t('seller_fetch_products_error'));
+            setError(err.response?.data?.message || 'Failed to fetch products');
         } finally {
             setLoading(false);
         }
@@ -35,20 +33,20 @@ const ProductsPage: React.FC = () => {
     };
 
     const handleDeleteProduct = async (productId: string, productName: string) => {
-        if (window.confirm(t('confirm_delete_product', { productName }))) {
+        if (window.confirm(`Are you sure you want to delete "${productName}"?`)) {
             try {
                 await api.deleteProduct(productId);
-                setSuccess(t('product_deleted_success_message'));
+                setSuccess('Product deleted successfully');
                 fetchProducts();
             } catch (err: any) {
-                setError(err.response?.data?.message || t('product_delete_error'));
+                setError(err.response?.data?.message || 'Failed to delete product');
             }
         }
     };
 
     return (
         <Container>
-            <h4>{t('your_products_title')}</h4>
+            <h4>Your Products</h4>
             {loading && <Spinner animation="border" />}
             {error && <Alert variant="danger">{error}</Alert>}
             {success && <Alert variant="success">{success}</Alert>}
@@ -81,26 +79,26 @@ const ProductsPage: React.FC = () => {
                                                 )}
                                             </div>
                                         ) : (
-                                            <span>{t('no_images_available')}</span>
+                                            <span>No images available</span>
                                         )}
                                     </td>
                                     <td>{product.name}</td>
                                     <td>TZS {product.price.toLocaleString()}</td>
                                     <td>{product.stock}</td>
-                                    <td>{product.category || t('not_applicable_short')}</td>
+                                    <td>{product.category || 'N/A'}</td>
                                     <td>
                                         <Button variant="info" size="sm" className="me-2" onClick={() => handleEditProduct(product)}>
-                                            {t('edit_button')}
+                                            Edit
                                         </Button>
                                         <Button variant="danger" size="sm" onClick={() => handleDeleteProduct(product._id, product.name)}>
-                                            {t('delete_button')}
+                                            Delete
                                         </Button>
                                     </td>
                                 </tr>
                             ))
                         ) : (
                             <tr>
-                                <td colSpan={6} className="text-center">{t('no_products_found')}</td>
+                                <td colSpan={6} className="text-center">No products found</td>
                             </tr>
                         )}
                     </tbody>

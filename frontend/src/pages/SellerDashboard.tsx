@@ -1,15 +1,12 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import React from 'react';
 import { Container, Nav, Card, Row, Col } from 'react-bootstrap';
-import { useTranslation } from 'react-i18next';
-
 const SellerDashboard = () => {
-    const { t } = useTranslation();
     const location = useLocation();
 
     return (
         <Container fluid>
-            <h2>{t('seller_dashboard_title')}</h2>
+            <h2>{'Seller Dashboard'}</h2>
             <hr />
 
             <Row>
@@ -22,10 +19,10 @@ const SellerDashboard = () => {
                 <Col md={3}>
                     <Card className="sticky-top" style={{ top: '20px' }}>
                         <Card.Header className="bg-primary text-white">
-                            <h5 className="mb-0">📊 {t('admin_page_title')}</h5>
+                            <h5 className="mb-0">📊 {'Admin Page'}</h5>
                         </Card.Header>
                         <Card.Body>
-                            <h6 className="text-primary mb-3">🛍️ {t('product_management_title')}</h6>
+                            <h6 className="text-primary mb-3">🛍️ {'Product Management'}</h6>
                             <Nav className="flex-column mb-4">
                                 <Nav.Item>
                                     <Nav.Link
@@ -34,7 +31,7 @@ const SellerDashboard = () => {
                                         active={location.pathname === '/seller/products' || location.pathname === '/seller' || location.pathname === '/seller/'}
                                         className="text-dark py-2"
                                     >
-                                        📦 {t('products_tab')}
+                                        📦 {'Products'}
                                     </Nav.Link>
                                 </Nav.Item>
                                 <Nav.Item>
@@ -44,7 +41,7 @@ const SellerDashboard = () => {
                                         active={location.pathname === '/seller/manage-products'}
                                         className="text-dark py-2"
                                     >
-                                        ➕ {t('manage_products_tab')}
+                                        ➕ {'Manage Products'}
                                     </Nav.Link>
                                 </Nav.Item>
                                 <Nav.Item>
@@ -59,7 +56,7 @@ const SellerDashboard = () => {
                                 </Nav.Item>
                             </Nav>
 
-                            <h6 className="text-primary mb-3">📮 {t('parcel_management_title')}</h6>
+                            <h6 className="text-primary mb-3">📮 {'Parcel Management'}</h6>
                             <Nav className="flex-column mb-4">
                                 <Nav.Item>
                                     <Nav.Link
@@ -68,7 +65,7 @@ const SellerDashboard = () => {
                                         active={location.pathname === '/seller/parcel-management'}
                                         className="text-dark py-2"
                                     >
-                                        📦 {t('parcel_management_tab')}
+                                        📦 {'Parcel Management'}
                                     </Nav.Link>
                                 </Nav.Item>
                             </Nav>
