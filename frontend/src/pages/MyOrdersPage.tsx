@@ -156,8 +156,9 @@ const MyOrdersPage: React.FC = () => {
                           variant="success"
                           size="sm"
                           onClick={() => handleConfirmReceipt(order._id)}
+                          className="d-flex align-items-center gap-1"
                         >
-                          Confirm Receipt
+                          <span>✓</span> Confirm Receipt
                         </Button>
                       )}
                     </td>
@@ -177,6 +178,15 @@ const MyOrdersPage: React.FC = () => {
         <Modal.Body>
           {selectedOrder && (
             <>
+              {selectedOrder.status === 'delivered' && (
+                <Alert variant="success">
+                  <strong>📦 Order Delivered!</strong>
+                  <p className="mb-0">
+                    Please confirm that you have received this order by clicking the "Confirm Receipt" button below.
+                  </p>
+                </Alert>
+              )}
+              
               <div className="mb-3">
                 <strong>{t('order_id')}:</strong> {selectedOrder._id}
               </div>
@@ -231,6 +241,17 @@ const MyOrdersPage: React.FC = () => {
           )}
         </Modal.Body>
         <Modal.Footer>
+          {selectedOrder && selectedOrder.status === 'delivered' && (
+            <Button 
+              variant="success" 
+              onClick={() => {
+                setShowModal(false);
+                handleConfirmReceipt(selectedOrder._id);
+              }}
+            >
+              ✓ Confirm Receipt
+            </Button>
+          )}
           <Button variant="secondary" onClick={() => setShowModal(false)}>
             {t('close')}
           </Button>
