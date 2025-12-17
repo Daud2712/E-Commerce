@@ -56,28 +56,58 @@ app.get('/', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-    console.log('User connected:', socket.id);
-    
+    console.log(`[SOCKET] User connected: ${socket.id}`);
+
     // Buyer joins their room
     socket.on('join', (userId: string) => {
+        // Leave all previous rooms except default rooms
+        const rooms = Array.from(socket.rooms);
+        rooms.forEach(room => {
+            if (room !== socket.id) {
+                socket.leave(room);
+                console.log(`[SOCKET] ${socket.id} left room: ${room}`);
+            }
+        });
+
+        // Join buyer room
         socket.join(`user-${userId}`);
-        console.log(`Buyer ${userId} joined room: user-${userId}`);
+        console.log(`[SOCKET] Buyer ${userId} (${socket.id}) joined room: user-${userId}`);
     });
-    
+
     // Seller joins their room
     socket.on('joinSeller', (sellerId: string) => {
+        // Leave all previous rooms except default rooms
+        const rooms = Array.from(socket.rooms);
+        rooms.forEach(room => {
+            if (room !== socket.id) {
+                socket.leave(room);
+                console.log(`[SOCKET] ${socket.id} left room: ${room}`);
+            }
+        });
+
+        // Join seller room
         socket.join(`seller-${sellerId}`);
-        console.log(`Seller ${sellerId} joined room: seller-${sellerId}`);
+        console.log(`[SOCKET] Seller ${sellerId} (${socket.id}) joined room: seller-${sellerId}`);
     });
-    
+
     // Rider joins their room
     socket.on('joinRider', (riderId: string) => {
+        // Leave all previous rooms except default rooms
+        const rooms = Array.from(socket.rooms);
+        rooms.forEach(room => {
+            if (room !== socket.id) {
+                socket.leave(room);
+                console.log(`[SOCKET] ${socket.id} left room: ${room}`);
+            }
+        });
+
+        // Join rider room
         socket.join(`rider-${riderId}`);
-        console.log(`Rider ${riderId} joined room: rider-${riderId}`);
+        console.log(`[SOCKET] Rider ${riderId} (${socket.id}) joined room: rider-${riderId}`);
     });
-    
+
     socket.on('disconnect', () => {
-        console.log('User disconnected:', socket.id);
+        console.log(`[SOCKET] User disconnected: ${socket.id}`);
     });
 });
 
