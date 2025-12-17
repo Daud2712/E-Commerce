@@ -133,6 +133,7 @@ const MyOrdersPage: React.FC = () => {
                       <strong>{t('price_with_currency_display', { amount: order.totalAmount.toFixed(2) })}</strong>
                     </td>
                     <td>{getStatusBadge(order.status)}</td>
+                    <td>{getPaymentStatusBadge(order.paymentStatus)}</td>
                     <td>
                       <Button
                         variant="info"
