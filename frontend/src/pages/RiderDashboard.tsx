@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Alert, Table, Spinner, Button, ButtonGroup, Form, Badge } from 'react-bootstrap';
 import * as api from '../services/api';
-import { Delivery, User, DeliveryAddress } from '../types';
+import { Delivery, User, DeliveryAddress, IOrder } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next'; // Import useTranslation
 import socketService from '../services/socket';
@@ -132,6 +132,29 @@ const RiderDashboard = () => {
     }
   };
 
+  const handleMarkPaymentPaid = async (delivery: Delivery) => {
+    if (!delivery.order) {
+      setUpdateError('Order information not available.');
+      return;
+    }
+
+    const orderId = typeof delivery.order === 'string' ? delivery.order : delivery.order._id;
+    
+    if (window.confirm('Mark payment as received from buyer?')) {
+      setUpdatingId(delivery._id);
+      setUpdateError('');
+      try {
+        await api.updatePaymentStatus(orderId, 'paid');
+        alert('Payment marked as paid successfully!');
+        fetchDeliveries(); // Refresh the list
+      } catch (err: any) {
+        setUpdateError(err.response?.data?.message || 'Failed to update payment status.');
+      } finally {
+        setUpdatingId(null);
+      }
+    }
+  };
+
   const handleRiderAvailabilityToggle = async () => {
     if (isRiderAvailable === null) return; // Don't toggle if initial status isn't loaded
     setAvailabilityLoading(true);
@@ -210,6 +233,7 @@ const RiderDashboard = () => {
               <th>Parcel</th>
               <th>Status</th>
               <th>Acceptance Status</th>
+              <th>Payment Status</th>
               <th>Destination</th>
               <th>Actions</th>
               </tr>
@@ -252,6 +276,19 @@ const RiderDashboard = () => {
                       <span className="text-muted">{t('not_applicable_dash')}</span>
                     )}
                   </td>
+                  <td>
+                    {typeof delivery.order === 'object' && delivery.order?.paymentStatus ? (
+                      <Badge bg={
+                        delivery.order.paymentStatus === 'paid' ? 'success' :
+                        delivery.order.paymentStatus === 'failed' ? 'danger' :
+                        'warning'
+                      }>
+                        {delivery.order.paymentStatus.replace(/\w/g, l => l.toUpperCase())}
+                      </Badge>
+                    ) : (
+                      <span className="text-muted">N/A</span>
+                    )}
+                  </td>
                   <td>{formatAddress(delivery.buyer?.deliveryAddress)}</td>
                   <td>
                   {delivery.riderAccepted === null ? (
@@ -274,24 +311,41 @@ const RiderDashboard = () => {
                       </Button>
                     </ButtonGroup>
                   ) : delivery.riderAccepted === true ? (
-                    <ButtonGroup>
-                      <Button
-                        size="sm"
-                        variant="info"
-                        disabled={delivery.status === 'in_transit' || updatingId === delivery._id}
-                        onClick={() => handleStatusUpdate(delivery._id, 'in_transit')}
-                      >
-                        {updatingId === delivery._id ? t('updating_button') : t('in_transit_button')}
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="success"
-                        disabled={delivery.status === 'delivered' || updatingId === delivery._id}
-                        onClick={() => handleStatusUpdate(delivery._id, 'delivered')}
-                      >
-                        {updatingId === delivery._id ? t('updating_button') : t('delivered_button')}
-                      </Button>
-                    </ButtonGroup>
+                    <div>
+                      <ButtonGroup className="mb-2">
+                        <Button
+                          size="sm"
+                          variant="info"
+                          disabled={delivery.status === 'in_transit' || updatingId === delivery._id}
+                          onClick={() => handleStatusUpdate(delivery._id, 'in_transit')}
+                        >
+                          {updatingId === delivery._id ? t('updating_button') : t('in_transit_button')}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="success"
+                          disabled={delivery.status === 'delivered' || updatingId === delivery._id}
+                          onClick={() => handleStatusUpdate(delivery._id, 'delivered')}
+                        >
+                          {updatingId === delivery._id ? t('updating_button') : t('delivered_button')}
+                        </Button>
+                      </ButtonGroup>
+                      {(delivery.status === 'delivered' || delivery.status === 'received') && 
+                       typeof delivery.order === 'object' && 
+                       delivery.order?.paymentStatus === 'pending' && 
+                       delivery.order?.paymentMethod === 'cash' && (
+                        <div>
+                          <Button
+                            size="sm"
+                            variant="warning"
+                            disabled={updatingId === delivery._id}
+                            onClick={() => handleMarkPaymentPaid(delivery)}
+                          >
+                            💰 Mark Paid
+                          </Button>
+                        </div>
+                      )}
+                    </div>
                   ) : (
                     <span className="text-muted">{t('not_applicable_dash')}</span>
                   )}

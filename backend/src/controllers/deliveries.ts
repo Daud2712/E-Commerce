@@ -527,7 +527,8 @@ export const rejectDelivery = async (req: AuthRequest, res: Response) => {
             const deliveries = await Delivery.find({ rider: userId, deleted: false })
                                              .populate('seller', 'name')
                                              .populate('rider', 'name')
-                                             .populate('buyer', 'name email registrationNumber deliveryAddress');
+                                             .populate('buyer', 'name email registrationNumber deliveryAddress')
+                                             .populate('order', 'paymentStatus paymentMethod');
             console.log(`[RIDER DELIVERIES] Found ${deliveries.length} deliveries for rider ${userId}`);
             console.log(`[RIDER DELIVERIES] Delivery IDs:`, deliveries.map(d => d._id));
             res.status(200).json(deliveries);

@@ -529,14 +529,14 @@ export const confirmReceipt = async (req: AuthRequest, res: Response) => {
 
 // @desc    Update payment status
 // @route   PUT /api/orders/:id/payment-status
-// @access  Private (Seller only)
+// @access  Private (Seller and Rider only)
 export const updatePaymentStatus = async (req: AuthRequest, res: Response) => {
   if (!req.user) {
     return res.status(401).json({ message: 'Not authenticated.' });
   }
 
-  if (req.user.role !== UserRole.SELLER) {
-    return res.status(403).json({ message: 'Only sellers can update payment status.' });
+  if (req.user.role !== UserRole.SELLER && req.user.role !== UserRole.RIDER) {
+    return res.status(403).json({ message: 'Only sellers and riders can update payment status.' });
   }
 
   const { paymentStatus } = req.body;
@@ -552,13 +552,33 @@ export const updatePaymentStatus = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ message: 'Order not found.' });
     }
 
-    // Check if seller owns at least one product in the order
-    const hasSellersProduct = order.items.some((item: any) =>
-      item.product?.seller?.toString() === req.user!.id
-    );
+    // Check authorization based on role
+    if (req.user.role === UserRole.SELLER) {
+      // Check if seller owns at least one product in the order
+      const hasSellersProduct = order.items.some((item: any) =>
+        item.product?.seller?.toString() === req.user!.id
+      );
 
-    if (!hasSellersProduct) {
-      return res.status(403).json({ message: 'Not authorized to update this order.' });
+      if (!hasSellersProduct) {
+        return res.status(403).json({ message: 'Not authorized to update this order.' });
+      }
+    } else if (req.user.role === UserRole.RIDER) {
+      // Check if rider is assigned to this order's delivery
+      const delivery = await Delivery.findOne({ order: order._id, rider: req.user.id, deleted: false });
+      
+      if (!delivery) {
+        return res.status(403).json({ message: 'Not authorized to update this order.' });
+      }
+
+      // Riders can only mark as paid after delivery
+      if (delivery.status !== 'delivered' && delivery.status !== 'received') {
+        return res.status(400).json({ message: 'Can only update payment status after delivery.' });
+      }
+
+      // Riders can only mark as paid (for cash on delivery)
+      if (paymentStatus !== 'paid') {
+        return res.status(400).json({ message: 'Riders can only mark payment as paid.' });
+      }
     }
 
     order.paymentStatus = paymentStatus as any;
@@ -571,6 +591,22 @@ export const updatePaymentStatus = async (req: AuthRequest, res: Response) => {
       message: `Payment status updated to ${paymentStatus}`,
       timestamp: new Date()
     });
+
+    // Notify seller if rider updated the payment
+    if (req.user.role === UserRole.RIDER) {
+      const orderItems = await Order.findById(order._id).populate('items.product', 'seller');
+      if (orderItems && orderItems.items.length > 0) {
+        const sellerId = (orderItems.items[0].product as any)?.seller;
+        if (sellerId) {
+          emitToSeller(sellerId.toString(), 'paymentUpdate', {
+            orderId: order._id,
+            paymentStatus,
+            message: `Rider has marked payment as ${paymentStatus}`,
+            timestamp: new Date()
+          });
+        }
+      }
+    }
 
     res.status(200).json({ message: 'Payment status updated successfully.', order });
   } catch (error: any) {

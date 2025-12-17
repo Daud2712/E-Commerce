@@ -39,6 +39,7 @@ export interface Delivery {
     _id: string;
     name: string;
   };
+  order?: string | IOrder; // Can be order ID or populated order object
   riderAccepted?: boolean;
   // ...existing code...
   paidAt?: string;

@@ -72,10 +72,10 @@ router.put('/:id/confirm-receipt', auth, (req: AuthRequest, res: Response) => {
 
 // @route   PUT /api/orders/:id/payment-status
 // @desc    Update payment status
-// @access  Private (Seller only)
+// @access  Private (Seller and Rider only)
 router.put('/:id/payment-status', auth, (req: AuthRequest, res: Response) => {
-  if (!req.user || req.user.role !== UserRole.SELLER) {
-    return res.status(403).json({ message: 'Access denied. Only sellers can update payment status.' });
+  if (!req.user || (req.user.role !== UserRole.SELLER && req.user.role !== UserRole.RIDER)) {
+    return res.status(403).json({ message: 'Access denied. Only sellers and riders can update payment status.' });
   }
   updatePaymentStatus(req, res);
 });
