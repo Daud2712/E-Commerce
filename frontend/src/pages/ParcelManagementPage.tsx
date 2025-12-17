@@ -167,14 +167,14 @@ const ParcelManagementPage: React.FC = () => {
                                                 • {item.productName} x {item.quantity}
                                                 <br />
                                                 <small className="text-muted">
-                                                    {t('price_with_currency_display', { amount: item.price.toFixed(2) })} each
+                                                    TSh {item.price.toFixed(2)} each
                                                 </small>
                                             </div>
                                         ))}
                                     </div>
                                 </td>
                                 <td>
-                                    <strong>{t('price_with_currency_display', { amount: order.totalAmount.toFixed(2) })}</strong>
+                                    <strong>TSh {order.totalAmount.toFixed(2)}</strong>
                                 </td>
                                 <td>
                                     {order.shippingAddress?.street ? (

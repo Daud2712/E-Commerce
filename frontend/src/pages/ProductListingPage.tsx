@@ -36,7 +36,7 @@ const ProductListingPage = () => {
     } finally {
       setLoading(false);
     }
-  }, [t]);
+  }, []);
 
   useEffect(() => {
     fetchProducts();

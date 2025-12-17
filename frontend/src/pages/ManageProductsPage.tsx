@@ -43,7 +43,7 @@ const ManageProductsPage: React.FC = () => {
         } else {
             console.log('ManageProductsPage: No product data in location.state, assuming add mode.');
         }
-    }, [location.state, t]);
+    }, [location.state]);
 
     const handleAddUpdateProduct = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -167,7 +167,7 @@ const ManageProductsPage: React.FC = () => {
                     />
                     {productImageFiles.length > 0 && (
                         <small className="text-muted d-block mt-1">
-                            {t('images_selected', { count: productImageFiles.length })}
+                            {productImageFiles.length} image(s) selected
                         </small>
                     )}
                     {editingProduct && editingProduct.images.length > 0 && (
@@ -175,7 +175,7 @@ const ManageProductsPage: React.FC = () => {
                             <small className="text-muted">{'Current Images'}</small>
                             <div className="d-flex flex-wrap gap-2 mt-1">
                                 {editingProduct.images.map((img, idx) => (
-                                    <img key={idx} src={getImageUrl(img)} alt={t('product_alt_text', { index: idx + 1 })} style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '4px' }} />
+                                    <img key={idx} src={getImageUrl(img)} alt={`Product image ${idx + 1}`} style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '4px' }} />
                                 ))}
                             </div>
                             <Form.Check

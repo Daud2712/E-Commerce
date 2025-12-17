@@ -106,8 +106,8 @@ const DriverDashboard = () => {
     return (
       <div>
         <div><strong>{parts.join(', ')}</strong></div>
-        {address.phone && <div><small>{t('phone_with_icon', { phone: address.phone })}</small></div>}
-        {address.additionalInfo && <div><small>{t('additional_info_with_icon', { info: address.additionalInfo })}</small></div>}
+        {address.phone && <div><small>📞 {address.phone}</small></div>}
+        {address.additionalInfo && <div><small>ℹ️ {address.additionalInfo}</small></div>}
       </div>
     );
   };

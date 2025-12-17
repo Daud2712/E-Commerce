@@ -290,7 +290,7 @@ const BuyerDashboard = () => {
                   </Col>
                   <Col md={6}>
                     <strong>{'Price'}</strong>
-                    <p>{delivery.price ? t('price_with_currency_display', { amount: delivery.price.toLocaleString() }) : 'N/A'}</p>
+                    <p>{delivery.price ? 'TSh ' + delivery.price.toLocaleString() : 'N/A'}</p>
                   </Col>
                 </Row>
 
@@ -496,7 +496,7 @@ const BuyerDashboard = () => {
                       <td>{delivery.status.toUpperCase()}</td>
                       <td>{delivery.seller.name}</td>
                       <td>{delivery.rider ? delivery.rider.name : 'Not Yet Assigned'}</td>
-                      <td>{delivery.price ? t('price_with_currency_display', { amount: delivery.price.toLocaleString() }) : 'N/A'}</td>
+                      <td>{delivery.price ? 'TSh ' + delivery.price.toLocaleString() : 'N/A'}</td>
                     </tr>
                   ))
                 ) : (

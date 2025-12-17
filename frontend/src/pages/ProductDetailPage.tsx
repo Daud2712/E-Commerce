@@ -34,7 +34,7 @@ const ProductDetailPage: React.FC = () => {
     };
 
     fetchProduct();
-  }, [id, t]);
+  }, [id]);
 
   const handleAddToCart = () => {
     if (!user) {
@@ -45,7 +45,7 @@ const ProductDetailPage: React.FC = () => {
     if (!product) return;
 
     if (quantity > product.stock) {
-      alert(t('quantity_exceeds_stock_detail', { stock: product.stock }));
+      alert(`Quantity exceeds available stock. Only ${product.stock} available.`);
       return;
     }
 
@@ -66,7 +66,7 @@ const ProductDetailPage: React.FC = () => {
     if (!product || product.stock === 0) return;
 
     if (quantity > product.stock) {
-      alert(t('quantity_exceeds_stock_detail', { stock: product.stock }));
+      alert(`Quantity exceeds available stock. Only ${product.stock} available.`);
       return;
     }
 
