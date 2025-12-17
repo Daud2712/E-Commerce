@@ -155,7 +155,7 @@ const MyOrdersPage: React.FC = () => {
                       <strong>{t('price_with_currency_display', { amount: order.totalAmount.toFixed(2) })}</strong>
                     </td>
                     <td>{getStatusBadge(order)}</td>
-                    <td>{getPaymentStatusBadge(order.paymentStatus)}</td>
+                    <td>{getPaymentStatusBadge(order.paymentStatus || 'pending')}</td>
                     <td>
                       <Button
                         variant="info"
@@ -217,7 +217,7 @@ const MyOrdersPage: React.FC = () => {
                 <strong>{t('date')}:</strong> {new Date(selectedOrder.createdAt).toLocaleString()}
               </div>
               <div className="mb-3">
-                <strong>{t('status')}:</strong> {getStatusBadge(selectedOrder.status)}
+                <strong>{t('status')}:</strong> {getStatusBadge(selectedOrder)}
               </div>
 
               <h5 className="mt-4">{t('shipping_address')}</h5>
