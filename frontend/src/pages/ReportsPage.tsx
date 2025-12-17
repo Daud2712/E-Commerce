@@ -116,6 +116,8 @@ const ReportsPage: React.FC = () => {
                       <option value="daily">Today</option>
                       <option value="weekly">Last 7 Days</option>
                       <option value="monthly">Last 30 Days</option>
+                      <option value="6months">Last 6 Months</option>
+                      <option value="yearly">Last 1 Year</option>
                     </Form.Select>
                   </Form.Group>
                 </Col>
@@ -328,6 +330,8 @@ const ReportsPage: React.FC = () => {
                       <option value="daily">Today</option>
                       <option value="weekly">Last 7 Days</option>
                       <option value="monthly">Last 30 Days</option>
+                      <option value="6months">Last 6 Months</option>
+                      <option value="yearly">Last 1 Year</option>
                     </Form.Select>
                   </Form.Group>
                 </Col>

@@ -16,7 +16,7 @@ export const getSalesReport = async (req: AuthRequest, res: Response) => {
     return res.status(403).json({ message: 'Only sellers can view sales reports.' });
   }
 
-  const { period } = req.query; // daily, weekly, monthly
+  const { period } = req.query; // daily, weekly, monthly, 6months, yearly
 
   try {
     let startDate = new Date();
@@ -26,7 +26,14 @@ export const getSalesReport = async (req: AuthRequest, res: Response) => {
     } else if (period === 'weekly') {
       startDate.setDate(startDate.getDate() - 7);
     } else if (period === 'monthly') {
-      startDate.setMonth(startDate.getMonth() - 1);
+      startDate.setDate(startDate.getDate() - 30);
+    } else if (period === '6months') {
+      startDate.setMonth(startDate.getMonth() - 6);
+    } else if (period === 'yearly') {
+      startDate.setFullYear(startDate.getFullYear() - 1);
+    } else {
+      // Default to daily
+      startDate.setHours(0, 0, 0, 0);
     }
 
     const orders = await Order.find({
@@ -142,7 +149,7 @@ export const getExpenseReport = async (req: AuthRequest, res: Response) => {
     return res.status(403).json({ message: 'Only sellers can view expense reports.' });
   }
 
-  const { period } = req.query; // daily, weekly, monthly
+  const { period } = req.query; // daily, weekly, monthly, 6months, yearly
 
   try {
     let startDate = new Date();
@@ -152,7 +159,14 @@ export const getExpenseReport = async (req: AuthRequest, res: Response) => {
     } else if (period === 'weekly') {
       startDate.setDate(startDate.getDate() - 7);
     } else if (period === 'monthly') {
-      startDate.setMonth(startDate.getMonth() - 1);
+      startDate.setDate(startDate.getDate() - 30);
+    } else if (period === '6months') {
+      startDate.setMonth(startDate.getMonth() - 6);
+    } else if (period === 'yearly') {
+      startDate.setFullYear(startDate.getFullYear() - 1);
+    } else {
+      // Default to daily
+      startDate.setHours(0, 0, 0, 0);
     }
 
     const expenses = await Expense.find({
