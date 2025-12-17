@@ -5,12 +5,10 @@
   RewriteEngine On
   RewriteBase /
   
-  # Don't rewrite files or directories
+  # Don't rewrite files with extensions (CSS, JS, images, etc.)
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
-  
-  # Don't rewrite assets folder
-  RewriteCond %{REQUEST_URI} !^/assets/
+  RewriteCond %{REQUEST_URI} !\.(css|js|jpg|jpeg|png|gif|svg|ico|mp3|woff|woff2|ttf|eot)$ [NC]
   
   # Rewrite everything else to index.html to allow React Router to handle routing
   RewriteRule . /index.html [L]
