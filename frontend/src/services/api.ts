@@ -66,6 +66,7 @@ export const getAllOrders = () => API.get('/orders');
 export const updateOrderStatus = (id: string, data: { status: string; assignedRider?: string }) => API.put(`/orders/${id}/status`, data);
 export const cancelOrder = (id: string) => API.delete(`/orders/${id}`);
 export const confirmReceipt = (id: string) => API.put(`/orders/${id}/confirm-receipt`);
+export const updatePaymentStatus = (id: string, paymentStatus: string) => API.put(`/orders/${id}/payment-status`, { paymentStatus });
 
 
 API.interceptors.response.use(

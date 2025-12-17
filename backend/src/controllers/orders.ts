@@ -67,8 +67,8 @@ export const checkout = async (req: AuthRequest, res: Response) => {
       totalAmount,
       shippingAddress,
       status: 'pending',
-      paymentStatus: paymentMethod === 'cash' ? 'pending' : 'pending',
-      paymentMethod: paymentMethod || 'pending',
+      paymentStatus: paymentMethod === 'azampay' ? 'paid' : 'pending',
+      paymentMethod: paymentMethod || 'cash',
     };
 
     const [order] = await Order.create([orderData], { session });
@@ -496,5 +496,57 @@ export const confirmReceipt = async (req: AuthRequest, res: Response) => {
   } catch (error: any) {
     console.error('Error confirming receipt:', error);
     res.status(500).json({ message: 'Failed to confirm receipt.' });
+  }
+};
+
+// @desc    Update payment status
+// @route   PUT /api/orders/:id/payment-status
+// @access  Private (Seller only)
+export const updatePaymentStatus = async (req: AuthRequest, res: Response) => {
+  if (!req.user) {
+    return res.status(401).json({ message: 'Not authenticated.' });
+  }
+
+  if (req.user.role !== UserRole.SELLER) {
+    return res.status(403).json({ message: 'Only sellers can update payment status.' });
+  }
+
+  const { paymentStatus } = req.body;
+
+  if (!['pending', 'paid', 'failed'].includes(paymentStatus)) {
+    return res.status(400).json({ message: 'Invalid payment status.' });
+  }
+
+  try {
+    const order = await Order.findById(req.params.id).populate('items.product', 'seller');
+
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found.' });
+    }
+
+    // Check if seller owns at least one product in the order
+    const hasSellersProduct = order.items.some((item: any) =>
+      item.product?.seller?.toString() === req.user!.id
+    );
+
+    if (!hasSellersProduct) {
+      return res.status(403).json({ message: 'Not authorized to update this order.' });
+    }
+
+    order.paymentStatus = paymentStatus as any;
+    await order.save();
+
+    // Notify buyer about payment status change
+    emitToUser(order.buyer.toString(), 'paymentUpdate', {
+      orderId: order._id,
+      paymentStatus,
+      message: `Payment status updated to ${paymentStatus}`,
+      timestamp: new Date()
+    });
+
+    res.status(200).json({ message: 'Payment status updated successfully.', order });
+  } catch (error: any) {
+    console.error('Error updating payment status:', error);
+    res.status(500).json({ message: 'Failed to update payment status.' });
   }
 };

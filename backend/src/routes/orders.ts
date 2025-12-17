@@ -1,5 +1,5 @@
 import { Router, Response } from 'express';
-import { checkout, getBuyerOrders, getOrderById, getAllOrders, updateOrderStatus, cancelOrder, confirmReceipt } from '../controllers/orders';
+import { checkout, getBuyerOrders, getOrderById, getAllOrders, updateOrderStatus, cancelOrder, confirmReceipt, updatePaymentStatus } from '../controllers/orders';
 import { auth } from '../middleware/auth';
 import { UserRole, AuthRequest } from '../types';
 
@@ -68,6 +68,16 @@ router.put('/:id/confirm-receipt', auth, (req: AuthRequest, res: Response) => {
     return res.status(403).json({ message: 'Access denied. Only buyers can confirm receipt.' });
   }
   confirmReceipt(req, res);
+});
+
+// @route   PUT /api/orders/:id/payment-status
+// @desc    Update payment status
+// @access  Private (Seller only)
+router.put('/:id/payment-status', auth, (req: AuthRequest, res: Response) => {
+  if (!req.user || req.user.role !== UserRole.SELLER) {
+    return res.status(403).json({ message: 'Access denied. Only sellers can update payment status.' });
+  }
+  updatePaymentStatus(req, res);
 });
 
 export default router;
