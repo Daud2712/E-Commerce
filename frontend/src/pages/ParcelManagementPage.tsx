@@ -76,7 +76,7 @@ const ParcelManagementPage: React.FC = () => {
         }
     };
 
-    const getStatusBadge = (status: string) => {
+    const getStatusBadge = (order: IOrder) => {
         const variants: { [key: string]: string } = {
             pending: 'warning',
             processing: 'info',
@@ -85,8 +85,21 @@ const ParcelManagementPage: React.FC = () => {
             received: 'success',
             cancelled: 'danger',
         };
-        const formattedStatus = status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-        return <Badge bg={variants[status] || 'secondary'}>{formattedStatus}</Badge>;
+        const formattedStatus = order.status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        
+        // Show shipping status if delivery exists
+        if (order.hasDelivery && order.deliveryStatus) {
+            const shippingStatus = order.deliveryStatus.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            return (
+                <div>
+                    <Badge bg={variants[order.status] || 'secondary'}>{formattedStatus}</Badge>
+                    <br />
+                    <small className="text-muted">Shipping: {shippingStatus}</small>
+                </div>
+            );
+        }
+        
+        return <Badge bg={variants[order.status] || 'secondary'}>{formattedStatus}</Badge>;
     };
 
     const getPaymentBadge = (status: string) => {
@@ -183,7 +196,7 @@ const ParcelManagementPage: React.FC = () => {
                                         <small className="text-muted">No address provided</small>
                                     )}
                                 </td>
-                                <td>{getStatusBadge(order.status)}</td>
+                                <td>{getStatusBadge(order)}</td>
                                 <td>{getPaymentBadge(order.paymentStatus || 'pending')}</td>
                                 <td>
                                     {order.status === 'pending' && (
