@@ -1,0 +1,227 @@
+╔══════════════════════════════════════════════════════════════╗
+║     📦 NAMECHEAP DEPLOYMENT FILES - READY TO UPLOAD          ║
+╚══════════════════════════════════════════════════════════════╝
+
+✅ All files are built and ready for deployment!
+📅 Built on: December 17, 2025
+🔖 Git commit: 7f834af
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📂 FRONTEND FILES (Upload to public_html/)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Location: E-Commerce/frontend/dist/
+
+Files to upload:
+  📄 index.html (463 bytes)
+  📄 .htaccess (2.0 KB) ⚠️ IMPORTANT - Don't forget!
+  📁 assets/
+     ├─ 📄 index-CmaasR_D.css (242.89 KB)
+     └─ 📄 index-C4yuJRZx.js (627.65 KB)
+
+Total size: ~871 KB (uncompressed), ~226 KB (gzipped)
+
+Upload destination: /public_html/ or /public_html/yourdomain.com/
+
+⚠️ CRITICAL: Make sure .htaccess is uploaded!
+   - Enable "Show Hidden Files" in File Manager
+   - Or use FTP client that shows hidden files
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📂 BACKEND FILES (Upload to ~/api/)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Location: E-Commerce/backend/
+
+Files to upload:
+  📄 package.json
+  📄 package-lock.json
+  📄 ecosystem.config.js
+  📁 dist/ (entire folder)
+     ├─ 📄 index.js
+     ├─ 📁 controllers/
+     ├─ 📁 models/
+     ├─ 📁 routes/
+     ├─ 📁 types/
+     └─ 📁 utils/
+
+Upload destination: /home/yourusername/api/
+
+❌ DO NOT UPLOAD:
+   - node_modules (install on server instead)
+   - src/ folder (not needed)
+   - .env file (create manually on server)
+   - tsconfig.json (not needed)
+
+✅ CREATE ON SERVER:
+   - /home/yourusername/api/public/uploads/ (755 permissions)
+   - /home/yourusername/api/.env (see template below)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚙️ ENVIRONMENT VARIABLES (.env)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Create file: /home/yourusername/api/.env
+
+Required variables:
+┌─────────────────────────────────────────────────────────────┐
+│ PORT=5002                                                   │
+│ MONGO_URI=mongodb+srv://user:pass@cluster.mongodb.net/db   │
+│ JWT_SECRET=your-random-32-character-secret-key-here         │
+│ NODE_ENV=production                                         │
+│ FRONTEND_URL=https://yourdomain.com                         │
+└─────────────────────────────────────────────────────────────┘
+
+Or in cPanel Node.js App, add as environment variables.
+
+To generate JWT_SECRET:
+  node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📚 DEPLOYMENT GUIDES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📖 QUICK_UPLOAD_GUIDE.md
+   → Quick reference for uploading files
+   → Step-by-step checklist
+   → Common issues & solutions
+   ⏱️ Read time: 5 minutes
+
+📖 DEPLOYMENT_READY.md
+   → Comprehensive deployment guide
+   → 3 deployment options (cPanel/VPS/Cloud)
+   → Testing checklist
+   → Troubleshooting guide
+   ⏱️ Read time: 15 minutes
+
+📖 NAMECHEAP_DEPLOYMENT.md
+   → Detailed Namecheap-specific instructions
+   → Server configuration examples
+   → Nginx/PM2 setup
+   ⏱️ Read time: 20 minutes
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 QUICK START (3 STEPS)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1️⃣ Upload Frontend
+   - Connect via FTP/cPanel File Manager
+   - Upload frontend/dist/* to public_html/
+   - Verify .htaccess is there
+
+2️⃣ Upload Backend
+   - Create folder: ~/api/
+   - Upload backend files (package.json, dist/, etc.)
+   - Don't upload node_modules
+
+3️⃣ Configure & Start
+   - Set environment variables
+   - Run: npm install (in cPanel Node.js App)
+   - Click "Start App"
+   - Test: Visit yourdomain.com
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✨ FEATURES INCLUDED IN THIS BUILD
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ Auto-deduct stock when orders placed
+✅ Mark products out-of-stock when stock = 0
+✅ Restore stock when orders cancelled
+✅ Seller notification when products sold out
+✅ Fixed: Notifications go to specific users only
+✅ Socket.IO automatic reconnection
+✅ Role-based notification system (Buyer/Seller/Rider)
+✅ Comprehensive logging for debugging
+✅ Production-optimized builds
+✅ Security headers (.htaccess)
+✅ Browser caching configured
+✅ Gzip compression enabled
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔍 TESTING URLS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+After deployment, test:
+
+Backend:  https://api.yourdomain.com/ or https://yourdomain.com:5002/
+          Should show: "Freshedtz backend is running."
+
+Frontend: https://yourdomain.com
+          Should load: Your application homepage
+
+Socket:   Open browser console (F12)
+          Should see: [SOCKET] Connected with ID: ...
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚠️ IMPORTANT NOTES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Update VITE_API_URL in frontend:
+   Currently set to: https://e-commerce-backend-g1t5.onrender.com/api
+   
+   To change:
+   - Edit: frontend/.env.production
+   - Set: VITE_API_URL=https://api.yourdomain.com/api
+   - Rebuild: cd frontend && npm run build
+   - Re-upload: frontend/dist/* to public_html/
+
+2. MongoDB Atlas:
+   - Whitelist your Namecheap server IP
+   - Or use 0.0.0.0/0 (less secure, but works everywhere)
+
+3. File Permissions:
+   - Backend uploads folder: 755
+   - .htaccess: 644
+   - index.html: 644
+
+4. Node.js Version:
+   - Minimum: Node.js 18.x
+   - Check cPanel: Setup Node.js App
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 BUILD STATISTICS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Frontend Build:
+  - 775 modules transformed
+  - Build time: 13.77s
+  - Output size: 871 KB (226 KB gzipped)
+  - TypeScript: ✅ No errors
+  - Vite optimization: ✅ Complete
+
+Backend Build:
+  - TypeScript compilation: ✅ Complete
+  - Output: dist/ folder with all .js files
+  - Source maps: ❌ Disabled for production
+
+Git Status:
+  - Commit: 7f834af
+  - Branch: main
+  - Status: ✅ Pushed to GitHub
+  - All files committed: ✅
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎉 YOU'RE READY TO DEPLOY!
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Next steps:
+1. Read QUICK_UPLOAD_GUIDE.md (5 min)
+2. Follow upload instructions
+3. Test your deployment
+4. Go live! 🚀
+
+Estimated deployment time: 15-30 minutes (first time)
+
+Good luck! 💪
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
