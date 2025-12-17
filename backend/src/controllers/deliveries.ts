@@ -82,6 +82,8 @@ export const updateDeliveryStatus = async (req: AuthRequest, res: Response) => {
             return res.status(403).json({ message: 'Not authorized to update this delivery.' });
         }
 
+        console.log(`[DELIVERY UPDATE] Rider ${userId} updating delivery ${id} status to ${status}`);
+
         const updatedDelivery = await Delivery.findByIdAndUpdate(
             id,
             { status: status },
@@ -90,6 +92,25 @@ export const updateDeliveryStatus = async (req: AuthRequest, res: Response) => {
 
         if (!updatedDelivery) {
             return res.status(404).json({ message: 'Delivery not found after update attempt.' });
+        }
+
+        // Sync order status with delivery status
+        if (updatedDelivery.order) {
+          const Order = (await import('../models/Order')).default;
+          const order = await Order.findById(updatedDelivery.order);
+          
+          if (order) {
+            // Map delivery status to order status
+            if (status === 'in_transit' && order.status !== 'shipped') {
+              order.status = 'shipped';
+              await order.save();
+              console.log(`[DELIVERY UPDATE] Synced order ${order._id} status to 'shipped'`);
+            } else if (status === 'delivered' && order.status !== 'delivered') {
+              order.status = 'delivered';
+              await order.save();
+              console.log(`[DELIVERY UPDATE] Synced order ${order._id} status to 'delivered'`);
+            }
+          }
         }
 
         // Correct Mongoose v6 populate for document instance

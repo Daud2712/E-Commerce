@@ -200,7 +200,19 @@ export const getAllOrders = async (req: AuthRequest, res: Response) => {
       .populate('items.product', 'name seller')
       .sort({ createdAt: -1 });
 
-    res.status(200).json(sellerOrders);
+    // Check if each order has an assigned delivery
+    const ordersWithDeliveryInfo = await Promise.all(
+      sellerOrders.map(async (order) => {
+        const delivery = await Delivery.findOne({ order: order._id, deleted: false });
+        return {
+          ...order.toObject(),
+          hasDelivery: !!delivery,
+          assignedRider: delivery?.rider?.toString()
+        };
+      })
+    );
+
+    res.status(200).json(ordersWithDeliveryInfo);
   } catch (error: any) {
     console.error('Error fetching orders:', error);
     res.status(500).json({ message: 'Failed to fetch orders.' });
@@ -235,6 +247,16 @@ export const updateOrderStatus = async (req: AuthRequest, res: Response) => {
 
     if (!hasSellersProduct) {
       return res.status(403).json({ message: 'Not authorized to update this order.' });
+    }
+
+    // Check if a rider is already assigned to this order
+    const existingDelivery = await Delivery.findOne({ order: order._id, deleted: false });
+    
+    if (existingDelivery && existingDelivery.rider && !assignedRider) {
+      // If rider already assigned and seller is trying to update status (not assigning new rider)
+      return res.status(403).json({ 
+        message: 'Order has been assigned to a rider. Only the rider can update delivery status now.' 
+      });
     }
 
     order.status = status;

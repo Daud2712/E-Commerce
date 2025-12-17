@@ -104,6 +104,8 @@ export interface IOrder {
     country?: string;
     phone?: string;
   };
+  assignedRider?: string; // Rider ID if assigned
+  hasDelivery?: boolean; // Whether a delivery record exists
   // ...existing code...
   createdAt: string;
   updatedAt: string;

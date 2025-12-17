@@ -211,7 +211,7 @@ const ParcelManagementPage: React.FC = () => {
                                         </Dropdown>
                                     )}
 
-                                    {order.status === 'processing' && (
+                                    {!order.hasDelivery && order.status === 'processing' && (
                                         <Dropdown>
                                             <Dropdown.Toggle variant="info" size="sm">
                                                 Update Status
@@ -227,7 +227,11 @@ const ParcelManagementPage: React.FC = () => {
                                         </Dropdown>
                                     )}
 
-                                    {order.status === 'shipped' && (
+                                    {order.hasDelivery && (
+                                        <Badge bg="secondary">Rider Assigned - Status controlled by rider</Badge>
+                                    )}
+
+                                    {!order.hasDelivery && order.status === 'shipped' && (
                                         <Dropdown>
                                             <Dropdown.Toggle variant="info" size="sm">
                                                 Update Status
