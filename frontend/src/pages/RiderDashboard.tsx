@@ -276,7 +276,7 @@ const RiderDashboard = () => {
                         delivery.order.paymentStatus === 'failed' ? 'danger' :
                         'warning'
                       }>
-                        {delivery.order.paymentStatus.replace(/\w/g, l => l.toUpperCase())}
+                        {delivery.order.paymentStatus.charAt(0).toUpperCase() + delivery.order.paymentStatus.slice(1)}
                       </Badge>
                     ) : (
                       <span className="text-muted">N/A</span>
