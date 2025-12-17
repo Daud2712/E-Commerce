@@ -11,7 +11,7 @@ export interface IOrder extends Document {
   buyer: Schema.Types.ObjectId;
   items: IOrderItem[];
   totalAmount: number;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'received' | 'cancelled';
   shippingAddress: {
     street?: string;
     city?: string;
@@ -41,7 +41,7 @@ const orderSchema = new Schema({
   totalAmount: { type: Number, required: true, min: 0 },
   status: {
     type: String,
-    enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled'],
+    enum: ['pending', 'processing', 'shipped', 'delivered', 'received', 'cancelled'],
     default: 'pending',
   },
   shippingAddress: {
