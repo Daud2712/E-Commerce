@@ -1,16 +1,26 @@
 {
   "name": "e-commerce",
   "version": "1.0.0",
-  "description": "E-Commerce Platform with Customer, Staff, and Rider roles",
+  "description": "E-Commerce Platform with Buyer, Seller, and Rider roles",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js"
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build:backend": "cd backend && npm run build",
+    "build:frontend": "cd frontend && npm run build",
+    "build": "npm run build:backend && npm run build:frontend",
+    "start:backend": "cd backend && npm start",
+    "start:frontend": "cd frontend && npm run preview",
+    "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\""
   },
   "keywords": [
     "ecommerce",
     "nodejs",
-    "mongodb"
+    "mongodb",
+    "react",
+    "typescript"
   ],
   "author": "",
   "license": "ISC",
@@ -24,6 +34,7 @@
     "mongoose": "^7.0.0"
   },
   "devDependencies": {
+    "concurrently": "^8.2.2",
     "jest": "^30.2.0",
     "nodemon": "^2.0.20"
   }
