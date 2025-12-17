@@ -82,6 +82,7 @@ const ParcelManagementPage: React.FC = () => {
             processing: 'info',
             shipped: 'primary',
             delivered: 'success',
+            received: 'success',
             cancelled: 'danger',
         };
         const formattedStatus = status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());

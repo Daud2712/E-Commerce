@@ -427,3 +427,74 @@ export const cancelOrder = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ message: 'Failed to cancel order.' });
   }
 };
+
+// @desc    Buyer confirms receipt of order
+// @route   PUT /api/orders/:id/confirm-receipt
+// @access  Private (Buyer only)
+export const confirmReceipt = async (req: AuthRequest, res: Response) => {
+  if (!req.user) {
+    return res.status(401).json({ message: 'Not authenticated.' });
+  }
+
+  if (req.user.role !== UserRole.BUYER) {
+    return res.status(403).json({ message: 'Only buyers can confirm receipt.' });
+  }
+
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found.' });
+    }
+
+    // Check authorization
+    if (order.buyer.toString() !== req.user.id) {
+      return res.status(403).json({ message: 'Not authorized to confirm this order.' });
+    }
+
+    // Can only confirm delivered orders
+    if (order.status !== 'delivered') {
+      return res.status(400).json({ message: 'Can only confirm receipt of delivered orders.' });
+    }
+
+    order.status = 'received';
+    await order.save();
+
+    // Update delivery status if exists
+    const delivery = await Delivery.findOne({ order: order._id, deleted: false });
+    if (delivery) {
+      delivery.status = 'received';
+      await delivery.save();
+      
+      // Notify rider
+      if (delivery.rider) {
+        emitToRider(delivery.rider.toString(), 'deliveryUpdate', {
+          deliveryId: delivery._id,
+          trackingNumber: delivery.trackingNumber,
+          status: 'received',
+          message: 'Customer has confirmed receipt of delivery',
+          timestamp: new Date()
+        });
+      }
+    }
+
+    // Notify seller
+    const orderItems = await Order.findById(order._id).populate('items.product', 'seller');
+    if (orderItems && orderItems.items.length > 0) {
+      const sellerId = (orderItems.items[0].product as any)?.seller;
+      if (sellerId) {
+        emitToSeller(sellerId.toString(), 'orderUpdate', {
+          orderId: order._id,
+          status: 'received',
+          message: 'Customer has confirmed receipt of order',
+          timestamp: new Date()
+        });
+      }
+    }
+
+    res.status(200).json({ message: 'Receipt confirmed successfully.', order });
+  } catch (error: any) {
+    console.error('Error confirming receipt:', error);
+    res.status(500).json({ message: 'Failed to confirm receipt.' });
+  }
+};

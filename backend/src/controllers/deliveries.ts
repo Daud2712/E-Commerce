@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import Delivery from '../models/Delivery';
 import User from '../models/User'; // Import User model to fetch seller's name
 import { UserRole } from '../types';
-import { emitToUser, emitToRider } from '../utils/socket';
+import { emitToUser, emitToRider, emitToSeller } from '../utils/socket';
 
 // Extend the Request interface for authenticated requests
 interface AuthRequest extends Request {
@@ -105,10 +105,30 @@ export const updateDeliveryStatus = async (req: AuthRequest, res: Response) => {
               order.status = 'shipped';
               await order.save();
               console.log(`[DELIVERY UPDATE] Synced order ${order._id} status to 'shipped'`);
+              
+              // Notify seller about status change
+              if (updatedDelivery.seller) {
+                emitToSeller(updatedDelivery.seller.toString(), 'orderUpdate', {
+                  orderId: order._id,
+                  status: 'shipped',
+                  message: 'Order is now in transit',
+                  timestamp: new Date()
+                });
+              }
             } else if (status === 'delivered' && order.status !== 'delivered') {
               order.status = 'delivered';
               await order.save();
               console.log(`[DELIVERY UPDATE] Synced order ${order._id} status to 'delivered'`);
+              
+              // Notify seller about status change
+              if (updatedDelivery.seller) {
+                emitToSeller(updatedDelivery.seller.toString(), 'orderUpdate', {
+                  orderId: order._id,
+                  status: 'delivered',
+                  message: 'Order has been delivered to customer',
+                  timestamp: new Date()
+                });
+              }
             }
           }
         }

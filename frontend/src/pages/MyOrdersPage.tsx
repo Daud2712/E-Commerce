@@ -43,6 +43,20 @@ const MyOrdersPage: React.FC = () => {
     }
   };
 
+  const handleConfirmReceipt = async (orderId: string) => {
+    if (!window.confirm('Are you sure you want to confirm receipt of this order?')) {
+      return;
+    }
+
+    try {
+      await api.confirmReceipt(orderId);
+      alert('Order receipt confirmed successfully!');
+      fetchOrders(); // Refresh orders
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Failed to confirm receipt.');
+    }
+  };
+
   const handleViewDetails = (order: IOrder) => {
     setSelectedOrder(order);
     setShowModal(true);
@@ -54,6 +68,7 @@ const MyOrdersPage: React.FC = () => {
       processing: 'info',
       shipped: 'primary',
       delivered: 'success',
+      received: 'success',
     };
     const formattedStatus = status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
     return <Badge bg={variants[status] || 'secondary'}>{formattedStatus}</Badge>;
@@ -134,6 +149,15 @@ const MyOrdersPage: React.FC = () => {
                           onClick={() => handleCancelOrder(order._id)}
                         >
                           {t('cancel')}
+                        </Button>
+                      )}
+                      {order.status === 'delivered' && (
+                        <Button
+                          variant="success"
+                          size="sm"
+                          onClick={() => handleConfirmReceipt(order._id)}
+                        >
+                          Confirm Receipt
                         </Button>
                       )}
                     </td>
