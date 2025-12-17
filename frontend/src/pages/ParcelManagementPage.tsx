@@ -79,27 +79,24 @@ const ParcelManagementPage: React.FC = () => {
     const getStatusBadge = (order: IOrder) => {
         const variants: { [key: string]: string } = {
             pending: 'warning',
-            processing: 'info',
-            shipped: 'primary',
+            in_transit: 'primary',
             delivered: 'success',
-            received: 'success',
-            cancelled: 'danger',
         };
-        const formattedStatus = order.status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
         
-        // Show shipping status if delivery exists
+        // Determine display status: pending, in_transit, or delivered only
+        let displayStatus = 'pending';
         if (order.hasDelivery && order.deliveryStatus) {
-            const shippingStatus = order.deliveryStatus.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-            return (
-                <div>
-                    <Badge bg={variants[order.status] || 'secondary'}>{formattedStatus}</Badge>
-                    <br />
-                    <small className="text-muted">Shipping: {shippingStatus}</small>
-                </div>
-            );
+            if (order.deliveryStatus === 'in_transit') {
+                displayStatus = 'in_transit';
+            } else if (order.deliveryStatus === 'delivered' || order.deliveryStatus === 'received') {
+                displayStatus = 'delivered';
+            }
+        } else if (order.status === 'delivered' || order.status === 'received' || order.status === 'shipped') {
+            displayStatus = 'delivered';
         }
         
-        return <Badge bg={variants[order.status] || 'secondary'}>{formattedStatus}</Badge>;
+        const formattedStatus = displayStatus.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        return <Badge bg={variants[displayStatus] || 'secondary'}>{formattedStatus}</Badge>;
     };
 
     const getPaymentBadge = (status: string) => {
@@ -244,25 +241,9 @@ const ParcelManagementPage: React.FC = () => {
                                     )}
 
                                     {order.hasDelivery && (
-                                        <div>
-                                            <Badge bg="secondary" className="mb-1 d-block">
-                                                Rider Managing Delivery
-                                            </Badge>
-                                            {order.deliveryStatus && (
-                                                <small className="text-muted d-block">
-                                                    Delivery: {order.deliveryStatus.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                                                </small>
-                                            )}
-                                            {order.riderAccepted === false && (
-                                                <Badge bg="warning" className="mt-1">Rider Rejected</Badge>
-                                            )}
-                                            {order.riderAccepted === true && (
-                                                <Badge bg="success" className="mt-1">Rider Accepted</Badge>
-                                            )}
-                                            {order.riderAccepted === null && order.deliveryStatus === 'assigned' && (
-                                                <Badge bg="info" className="mt-1">Awaiting Rider Response</Badge>
-                                            )}
-                                        </div>
+                                        <Badge bg="secondary">
+                                            Rider Managing
+                                        </Badge>
                                     )}
 
                                     {!order.hasDelivery && order.status === 'shipped' && (
@@ -278,10 +259,8 @@ const ParcelManagementPage: React.FC = () => {
                                         </Dropdown>
                                     )}
 
-                                    {(order.status === 'delivered' || order.status === 'cancelled') && (
-                                        <small className="text-muted">
-                                            {order.status === 'delivered' ? '✓ Completed' : 'Cancelled'}
-                                        </small>
+                                    {order.status === 'delivered' && (
+                                        <small className="text-muted">✓ Completed</small>
                                     )}
                                 </td>
                             </tr>

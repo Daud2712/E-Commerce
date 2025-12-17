@@ -232,7 +232,6 @@ const RiderDashboard = () => {
               <th>Buyer</th>
               <th>Parcel</th>
               <th>Status</th>
-              <th>Acceptance Status</th>
               <th>Payment Status</th>
               <th>Destination</th>
               <th>Actions</th>
@@ -252,29 +251,25 @@ const RiderDashboard = () => {
                   </td>
                   <td>{delivery.packageName}</td>
                   <td>
-                    <Badge bg={
-                      delivery.status === 'received' ? 'success' :
-                      delivery.status === 'delivered' ? 'info' :
-                      delivery.status === 'in_transit' ? 'warning' :
-                      delivery.status === 'assigned' ? 'primary' :
-                      'secondary'
-                    }>
-                      {delivery.status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                    </Badge>
-                  </td>
-                  <td>
-                    {delivery.riderAccepted === null && (
-                      <Badge bg="warning">{t('status_pending_response')}</Badge>
-                    )}
-                    {delivery.riderAccepted === true && (
-                      <Badge bg="success">{t('status_accepted')}</Badge>
-                    )}
-                    {delivery.riderAccepted === false && (
-                      <Badge bg="danger">{t('status_rejected')}</Badge>
-                    )}
-                    {delivery.riderAccepted === undefined && (
-                      <span className="text-muted">{t('not_applicable_dash')}</span>
-                    )}
+                    {(() => {
+                      // Show only pending, in_transit, or delivered
+                      let displayStatus = 'pending';
+                      let variant = 'warning';
+                      
+                      if (delivery.status === 'in_transit') {
+                        displayStatus = 'in_transit';
+                        variant = 'primary';
+                      } else if (delivery.status === 'delivered' || delivery.status === 'received') {
+                        displayStatus = 'delivered';
+                        variant = 'success';
+                      }
+                      
+                      return (
+                        <Badge bg={variant}>
+                          {displayStatus.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                        </Badge>
+                      );
+                    })()}
                   </td>
                   <td>
                     {typeof delivery.order === 'object' && delivery.order?.paymentStatus ? (

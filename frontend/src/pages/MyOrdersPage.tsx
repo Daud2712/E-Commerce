@@ -62,16 +62,38 @@ const MyOrdersPage: React.FC = () => {
     setShowModal(true);
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (order: IOrder) => {
     const variants: { [key: string]: string } = {
       pending: 'warning',
-      processing: 'info',
-      shipped: 'primary',
+      assigned: 'info',
+      in_transit: 'primary',
       delivered: 'success',
-      received: 'success',
     };
-    const formattedStatus = status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-    return <Badge bg={variants[status] || 'secondary'}>{formattedStatus}</Badge>;
+    
+    // Determine display status: pending, assigned to rider, in_transit, or delivered only
+    let displayStatus = 'pending';
+    let displayText = 'Pending';
+    
+    if (order.hasDelivery) {
+      if (order.deliveryStatus === 'in_transit') {
+        displayStatus = 'in_transit';
+        displayText = 'In Transit';
+      } else if (order.deliveryStatus === 'delivered' || order.deliveryStatus === 'received' || order.status === 'received') {
+        displayStatus = 'delivered';
+        displayText = 'Delivered';
+      } else if (order.deliveryStatus === 'assigned' || order.status === 'processing') {
+        displayStatus = 'assigned';
+        displayText = 'Assigned To Rider';
+      }
+    } else if (order.status === 'delivered' || order.status === 'received' || order.status === 'shipped') {
+      displayStatus = 'delivered';
+      displayText = 'Delivered';
+    } else if (order.status === 'processing') {
+      displayStatus = 'assigned';
+      displayText = 'Assigned To Rider';
+    }
+    
+    return <Badge bg={variants[displayStatus] || 'secondary'}>{displayText}</Badge>;
   };
 
   const getPaymentStatusBadge = (status: string) => {
@@ -132,7 +154,7 @@ const MyOrdersPage: React.FC = () => {
                     <td>
                       <strong>{t('price_with_currency_display', { amount: order.totalAmount.toFixed(2) })}</strong>
                     </td>
-                    <td>{getStatusBadge(order.status)}</td>
+                    <td>{getStatusBadge(order)}</td>
                     <td>{getPaymentStatusBadge(order.paymentStatus)}</td>
                     <td>
                       <Button
