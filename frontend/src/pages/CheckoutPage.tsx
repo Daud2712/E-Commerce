@@ -332,10 +332,10 @@ const CheckoutPage: React.FC = () => {
                 <Table responsive>
                   <thead>
                     <tr>
-                      <th>{t('product')}</th>
-                      <th>{t('quantity')}</th>
-                      <th>{t('price')}</th>
-                      <th>{t('subtotal')}</th>
+                      <th>Product</th>
+                      <th>Quantity</th>
+                      <th>Price</th>
+                      <th>Subtotal</th>
                     </tr>
                   </thead>
                   <tbody>

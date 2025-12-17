@@ -150,11 +150,11 @@ const DriverDashboard = () => {
           <Table striped bordered hover responsive>
           <thead>
               <tr>
-              <th>{t('tracking_number_header')}</th>
-              <th>{t('package_header')}</th>
-              <th>{t('status_header')}</th>
-              <th>{t('destination_header')}</th>
-              <th>{t('actions_header')}</th>
+              <th>Tracking Number</th>
+              <th>Package</th>
+              <th>Status</th>
+              <th>Destination</th>
+              <th>Actions</th>
               </tr>
           </thead>
           <tbody>

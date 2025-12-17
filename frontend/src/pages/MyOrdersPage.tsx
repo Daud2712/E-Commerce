@@ -97,13 +97,13 @@ const MyOrdersPage: React.FC = () => {
             <Table responsive hover>
               <thead>
                 <tr>
-                  <th>{t('order_id')}</th>
-                  <th>{t('date')}</th>
-                  <th>{t('items')}</th>
-                  <th>{t('total')}</th>
-                  <th>{t('status')}</th>
-                  <th>{t('payment')}</th>
-                  <th>{t('actions')}</th>
+                  <th>Order ID</th>
+                  <th>Date</th>
+                  <th>Items</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th>Payment</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>

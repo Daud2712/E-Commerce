@@ -205,12 +205,12 @@ const RiderDashboard = () => {
           <Table striped bordered hover responsive>
           <thead>
               <tr>
-              <th>{t('tracking_number_header')}</th>
-              <th>{t('parcel_header')}</th>
-              <th>{t('status_header')}</th>
-              <th>{t('acceptance_status_header')}</th>
-              <th>{t('destination_header')}</th>
-              <th>{t('actions_header')}</th>
+              <th>Tracking Number</th>
+              <th>Parcel</th>
+              <th>Status</th>
+              <th>Acceptance Status</th>
+              <th>Destination</th>
+              <th>Actions</th>
               </tr>
           </thead>
           <tbody>

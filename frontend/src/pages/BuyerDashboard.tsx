@@ -481,12 +481,12 @@ const BuyerDashboard = () => {
             <Table striped bordered hover responsive>
               <thead>
                 <tr>
-                  <th>{t('tracking_number_header')}</th>
-                  <th>{t('package_name_header')}</th>
-                  <th>{t('status_header')}</th>
-                  <th>{t('seller_header')}</th>
-                  <th>{t('rider_header')}</th>
-                  <th>{t('price_column')}</th>
+                  <th>Tracking Number</th>
+                  <th>Package Name</th>
+                  <th>Status</th>
+                  <th>Seller</th>
+                  <th>Rider</th>
+                  <th>Price</th>
                 </tr>
               </thead>
               <tbody>

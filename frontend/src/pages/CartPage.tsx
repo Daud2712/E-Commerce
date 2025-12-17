@@ -52,11 +52,11 @@ const CartPage: React.FC = () => {
               <Table responsive>
                 <thead>
                   <tr>
-                    <th>{t('product')}</th>
-                    <th>{t('price')}</th>
-                    <th>{t('quantity')}</th>
-                    <th>{t('subtotal')}</th>
-                    <th>{t('actions')}</th>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Subtotal</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>

@@ -56,12 +56,12 @@ const ProductsPage: React.FC = () => {
                 <Table striped bordered hover responsive>
                     <thead>
                         <tr>
-                            <th>{t('product_image_header')}</th>
-                            <th>{t('product_name_header')}</th>
-                            <th>{t('product_price_header')}</th>
-                            <th>{t('product_stock_header')}</th>
-                            <th>{t('product_category_header')}</th>
-                            <th>{t('actions_header')}</th>
+                            <th>Product Image</th>
+                            <th>Product Name</th>
+                            <th>Product Price</th>
+                            <th>Product Stock</th>
+                            <th>Product Category</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
