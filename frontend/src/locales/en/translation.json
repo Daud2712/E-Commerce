@@ -198,6 +198,7 @@
   "quantity_exceeds_stock": "Quantity exceeds available stock.",
   "view_details": "View Details",
   "out_of_stock": "Out of Stock",
+  "sold_out": "Sold Out",
   "no_products_found": "No products found matching your criteria.",
   "search_products_placeholder": "Search products...",
   "all_categories": "All Categories",

@@ -255,7 +255,9 @@ const InventoryPage: React.FC = () => {
                       </td>
                       <td>{stockValue.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
                       <td>
-                        {product.isAvailable && product.stock > 0 ? (
+                        {product.stock === 0 ? (
+                          <Badge bg="danger">Sold Out</Badge>
+                        ) : product.isAvailable ? (
                           <Badge bg="success">Available</Badge>
                         ) : (
                           <Badge bg="secondary">Unavailable</Badge>

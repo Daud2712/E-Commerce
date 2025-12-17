@@ -49,6 +49,12 @@ export const checkout = async (req: AuthRequest, res: Response) => {
       }
 
       product.stock -= quantity;
+      
+      // Mark product as unavailable if stock becomes 0
+      if (product.stock === 0) {
+        product.isAvailable = false;
+      }
+      
       await product.save({ session });
 
       orderItems.push({
