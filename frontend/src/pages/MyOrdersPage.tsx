@@ -55,7 +55,8 @@ const MyOrdersPage: React.FC = () => {
       shipped: 'primary',
       delivered: 'success',
     };
-    return <Badge bg={variants[status] || 'secondary'}>{t('status_' + status)}</Badge>;
+    const formattedStatus = status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    return <Badge bg={variants[status] || 'secondary'}>{formattedStatus}</Badge>;
   };
 
   const getPaymentStatusBadge = (status: string) => {
@@ -64,7 +65,8 @@ const MyOrdersPage: React.FC = () => {
       paid: 'success',
       failed: 'danger',
     };
-    return <Badge bg={variants[status] || 'secondary'}>{t('payment_status_' + status)}</Badge>;
+    const formattedStatus = status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    return <Badge bg={variants[status] || 'secondary'}>{formattedStatus}</Badge>;
   };
 
   if (loading) {

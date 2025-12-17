@@ -226,7 +226,7 @@ const RiderDashboard = () => {
                       delivery.status === 'assigned' ? 'primary' :
                       'secondary'
                     }>
-                      {t('status_' + delivery.status)}
+                      {delivery.status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                     </Badge>
                   </td>
                   <td>

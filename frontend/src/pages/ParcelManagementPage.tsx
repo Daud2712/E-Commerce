@@ -84,7 +84,8 @@ const ParcelManagementPage: React.FC = () => {
             delivered: 'success',
             cancelled: 'danger',
         };
-        return <Badge bg={variants[status] || 'secondary'}>{status}</Badge>;
+        const formattedStatus = status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        return <Badge bg={variants[status] || 'secondary'}>{formattedStatus}</Badge>;
     };
 
     const getPaymentBadge = (status: string) => {

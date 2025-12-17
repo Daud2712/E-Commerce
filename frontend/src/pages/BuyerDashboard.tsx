@@ -280,7 +280,7 @@ const BuyerDashboard = () => {
                         }`}
                         style={{ fontSize: '1em' }}
                       >
-                        {delivery.status === 'assigned' ? t('status_assigned_to_rider') : t('status_' + delivery.status)}                     </span>
+                        {delivery.status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}                     </span>
                     </p>
                   </Col>
                 </Row>

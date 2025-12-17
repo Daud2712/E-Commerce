@@ -162,7 +162,7 @@ const DriverDashboard = () => {
               <tr key={delivery._id}>
                   <td>{delivery.trackingNumber}</td>
                   <td>{delivery.packageName}</td>
-                  <td>{delivery.status === 'assigned' ? t('status_assigned_to_rider') : t('status_' + delivery.status)}</td>
+                  <td>{delivery.status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</td>
                   <td>{formatAddress(delivery.buyer?.deliveryAddress)}</td>
                   <td>
                   <ButtonGroup>
