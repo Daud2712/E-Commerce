@@ -1,5 +1,9 @@
 # Environment Setup Guide
 
+**Last Updated:** December 17, 2025  
+**Repository:** https://github.com/Daud2712/E-Commerce  
+**Latest Commit:** 0d335c4
+
 This guide explains how to run the E-Commerce application in both local development and production environments.
 
 ## Table of Contents

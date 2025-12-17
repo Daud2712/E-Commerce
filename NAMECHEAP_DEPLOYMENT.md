@@ -1,5 +1,9 @@
 # Namecheap Deployment Guide
 
+**Last Updated:** December 17, 2025  
+**Repository:** https://github.com/Daud2712/E-Commerce  
+**Latest Commit:** 0d335c4 - Translation keys replaced with plain text
+
 This guide will help you deploy the E-Commerce application to Namecheap shared hosting or VPS.
 
 ## Prerequisites
