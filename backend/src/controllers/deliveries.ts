@@ -130,7 +130,8 @@ export const updateDeliveryStatus = async (req: AuthRequest, res: Response) => {
           } else if (status === 'cancelled') {
             message = 'Your delivery has been cancelled';
           } else {
-            message = `Your delivery status has been updated to ${status}`;
+            const displayStatus = status.replace(/_/g, ' ');
+            message = `Your delivery status has been updated to ${displayStatus}`;
           }
 
           emitToUser(updatedDelivery.buyer.toString(), 'deliveryUpdate', {
@@ -144,11 +145,12 @@ export const updateDeliveryStatus = async (req: AuthRequest, res: Response) => {
 
         // Notify the rider about delivery status change
         if (updatedDelivery.rider && (status === 'in_transit' || status === 'delivered')) {
+          const displayStatus = status.replace(/_/g, ' ');
           emitToUser(updatedDelivery.rider.toString(), 'deliveryUpdate', {
             deliveryId: updatedDelivery._id,
             trackingNumber: updatedDelivery.trackingNumber,
             status: status,
-            message: `Delivery status updated to ${status}`,
+            message: `Delivery status updated to ${displayStatus}`,
             timestamp: new Date()
           });
         }
