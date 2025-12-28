@@ -102,6 +102,7 @@ const ManageProductsPage: React.FC = () => {
     return (
         <Container>
             <h4>{editingProduct ? 'Edit Product' : 'Add New Product'}</h4>
+            <p className="text-muted">Products are shared among all sellers - everyone can manage them</p>
             {formError && <Alert variant="danger">{formError}</Alert>}
             {formSuccess && <Alert variant="success">{formSuccess}</Alert>}
             <Form onSubmit={handleAddUpdateProduct}>

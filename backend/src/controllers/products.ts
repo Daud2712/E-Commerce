@@ -56,11 +56,11 @@ export const createProduct = async (req: AuthRequest, res: Response) => {
 
 // @desc    Get all products
 // @route   GET /api/products
-// @access  Public for buyers, Private for sellers
+// @access  Public for buyers, sellers see all products (collaborative system)
 export const getProducts = async (req: AuthRequest, res: Response) => {
   try {
-    // For all users accessing the main /api/products route, show all available and non-deleted products.
-    // Seller-specific products will be handled by the /api/products/my-products route.
+    // Show all available and non-deleted products to everyone
+    // All sellers can manage all products in a collaborative system
     const products = await Product.find({ isAvailable: true, deleted: false }).populate('seller', 'name');
     res.status(200).json(products);
   } catch (error: any) {
@@ -122,8 +122,9 @@ export const updateProduct = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ message: 'Product not found.' });
     }
 
-    if (product.seller.toString() !== req.user.id) {
-      return res.status(403).json({ message: 'Not authorized to update this product.' });
+    // All sellers can update any product (collaborative system)
+    if (req.user.role !== UserRole.SELLER) {
+      return res.status(403).json({ message: 'Only sellers can update products.' });
     }
 
     product.name = name || product.name;
@@ -164,9 +165,9 @@ export const deleteProduct = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ message: 'Product not found.' });
     }
 
-    // Ensure seller is the owner of the product
-    if (product.seller.toString() !== req.user.id) {
-      return res.status(403).json({ message: 'Not authorized to delete this product.' });
+    // All sellers can delete any product (collaborative system)
+    if (req.user.role !== UserRole.SELLER) {
+      return res.status(403).json({ message: 'Only sellers can delete products.' });
     }
 
     product.deleted = true;

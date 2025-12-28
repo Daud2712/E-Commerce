@@ -35,9 +35,9 @@ export const register = async (req: Request, res: Response) => {
     const hashedPassword = await bcrypt.hash(password, 12);
 
     // Determine initial status based on role
-    let initialStatus = UserStatus.APPROVED; // Buyers and admins are auto-approved
-    if (role === UserRole.SELLER || role === UserRole.RIDER) {
-      initialStatus = UserStatus.PENDING; // Sellers and riders need admin approval
+    let initialStatus = UserStatus.APPROVED; // All users are auto-approved (buyers, sellers, admins)
+    if (role === UserRole.RIDER) {
+      initialStatus = UserStatus.PENDING; // Only riders need admin approval for safety
     }
 
     const user = new User({
@@ -60,9 +60,9 @@ export const register = async (req: Request, res: Response) => {
       userId: user.id, 
       role: user.role,
       status: user.status,
-      message: (role === UserRole.SELLER || role === UserRole.RIDER) 
+      message: role === UserRole.RIDER
         ? 'Registration successful. Your account is pending admin approval.' 
-        : 'Registration successful.'
+        : 'Registration successful. You can now access the dashboard.'
     });
   } catch (error: any) {
     if (error.code === 11000 && error.keyPattern && error.keyPattern.registrationNumber) {

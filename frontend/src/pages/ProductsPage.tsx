@@ -46,7 +46,8 @@ const ProductsPage: React.FC = () => {
 
     return (
         <Container>
-            <h4>Your Products</h4>
+            <h4>All Products (Collaborative Management)</h4>
+            <p className="text-muted">All sellers can add, edit, and delete any product</p>
             {loading && <Spinner animation="border" />}
             {error && <Alert variant="danger">{error}</Alert>}
             {success && <Alert variant="success">{success}</Alert>}
