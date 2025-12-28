@@ -124,7 +124,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
           message 
         });
         
-        const audio = new Audio('/notification.mp3');
+        const audio = new Audio('/bell-notification.wav');
         audio.play().catch(() => {});
         
         window.dispatchEvent(new CustomEvent('newOrderReceived', { detail: data }));
@@ -152,7 +152,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
           message 
         });
         
-        const audio = new Audio('/notification.mp3');
+        const audio = new Audio('/interface-notification.wav');
         audio.play().catch(() => {});
         
         // Dispatch event to refresh delivery list
