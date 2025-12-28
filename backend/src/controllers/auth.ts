@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '../models/User';
-import { UserRole } from '../types';
+import { UserRole, UserStatus } from '../types';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
 
@@ -19,38 +19,52 @@ export const register = async (req: Request, res: Response) => {
     if (role === UserRole.BUYER) {
         // Find the highest existing registration number
         const lastBuyer = await User.findOne({ role: UserRole.BUYER })
-                                    .sort({ registrationNumber: -1 }) // Sort in descending order to get the highest
+                                    .sort({ registrationNumber: -1 })
                                     .select('registrationNumber');
 
-        let nextNumber = 100; // Starting number if no buyer exists
+        let nextNumber = 100;
         if (lastBuyer && lastBuyer.registrationNumber) {
             const lastNum = parseInt(lastBuyer.registrationNumber, 10);
-            if (!isNaN(lastNum) && lastNum >= 100) { // Ensure it's a valid number and at least 100
+            if (!isNaN(lastNum) && lastNum >= 100) {
                 nextNumber = lastNum + 1;
             }
         }
-        // Format to 6 digits with leading zeros
         generatedRegistrationNumber = nextNumber.toString().padStart(6, '0');
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
+
+    // Determine initial status based on role
+    let initialStatus = UserStatus.APPROVED; // Buyers and admins are auto-approved
+    if (role === UserRole.SELLER || role === UserRole.RIDER) {
+      initialStatus = UserStatus.PENDING; // Sellers and riders need admin approval
+    }
 
     const user = new User({
       name,
       email,
       password: hashedPassword,
       role: role || UserRole.BUYER,
+      status: initialStatus,
       ...(role === UserRole.BUYER && generatedRegistrationNumber && { registrationNumber: generatedRegistrationNumber }),
     });
 
     await user.save();
 
-    const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET, {
+    const token = jwt.sign({ userId: user.id, role: user.role, status: user.status }, JWT_SECRET, {
       expiresIn: '1h',
     });
 
-    res.status(201).json({ token, userId: user.id, role: user.role });
-  } catch (error: any) { // Explicitly type error as 'any'
+    res.status(201).json({ 
+      token, 
+      userId: user.id, 
+      role: user.role,
+      status: user.status,
+      message: (role === UserRole.SELLER || role === UserRole.RIDER) 
+        ? 'Registration successful. Your account is pending admin approval.' 
+        : 'Registration successful.'
+    });
+  } catch (error: any) {
     if (error.code === 11000 && error.keyPattern && error.keyPattern.registrationNumber) {
       return res.status(400).json({ message: 'Registration number already in use.' });
     }
@@ -72,11 +86,33 @@ export const login = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Invalid credentials.' });
     }
 
-    const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET, {
+    // Check if account is suspended
+    if (user.status === UserStatus.SUSPENDED) {
+      return res.status(403).json({ 
+        message: 'Your account has been suspended.', 
+        reason: user.suspensionReason 
+      });
+    }
+
+    // Check if account is rejected
+    if (user.status === UserStatus.REJECTED) {
+      return res.status(403).json({ 
+        message: 'Your account registration was rejected.', 
+        reason: user.rejectionReason 
+      });
+    }
+
+    const token = jwt.sign({ userId: user.id, role: user.role, status: user.status }, JWT_SECRET, {
       expiresIn: '1h',
     });
 
-    res.status(200).json({ token, userId: user.id, role: user.role });
+    res.status(200).json({ 
+      token, 
+      userId: user.id, 
+      role: user.role,
+      status: user.status,
+      isPending: user.status === UserStatus.PENDING
+    });
   } catch (error) {
     res.status(500).json({ message: 'Something went wrong.' });
   }

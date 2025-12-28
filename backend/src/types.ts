@@ -2,6 +2,14 @@ export enum UserRole {
   BUYER = 'buyer',
   SELLER = 'seller',
   RIDER = 'rider',
+  ADMIN = 'admin',
+}
+
+export enum UserStatus {
+  PENDING = 'pending',
+  APPROVED = 'approved',
+  REJECTED = 'rejected',
+  SUSPENDED = 'suspended',
 }
 
 export interface RegisterFormData {

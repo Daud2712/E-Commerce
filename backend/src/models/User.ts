@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { UserRole } from '../types'; // I will create this type file next
+import { UserRole, UserStatus } from '../types';
 
 const userSchema = new Schema({
   name: { type: String, required: true },
@@ -10,8 +10,13 @@ const userSchema = new Schema({
     enum: Object.values(UserRole),
     default: UserRole.BUYER,
   },
+  status: {
+    type: String,
+    enum: Object.values(UserStatus),
+    default: UserStatus.PENDING,
+  },
   isAvailable: { type: Boolean, default: false },
-  registrationNumber: { type: String, unique: true, sparse: true }, // Added for buyers
+  registrationNumber: { type: String, unique: true, sparse: true },
   deliveryAddress: {
     street: { type: String },
     city: { type: String },
@@ -19,8 +24,14 @@ const userSchema = new Schema({
     postalCode: { type: String },
     country: { type: String },
     phone: { type: String },
-    additionalInfo: { type: String }, // For apartment number, landmarks, etc.
+    additionalInfo: { type: String },
   },
+  approvedBy: { type: Schema.Types.ObjectId, ref: 'User' },
+  approvedAt: { type: Date },
+  rejectedAt: { type: Date },
+  rejectionReason: { type: String },
+  suspendedAt: { type: Date },
+  suspensionReason: { type: String },
 }, { timestamps: true });
 
 const User = model('User', userSchema);

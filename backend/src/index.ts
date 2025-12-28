@@ -11,6 +11,7 @@ import productRoutes from './routes/products';
 import orderRoutes from './routes/orders';
 import expenseRoutes from './routes/expenses';
 import reportRoutes from './routes/reports';
+import adminRoutes from './routes/admin';
 import { setSocketIO } from './utils/socket';
 
 dotenv.config();
@@ -48,6 +49,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/expenses', expenseRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/admin', adminRoutes);
 
 const PORT = process.env.PORT || 5002;
 
