@@ -4,6 +4,7 @@ import { Navbar, Container, Nav, Badge } from 'react-bootstrap';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ProtectedRoute from './components/ProtectedRoute';
+import AdminOnlyRoute from './components/AdminOnlyRoute';
 
 import SellerDashboard from './pages/SellerDashboard';
 import RiderDashboard from './pages/RiderDashboard';
@@ -65,11 +66,11 @@ function App() {
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse id="basic-navbar-nav">
               <Nav className="me-auto">
-                {role !== UserRole.RIDER && (
+                {role !== UserRole.RIDER && role !== UserRole.ADMIN && (
                   <Nav.Link as={Link} to="/">{t('products_link')}</Nav.Link>
                 )}
 
-                {isAuthenticated && (
+                {isAuthenticated && role !== UserRole.ADMIN && (
                   <Nav.Link as={Link} to={
                     role === UserRole.SELLER ? "/seller/products" :
                     role === UserRole.RIDER ? "/rider-dashboard" :
@@ -97,7 +98,7 @@ function App() {
                     )}
                   </Nav.Link>
                 )}
-                {isAuthenticated && <NotificationDropdown />}
+                {isAuthenticated && role !== UserRole.ADMIN && <NotificationDropdown />}
                 {!isAuthenticated && <Nav.Link as={Link} to="/login">{t('login_button')}</Nav.Link>}
                 {!isAuthenticated && <Nav.Link as={Link} to="/register">{t('register_button')}</Nav.Link>}
                 {isAuthenticated && <UserSettingsDropdown onLogout={logout} />}
@@ -109,17 +110,30 @@ function App() {
           <Container className="mt-4">
             <Routes>
               <Route path="/" element={
+                role === UserRole.ADMIN ? <Navigate to="/admin-dashboard" replace /> :
                 role === UserRole.RIDER ? <RiderDashboard /> : <ProductListingPage />
               } />
 
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
-              <Route path="/settings" element={<SettingsPage />} />
+              
+              {/* Admin-only routes */}
+              <Route path="/admin-dashboard" element={
+                <AdminOnlyRoute>
+                  <AdminDashboard />
+                </AdminOnlyRoute>
+              } />
+              <Route path="/settings" element={
+                role === UserRole.ADMIN ? (
+                  <AdminOnlyRoute>
+                    <SettingsPage />
+                  </AdminOnlyRoute>
+                ) : (
+                  <SettingsPage />
+                )
+              } />
 
-              <Route element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]} />}>
-                <Route path="/admin-dashboard" element={<AdminDashboard />} />
-              </Route>
-
+              {/* Seller routes - blocked for admins */}
               <Route element={<ProtectedRoute allowedRoles={[UserRole.SELLER]} />}>
                 <Route path="/seller" element={<SellerDashboard />}>
                   <Route path="products" element={<ProductsPage />} />
