@@ -1,11 +1,12 @@
 import { Request, Response } from 'express';
 import User from '../models/User';
-import { UserRole } from '../types';
+import { UserRole, UserStatus } from '../types';
 
 interface AuthRequest extends Request {
     user?: {
         id: string;
         role: UserRole;
+        status: UserStatus;
     };
 }
 

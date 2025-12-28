@@ -31,7 +31,9 @@ const LoginPage = () => {
 
   React.useEffect(() => {
     if (auth.isAuthenticated && auth.role) {
-      if (auth.role === UserRole.RIDER) {
+      if (auth.role === UserRole.ADMIN) {
+        navigate('/admin-dashboard');
+      } else if (auth.role === UserRole.RIDER) {
         navigate('/rider-dashboard');
       } else if (auth.role === UserRole.SELLER) {
         navigate('/'); // Redirect sellers to the main product listing page

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { UserRole } from '../types'; // Import UserRole
+import { UserRole, UserStatus } from '../types'; // Import UserRole and UserStatus
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
 
@@ -11,6 +11,7 @@ declare global {
       user?: {
         id: string;
         role: UserRole; // Use UserRole type
+        status: UserStatus; // Add status
       };
     }
   }
@@ -23,11 +24,12 @@ export const auth = (req: Request, res: Response, next: NextFunction) => {
       return res.status(401).json({ message: 'Authentication failed.' });
     }
 
-    const decodedToken = jwt.verify(token, JWT_SECRET) as { userId: string; role: UserRole }; // Use UserRole
+    const decodedToken = jwt.verify(token, JWT_SECRET) as { userId: string; role: UserRole; status: UserStatus }; // Include status
 
     req.user = {
       id: decodedToken.userId,
       role: decodedToken.role,
+      status: decodedToken.status,
     };
 
     next();
@@ -41,10 +43,11 @@ export const optionalAuth = (req: Request, res: Response, next: NextFunction) =>
   try {
     const token = req.headers.authorization?.split(' ')[1];
     if (token) {
-      const decodedToken = jwt.verify(token, JWT_SECRET) as { userId: string; role: UserRole };
+      const decodedToken = jwt.verify(token, JWT_SECRET) as { userId: string; role: UserRole; status: UserStatus };
       req.user = {
         id: decodedToken.userId,
         role: decodedToken.role,
+        status: decodedToken.status,
       };
     }
     // Continue even if no token or invalid token

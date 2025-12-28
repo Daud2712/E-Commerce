@@ -1,14 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { UserRole } from '../types';
-
-// Extend Express Request to include user
-declare global {
-  namespace Express {
-    interface Request {
-      user?: any;
-    }
-  }
-}
+import { UserRole, UserStatus } from '../types';
 
 export const requireAdmin = (req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {
@@ -33,7 +24,7 @@ export const requireApprovedStatus = (req: Request, res: Response, next: NextFun
   }
 
   // Sellers and riders need approval
-  if (req.user.status !== 'approved') {
+  if (req.user.status !== UserStatus.APPROVED) {
     return res.status(403).json({ 
       message: 'Your account is pending approval', 
       status: req.user.status 

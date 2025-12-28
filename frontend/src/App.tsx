@@ -8,6 +8,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import SellerDashboard from './pages/SellerDashboard';
 import RiderDashboard from './pages/RiderDashboard';
 import BuyerDashboard from './pages/BuyerDashboard';
+import AdminDashboard from './pages/AdminDashboard';
 import SettingsPage from './pages/SettingsPage';
 import ProductListingPage from './pages/ProductListingPage';
 import ProductDetailPage from './pages/ProductDetailPage';
@@ -114,6 +115,10 @@ function App() {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/settings" element={<SettingsPage />} />
+
+              <Route element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]} />}>
+                <Route path="/admin-dashboard" element={<AdminDashboard />} />
+              </Route>
 
               <Route element={<ProtectedRoute allowedRoles={[UserRole.SELLER]} />}>
                 <Route path="/seller" element={<SellerDashboard />}>

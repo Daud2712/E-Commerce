@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import Delivery from '../models/Delivery';
 import User from '../models/User'; // Import User model to fetch seller's name
-import { UserRole } from '../types';
+import { UserRole, UserStatus } from '../types';
 import { emitToUser, emitToRider, emitToSeller } from '../utils/socket';
 
 // Extend the Request interface for authenticated requests
@@ -9,6 +9,7 @@ interface AuthRequest extends Request {
   user?: {
     id: string;
     role: UserRole;
+    status: UserStatus;
   };
 }
 

@@ -2,6 +2,7 @@ export enum UserRole {
   BUYER = 'buyer',
   SELLER = 'seller',
   RIDER = 'rider',
+  ADMIN = 'admin',
 }
 
 export interface DeliveryAddress {

@@ -71,6 +71,16 @@ export const cancelOrder = (id: string) => API.delete(`/orders/${id}`);
 export const confirmReceipt = (id: string) => API.put(`/orders/${id}/confirm-receipt`);
 export const updatePaymentStatus = (id: string, paymentStatus: string) => API.put(`/orders/${id}/payment-status`, { paymentStatus });
 
+// Admin API calls
+export const getPendingSellers = (token: string) => API.get('/admin/pending-sellers', { headers: { Authorization: `Bearer ${token}` } });
+export const getPendingRiders = (token: string) => API.get('/admin/pending-riders', { headers: { Authorization: `Bearer ${token}` } });
+export const getAllUsers = (token: string) => API.get('/admin/users', { headers: { Authorization: `Bearer ${token}` } });
+export const getUserDetails = (userId: string, token: string) => API.get(`/admin/users/${userId}`, { headers: { Authorization: `Bearer ${token}` } });
+export const approveUser = (userId: string, token: string) => API.post(`/admin/users/${userId}/approve`, {}, { headers: { Authorization: `Bearer ${token}` } });
+export const rejectUser = (userId: string, reason: string, token: string) => API.post(`/admin/users/${userId}/reject`, { reason }, { headers: { Authorization: `Bearer ${token}` } });
+export const suspendUser = (userId: string, reason: string, token: string) => API.post(`/admin/users/${userId}/suspend`, { reason }, { headers: { Authorization: `Bearer ${token}` } });
+export const reactivateUser = (userId: string, token: string) => API.post(`/admin/users/${userId}/reactivate`, {}, { headers: { Authorization: `Bearer ${token}` } });
+
 
 API.interceptors.response.use(
   (response) => response,

@@ -3,6 +3,7 @@ import User from '../models/User';
 import SellerProfile from '../models/SellerProfile';
 import RiderProfile from '../models/RiderProfile';
 import { UserRole, UserStatus } from '../types';
+import { Types } from 'mongoose';
 
 // Get all pending sellers
 export const getPendingSellers = async (req: Request, res: Response) => {
@@ -76,7 +77,7 @@ export const getAllUsers = async (req: Request, res: Response) => {
 export const approveUser = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
-    const adminId = req.user._id;
+    const adminId = req.user?.id ? new Types.ObjectId(req.user.id) : undefined;
 
     const user = await User.findById(userId);
     if (!user) {
