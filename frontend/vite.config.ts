@@ -1,10 +1,24 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
+import { copyFileSync } from 'fs'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    {
+      name: 'copy-htaccess',
+      closeBundle() {
+        try {
+          copyFileSync('.htaccess', 'dist/.htaccess')
+          console.log('✓ Copied .htaccess to dist/')
+        } catch (err) {
+          console.warn('⚠ Could not copy .htaccess:', err)
+        }
+      }
+    }
+  ],
   base: './',
   esbuild: {
     target: 'es2020'

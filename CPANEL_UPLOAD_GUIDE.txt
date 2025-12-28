@@ -1,0 +1,205 @@
+═══════════════════════════════════════════════════════════════════════
+    cPANEL UPLOAD GUIDE - FRESH EDTanzania E-Commerce
+═══════════════════════════════════════════════════════════════════════
+
+📁 FILES TO UPLOAD
+═══════════════════════════════════════════════════════════════════════
+
+Location: D:\DtopProj\E-Commerce\frontend\dist\
+
+Upload ALL contents from the "dist" folder:
+  ✓ .htaccess (IMPORTANT - handles routing for React app!)
+  ✓ index.html
+  ✓ Logo.jpeg
+  ✓ notification.mp3
+  ✓ assets/ (entire folder with all files inside)
+
+
+📋 STEP-BY-STEP UPLOAD INSTRUCTIONS
+═══════════════════════════════════════════════════════════════════════
+
+1. LOGIN TO CPANEL
+   • Go to: https://freshedtanzania.co.tz:2083
+   • Or: Your Namecheap cPanel login URL
+   • Username: Your cPanel username
+   • Password: Your cPanel password
+
+2. OPEN FILE MANAGER
+   • Find "File Manager" in the Files section
+   • Click to open
+
+3. NAVIGATE TO PUBLIC_HTML
+   • In File Manager, locate "public_html" folder
+   • Double-click to open it
+
+4. DELETE OLD FILES (Important!)
+   • Select ALL files in public_html
+   • Click "Delete" button at the top
+   • Confirm deletion
+   • This ensures no old code conflicts with new code
+
+5. UPLOAD NEW FILES
+   • Click "Upload" button at the top
+   • Navigate to: D:\DtopProj\E-Commerce\frontend\dist\
+   • Select ALL files and folders:
+     - .htaccess (CRITICAL - make sure to select this!)
+     - index.html
+     - Logo.jpeg
+     - notification.mp3
+     - assets folder
+   • Click "Open" to start upload
+   • Wait for all files to upload (100% complete)
+
+6. VERIFY UPLOAD
+   • Check that all files are now in public_html:
+     ✓ .htaccess (Enable hidden files if you don't see it!)
+     ✓ index.html (0.71 KB)
+     ✓ Logo.jpeg
+     ✓ notification.mp3
+     ✓ assets/ folder (with CSS and JS files inside)
+
+7. ENABLE HIDDEN FILES (If .htaccess not visible)
+   • Click "Settings" button at top right of File Manager
+   • Check the box "Show Hidden Files (dotfiles)"
+   • Click "Save"
+   • Verify .htaccess is now visible
+
+8. TEST YOUR WEBSITE
+   • Open browser
+   • Go to: https://freshedtanzania.co.tz
+   • You should see your updated e-commerce site
+   • Test navigation - pages should load without 404 errors
+   • Test login with admin account:
+     Email: nehemiahernest3@gmail.com
+     Password: Ephra@2424#
+
+
+🔧 WHAT'S INCLUDED IN THIS BUILD
+═══════════════════════════════════════════════════════════════════════
+
+✓ Admin Dashboard - Complete user management interface
+✓ Collaborative Seller System - All sellers can manage all products
+✓ Auto-approve sellers on registration
+✓ RBAC (Role-Based Access Control) system
+✓ Real-time notifications
+✓ Multi-language support (English, Swahili, French, German, Spanish, Chinese)
+✓ React Router integration with .htaccess for clean URLs
+✓ All latest features and bug fixes
+
+
+⚠️ IMPORTANT NOTES ABOUT .HTACCESS
+═══════════════════════════════════════════════════════════════════════
+
+• The .htaccess file is CRITICAL for React Router to work properly
+• Without it, you'll get 404 errors when refreshing pages
+• It handles URL rewriting so all routes go through index.html
+• It sets proper MIME types for CSS, JS, and assets
+• Always make sure .htaccess is uploaded and in public_html root
+
+
+🔍 WHAT'S IN THE .HTACCESS FILE
+═══════════════════════════════════════════════════════════════════════
+
+1. MIME type configuration (CSS, JS, images)
+2. URL rewriting for React Router (no 404 on refresh)
+3. Compression for faster loading
+4. Caching rules for better performance
+5. Security headers
+
+
+📊 BUILD INFORMATION
+═══════════════════════════════════════════════════════════════════════
+
+Build Date: December 28, 2025
+Build Size: 358.66 KB main bundle (97.03 KB gzipped)
+Vite Version: 5.4.21
+React Version: 18.2.0
+
+Files:
+• dist/assets/index-DJfpCMp1.js (358.66 KB) - Main application
+• dist/assets/index-XRW1c6g5.css (242.97 KB) - Styles
+• dist/assets/vendor-BEaxiNVF.js (161.15 KB) - React & libraries
+• dist/assets/bootstrap-DCRSy28Z.js (93.99 KB) - Bootstrap UI
+• dist/.htaccess (81 lines) - Apache configuration
+
+
+🔍 TROUBLESHOOTING
+═══════════════════════════════════════════════════════════════════════
+
+Problem: 404 errors when refreshing pages
+Solution: Make sure .htaccess is uploaded! Enable hidden files in File Manager
+
+Problem: CSS/JS not loading properly
+Solution: .htaccess sets proper MIME types. Verify it's in public_html
+
+Problem: "Cannot read properties of undefined"
+Solution: Clear browser cache (Ctrl+Shift+Del), then refresh
+
+Problem: "Failed to fetch"
+Solution: Check that backend on Render.com is running
+
+Problem: Admin login not working
+Solution: Verify you're using exact password (case-sensitive):
+         nehemiahernest3@gmail.com / Ephra@2424#
+
+Problem: Old site still showing
+Solution: 
+  1. Clear ALL files from public_html before uploading
+  2. Clear browser cache completely
+  3. Try incognito/private browsing mode
+  4. Hard refresh: Ctrl+F5
+
+Problem: .htaccess not visible in File Manager
+Solution:
+  1. Click "Settings" at top right
+  2. Check "Show Hidden Files (dotfiles)"
+  3. Click "Save"
+
+
+✅ UPLOAD CHECKLIST
+═══════════════════════════════════════════════════════════════════════
+
+[ ] Logged into cPanel
+[ ] Opened File Manager
+[ ] Navigated to public_html
+[ ] Deleted all old files
+[ ] Enabled "Show Hidden Files" in Settings
+[ ] Uploaded all files from dist folder
+[ ] Verified .htaccess is in public_html (check hidden files!)
+[ ] Verified index.html uploaded successfully
+[ ] Verified assets folder uploaded successfully
+[ ] Tested website in browser
+[ ] Tested page navigation (no 404 errors)
+[ ] Tested admin login
+[ ] Tested seller features
+[ ] Backend on Render is running
+
+
+📞 BACKEND INFORMATION
+═══════════════════════════════════════════════════════════════════════
+
+Backend API: Hosted on Render.com
+- Auto-deploys from GitHub on push
+- Latest commit: cb9bd98
+- Database: MongoDB Atlas (freshedtz.wafuvnb.mongodb.net)
+- Admin Accounts Ready:
+  1. nehemiahernest3@gmail.com / Ephra@2424#
+  2. daud@kidoncho.com / Daud@2712
+
+
+🎯 AUTOMATIC .HTACCESS COPYING
+═══════════════════════════════════════════════════════════════════════
+
+Good news! The build process now automatically copies .htaccess to dist/
+
+When you run: npm run build
+The vite.config.ts automatically:
+  1. Builds your React app
+  2. Copies .htaccess to dist folder
+  3. You're ready to upload!
+
+
+═══════════════════════════════════════════════════════════════════════
+                    READY TO UPLOAD! 🚀
+          Don't forget the .htaccess file!
+═══════════════════════════════════════════════════════════════════════
