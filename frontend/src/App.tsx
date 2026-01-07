@@ -22,6 +22,7 @@ import ParcelManagementPage from './pages/ParcelManagementPage';
 import InventoryPage from './pages/InventoryPage';
 import ExpensesPage from './pages/ExpensesPage';
 import ReportsPage from './pages/ReportsPage';
+import ProfitLossReport from './components/ProfitLossReport';
 import Footer from './components/Footer'; // Import Footer
 import UserSettingsDropdown from './components/UserSettingsDropdown'; // Import UserSettingsDropdown
 
@@ -142,6 +143,7 @@ function App() {
                   <Route path="inventory" element={<InventoryPage />} />
                   <Route path="expenses" element={<ExpensesPage />} />
                   <Route path="reports" element={<ReportsPage />} />
+                  <Route path="profit-loss" element={<ProfitLossReport />} />
                   <Route index element={<Navigate to="products" />} />
                 </Route>
               </Route>

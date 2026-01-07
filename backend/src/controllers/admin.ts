@@ -206,3 +206,79 @@ export const getUserDetails = async (req: Request, res: Response) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// Delete pending user account
+export const deletePendingUser = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Only allow deletion of pending sellers and riders
+    if (user.status !== UserStatus.PENDING || (user.role !== UserRole.SELLER && user.role !== UserRole.RIDER)) {
+      return res.status(403).json({ message: 'Only pending seller and rider accounts can be deleted' });
+    }
+
+    // Delete associated profiles
+    if (user.role === UserRole.SELLER) {
+      await SellerProfile.deleteMany({ user: userId });
+    } else if (user.role === UserRole.RIDER) {
+      await RiderProfile.deleteMany({ user: userId });
+    }
+
+    // Delete user
+    await User.deleteOne({ _id: userId });
+
+    res.json({ message: `${user.role} account deleted successfully`, deletedUser: user });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Delete all pending accounts (sellers and riders)
+export const deleteAllPendingAccounts = async (req: Request, res: Response) => {
+  try {
+    // Find all pending sellers and riders
+    const pendingUsers = await User.find({
+      status: UserStatus.PENDING,
+      $or: [
+        { role: UserRole.SELLER },
+        { role: UserRole.RIDER }
+      ]
+    });
+
+    if (pendingUsers.length === 0) {
+      return res.json({ message: 'No pending accounts found', deletedCount: 0 });
+    }
+
+    let deletedCount = 0;
+
+    // Delete each pending user and their profiles
+    for (const user of pendingUsers) {
+      // Delete seller profile if exists
+      if (user.role === UserRole.SELLER) {
+        await SellerProfile.deleteMany({ user: user._id });
+      }
+
+      // Delete rider profile if exists
+      if (user.role === UserRole.RIDER) {
+        await RiderProfile.deleteMany({ user: user._id });
+      }
+
+      // Delete user
+      await User.deleteOne({ _id: user._id });
+      deletedCount++;
+    }
+
+    res.json({ 
+      message: `Successfully deleted ${deletedCount} pending account(s)`,
+      deletedCount,
+      deletedUsers: pendingUsers.map(u => ({ name: u.name, email: u.email, role: u.role }))
+    });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+};

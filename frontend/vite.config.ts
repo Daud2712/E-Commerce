@@ -1,57 +1,30 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
-import path from 'path'
-import { copyFileSync } from 'fs'
 
 // https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [
-    react(),
-    {
-      name: 'copy-htaccess',
-      closeBundle() {
-        try {
-          copyFileSync('.htaccess', 'dist/.htaccess')
-          console.log('✓ Copied .htaccess to dist/')
-        } catch (err) {
-          console.warn('⚠ Could not copy .htaccess:', err)
-        }
-      }
-    }
-  ],
-  base: './',
-  esbuild: {
-    target: 'es2020'
-  },
-  resolve: {
-    alias: {
-      // This is a workaround for a potential Vite issue where it cannot resolve the package.
-      'react-i18next': path.resolve(__dirname, 'node_modules/react-i18next/dist/es/index.js'),
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '')
+  return {
+    plugins: [
+      react(),
+    ],
+    base: './',
+    esbuild: {
+      target: 'es2020'
     },
-  },
-  build: {
-    outDir: 'dist',
-    assetsDir: 'assets',
-    sourcemap: false,
-    minify: 'terser',
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom', 'react-router-dom'],
-          bootstrap: ['react-bootstrap', 'bootstrap'],
+    build: {
+      outDir: 'dist',
+      assetsDir: 'assets',
+      sourcemap: false,
+    },
+    server: {
+      port: 5173,
+      proxy: {
+        '/api': {
+           target: (env.VITE_API_URL || 'http://localhost:5002').replace(/\/api\/?$/, ''),
+          changeOrigin: true,
         },
       },
     },
-  },
-  server: {
-    port: 5173,
-    strictPort: false,
-    proxy: {
-      '/api': {
-        target: process.env.VITE_API_URL || 'http://localhost:5002',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '/api'),
-      },
-    },
-  },
+  }
 })

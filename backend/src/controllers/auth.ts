@@ -35,10 +35,13 @@ export const register = async (req: Request, res: Response) => {
     const hashedPassword = await bcrypt.hash(password, 12);
 
     // Determine initial status based on role
-    let initialStatus = UserStatus.APPROVED; // All users are auto-approved (buyers, sellers, admins)
-    if (role === UserRole.RIDER) {
-      initialStatus = UserStatus.PENDING; // Only riders need admin approval for safety
+    let initialStatus = UserStatus.PENDING;
+    
+    // Buyers are auto-approved - they can login immediately
+    if (role === UserRole.BUYER) {
+      initialStatus = UserStatus.APPROVED;
     }
+    // Sellers, Riders, and Admins need admin approval (PENDING)
 
     const user = new User({
       name,
@@ -51,18 +54,27 @@ export const register = async (req: Request, res: Response) => {
 
     await user.save();
 
-    const token = jwt.sign({ userId: user.id, role: user.role, status: user.status }, JWT_SECRET, {
-      expiresIn: '1h',
-    });
+    // Generate token for buyers (auto-approved), but not for others
+    if (initialStatus === UserStatus.APPROVED && role === UserRole.BUYER) {
+      const token = jwt.sign({ userId: user.id, role: user.role, status: user.status }, JWT_SECRET, {
+        expiresIn: '1h',
+      });
+      
+      return res.status(201).json({ 
+        token,
+        userId: user.id,
+        role: user.role,
+        status: user.status,
+        registrationNumber: generatedRegistrationNumber,
+        message: 'Registration successful. Your account is approved. You can now access the dashboard.'
+      });
+    }
 
+    // For non-buyers (sellers, riders, admins): pending approval
     res.status(201).json({ 
-      token, 
-      userId: user.id, 
-      role: user.role,
-      status: user.status,
-      message: role === UserRole.RIDER
-        ? 'Registration successful. Your account is pending admin approval.' 
-        : 'Registration successful. You can now access the dashboard.'
+      message: 'Registration successful. Your account is pending admin approval. Please wait for email confirmation before logging in.',
+      isPending: true,
+      status: initialStatus
     });
   } catch (error: any) {
     if (error.code === 11000 && error.keyPattern && error.keyPattern.registrationNumber) {
@@ -94,11 +106,67 @@ export const login = async (req: Request, res: Response) => {
       });
     }
 
-    // Check if account is rejected
+    // Buyers can login if they are approved
+    if (user.role === UserRole.BUYER) {
+      if (user.status !== UserStatus.APPROVED) {
+        return res.status(403).json({ 
+          message: 'Your buyer account is not approved yet. Please wait for admin confirmation or contact support.',
+          status: user.status
+        });
+      }
+
+      const token = jwt.sign({ userId: user.id, role: user.role, status: user.status }, JWT_SECRET, {
+        expiresIn: '1h',
+      });
+
+      return res.status(200).json({ 
+        token, 
+        userId: user.id, 
+        role: user.role,
+        status: user.status,
+        message: 'Login successful.'
+      });
+    }
+
+    // ONLY ADMIN ACCOUNTS can login (for approval system)
+    if (user.role !== UserRole.ADMIN) {
+      return res.status(403).json({ 
+        message: 'Only admin and buyer accounts can login. Your account is pending admin approval.',
+        requiresAdminApproval: true
+      });
+    }
+
+    // Check if admin account is pending
+    if (user.status === UserStatus.PENDING) {
+      return res.status(403).json({ 
+        message: 'Your admin account is pending verification. Please contact a system administrator.',
+        isPending: true
+      });
+    }
+
+    // Check if admin account is rejected
     if (user.status === UserStatus.REJECTED) {
       return res.status(403).json({ 
-        message: 'Your account registration was rejected.', 
+        message: 'Your admin account has been rejected.', 
         reason: user.rejectionReason 
+      });
+    }
+
+    // Admin must be approved (either by another admin or auto-approved from before)
+    if (user.status === UserStatus.APPROVED) {
+      // Allow both:
+      // 1. Old admin accounts (approved without approvedBy - auto-approved before)
+      // 2. New admin accounts (approved with approvedBy - manually approved)
+      const token = jwt.sign({ userId: user.id, role: user.role, status: user.status }, JWT_SECRET, {
+        expiresIn: '1h',
+      });
+
+      return res.status(200).json({ 
+        token, 
+        userId: user.id, 
+        role: user.role,
+        status: user.status,
+        message: 'Login successful. You can now approve pending accounts.'
       });
     }
 
@@ -111,7 +179,7 @@ export const login = async (req: Request, res: Response) => {
       userId: user.id, 
       role: user.role,
       status: user.status,
-      isPending: user.status === UserStatus.PENDING
+      message: 'Login successful. You can now approve pending accounts.'
     });
   } catch (error) {
     res.status(500).json({ message: 'Something went wrong.' });

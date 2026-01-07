@@ -389,5 +389,13 @@
   "order_delivered_notification": "🎉 Agizo lako {{orderId}} limeletwa!",
   "rider_assigned_notification": "Msafirishaji {{riderName}} amepewa jukumu la kuleta mzigo wako {{deliveryId}}.",
   "delivery_update_notification": "ℹ️ Hali ya usafirishaji wako {{deliveryId}} imebadilishwa kuwa {{status}}.",
-  "delivery_assigned_notification": "Hongera, umepewa jukumu la usafirishaji mpya: {{deliveryId}}."
+  "delivery_assigned_notification": "Hongera, umepewa jukumu la usafirishaji mpya: {{deliveryId}}.",
+  "add_special_sale": "Ongeza Mauzo Maalum (Nje ya Stock)",
+  "special_product_name": "Jina la Bidhaa Maalum",
+  "special_sale_price": "Bei ya Kuuza",
+  "record_special_sale": "Rekodi Mauzo",
+  "search_placeholder_global": "Tafuta bidhaa, oda, au wateja...",
+  "backorder_allowed_message": "Bidhaa imeisha stock, lakini oda yako imepokelewa na itashughulikiwa.",
+  "out_of_stock_action_required": "Imeisha Stock – Muuzaji Anahitajika",
+  "special_product_label": "Bidhaa Maalum"
 }

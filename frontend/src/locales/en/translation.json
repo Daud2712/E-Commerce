@@ -391,5 +391,13 @@
   "order_delivered_notification": "🎉 Your order {{orderId}} has been delivered!",
   "rider_assigned_notification": " rider {{riderName}} has been assigned to your delivery {{deliveryId}}.",
   "delivery_update_notification": "ℹ️ The status of your delivery {{deliveryId}} has been updated to {{status}}.",
-  "delivery_assigned_notification": " Cngratulations, You have been assigned a new delivery: {{deliveryId}}."
+  "delivery_assigned_notification": " Cngratulations, You have been assigned a new delivery: {{deliveryId}}.",
+  "add_special_sale": "Add Special Sale (Non-Stock)",
+  "special_product_name": "Special Product Name",
+  "special_sale_price": "Sale Price",
+  "record_special_sale": "Record Sale",
+  "search_placeholder_global": "Search products, orders, or customers...",
+  "backorder_allowed_message": "Product is out of stock, but your order has been received and will be processed.",
+  "out_of_stock_action_required": "Out of Stock – Seller Action Required",
+  "special_product_label": "Special Product"
 }

@@ -92,6 +92,16 @@ const SellerDashboard = () => {
                                         📈 Reports
                                     </Nav.Link>
                                 </Nav.Item>
+                                <Nav.Item>
+                                    <Nav.Link
+                                        as={Link}
+                                        to="/seller/profit-loss"
+                                        active={location.pathname === '/seller/profit-loss'}
+                                        className="text-dark py-2"
+                                    >
+                                        💹 Profit & Loss
+                                    </Nav.Link>
+                                </Nav.Item>
                             </Nav>
                         </Card.Body>
                     </Card>

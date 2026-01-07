@@ -27,4 +27,8 @@ router.post('/users/:userId/reject', adminController.rejectUser);
 router.post('/users/:userId/suspend', adminController.suspendUser);
 router.post('/users/:userId/reactivate', adminController.reactivateUser);
 
+// Delete pending users
+router.delete('/users/:userId/delete', adminController.deletePendingUser);
+router.delete('/pending-accounts/delete-all', adminController.deleteAllPendingAccounts);
+
 export default router;
