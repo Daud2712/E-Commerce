@@ -2,7 +2,9 @@ import axios from 'axios';
 import { RegisterFormData, LoginFormData, Delivery, User, UpdateProfileData } from '../types';
 
 // Single source of truth for the API base URL
-const BASE_URL = import.meta.env.VITE_API_URL || 'https://e-commerce-backend-g1t5.onrender.com/api';
+// For production: use your domain
+// For development: use localhost
+const BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 const API = axios.create({
   baseURL: BASE_URL,

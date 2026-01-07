@@ -22,7 +22,7 @@ const server = http.createServer(app);
 // Configure CORS origins
 const allowedOrigins = process.env.FRONTEND_URL 
   ? process.env.FRONTEND_URL.split(',').map(url => url.trim())
-  : ["http://localhost:5173", "http://localhost:5174"];
+  : ["http://localhost:5173", "http://localhost:5174", "https://freshedtanzania.co.tz", "https://www.freshedtanzania.co.tz"];
 
 const io = new Server(server, {
   cors: {
