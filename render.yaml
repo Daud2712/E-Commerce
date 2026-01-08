@@ -24,6 +24,6 @@ services:
     publishDir: dist
     envVars:
       - key: VITE_API_URL
-        value: https://your-backend-host.onrender.com/api
+        value: https://e-commerce-backend-g1t5.onrender.com/api
       - key: VITE_SOCKET_URL
-        value: https://your-backend-host.onrender.com
+        value: https://e-commerce-backend-g1t5.onrender.com
