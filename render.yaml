@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: ecommerce-backend
+    env: node
+    rootDir: backend
+    plan: free
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: "18"
+      - key: PORT
+        value: "10000" # Render assigns this; keep in sync with backend
+      - key: MONGO_URI
+        sync: false # set in Render dashboard
+      - key: FRONTEND_URL
+        value: https://your-frontend-domain
+
+  - type: static_site
+    name: ecommerce-frontend
+    rootDir: frontend
+    plan: free
+    buildCommand: npm ci && npm run build
+    publishDir: dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://your-backend-host.onrender.com/api
+      - key: VITE_SOCKET_URL
+        value: https://your-backend-host.onrender.com
