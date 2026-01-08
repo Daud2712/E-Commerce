@@ -205,7 +205,7 @@ const ProductListingPage = () => {
                       <Card.Text><strong>TZS {product.price.toLocaleString()}</strong></Card.Text>
                       <Card.Text>
                         <small className={product.stock > 0 ? 'text-success' : 'text-danger'}>
-                          {product.stock > 0 ? `In Stock (${product.stock})` : 'Sold Out'}
+                          {product.stock > 0 ? 'In Stock' : 'Sold Out'}
                         </small>
                       </Card.Text>
                       <Button

@@ -1,0 +1,26 @@
+========================================
+RENDER ENVIRONMENT VARIABLES SETUP
+========================================
+
+Go to your Render dashboard for the backend service:
+https://dashboard.render.com/web/e-commerce-backend-g1t5
+
+Click "Environment" tab and add/update these variables:
+
+PORT=5002
+
+FRONTEND_URL=https://freshedtanzania.co.tz,https://www.freshedtanzania.co.tz
+
+MONGO_URI=mongodb+srv://username:password@cluster0.xxxxx.mongodb.net/ecommerce?retryWrites=true&w=majority
+(Replace with your actual MongoDB Atlas connection string)
+
+JWT_SECRET=your-super-secret-jwt-key-change-this-to-random-string
+(Use a strong random string)
+
+BACKEND_URL=https://e-commerce-backend-g1t5.onrender.com
+
+NODE_ENV=production
+
+========================================
+After adding these, click "Save Changes" and Render will automatically redeploy your backend.
+========================================
