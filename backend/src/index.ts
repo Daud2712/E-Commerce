@@ -19,25 +19,25 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 
-// Configure CORS origins
+// Configure CORS origins. If FRONTEND_URL is not set, allow all to avoid host-origin mismatches (Namecheap, etc.).
 const allowedOrigins = process.env.FRONTEND_URL 
-  ? process.env.FRONTEND_URL.split(',').map(url => url.trim())
-  : ["http://localhost:5173", "http://localhost:5174", "https://freshedtanzania.co.tz", "https://www.freshedtanzania.co.tz"];
+    ? process.env.FRONTEND_URL.split(',').map(url => url.trim())
+    : undefined; // undefined lets cors reflect the request origin
 
 const io = new Server(server, {
-  cors: {
-    origin: allowedOrigins,
-    methods: ["GET", "POST"],
-    credentials: true
-  }
+    cors: {
+        origin: allowedOrigins || '*',
+        methods: ["GET", "POST"],
+        credentials: true
+    }
 });
 
 // Set the socket.io instance for use in controllers
 setSocketIO(io);
 
 app.use(cors({
-  origin: allowedOrigins,
-  credentials: true
+    origin: allowedOrigins || true,
+    credentials: true
 }));
 app.use(express.json());
 app.use('/uploads', express.static('public/uploads'));

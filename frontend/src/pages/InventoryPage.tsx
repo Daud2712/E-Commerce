@@ -13,6 +13,7 @@ interface Product {
   category: string;
   images?: string[];
   isAvailable: boolean;
+  seller?: { _id?: string } | null;
 }
 
 const InventoryPage: React.FC = () => {
@@ -36,9 +37,10 @@ const InventoryPage: React.FC = () => {
 
   const fetchProducts = async () => {
     try {
+      // Fetch all products and show them; no seller filtering
       const { data } = await api.getProducts();
-      const myProducts = data.filter((p: any) => p.seller._id === user?._id);
-      setProducts(myProducts);
+      setProducts(Array.isArray(data) ? data : []);
+      setFilteredProducts(Array.isArray(data) ? data : []);
       setLoading(false);
     } catch (err: any) {
       console.error('Failed to fetch products:', err);

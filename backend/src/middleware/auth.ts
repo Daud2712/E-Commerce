@@ -32,6 +32,15 @@ export const auth = (req: Request, res: Response, next: NextFunction) => {
       status: decodedToken.status,
     };
 
+    // Block access if account is not approved (except for admin)
+    if (req.user.role !== UserRole.ADMIN && req.user.status !== UserStatus.APPROVED) {
+      return res.status(403).json({ 
+        message: 'Your account is pending admin approval. Access denied.',
+        status: req.user.status,
+        requiresAdminApproval: true
+      });
+    }
+
     next();
   } catch (error) {
     res.status(401).json({ message: 'Authentication failed.' });

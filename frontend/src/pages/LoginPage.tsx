@@ -23,7 +23,14 @@ const LoginPage = () => {
       auth.login(data.token, data.userId, data.role);
     } catch (error: unknown) {
       const err = error as any;
-      setError(err.response?.data?.message || 'Invalid credentials'); // Translated error
+      const message = err.response?.data?.message || 'Invalid credentials';
+      const requiresApproval = err.response?.data?.requiresAdminApproval;
+      
+      if (requiresApproval) {
+        setError('⏳ ' + message + ' Sellers and Riders must be approved by an admin before accessing the portal.');
+      } else {
+        setError(message);
+      }
     } finally {
       setLoading(false);
     }

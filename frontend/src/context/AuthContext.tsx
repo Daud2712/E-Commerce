@@ -22,6 +22,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
+  // Update browser tab title based on auth state/role
+  useEffect(() => {
+    const baseTitle = 'Fresh EDTanzania - E-Commerce Platform';
+    if (token && role) {
+      const roleLabel = role === UserRole.ADMIN
+        ? 'Admin'
+        : role === UserRole.SELLER
+        ? 'Seller'
+        : role === UserRole.RIDER
+        ? 'Rider'
+        : 'Buyer';
+      document.title = `${baseTitle} | ${roleLabel}`;
+    } else {
+      document.title = baseTitle;
+    }
+  }, [token, role]);
+
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
     const storedUserId = localStorage.getItem('userId');

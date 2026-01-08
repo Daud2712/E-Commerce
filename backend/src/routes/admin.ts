@@ -16,19 +16,35 @@ router.get('/pending-riders', adminController.getPendingRiders);
 // Get all users with filters
 router.get('/users', adminController.getAllUsers);
 
+// Get all by role
+router.get('/buyers', adminController.getAllBuyers);
+router.get('/sellers', adminController.getAllSellers);
+router.get('/riders', adminController.getAllRiders);
+
 // Get user details
 router.get('/users/:userId', adminController.getUserDetails);
+router.get('/users/by-email', adminController.findUserByEmailController);
 
 // Approve/reject users
 router.post('/users/:userId/approve', adminController.approveUser);
 router.post('/users/:userId/reject', adminController.rejectUser);
 
+// Bulk approve all buyers
+router.post('/buyers/approve-all', adminController.approveAllBuyers);
+
 // Suspend/reactivate users
 router.post('/users/:userId/suspend', adminController.suspendUser);
 router.post('/users/:userId/reactivate', adminController.reactivateUser);
 
-// Delete pending users
-router.delete('/users/:userId/delete', adminController.deletePendingUser);
-router.delete('/pending-accounts/delete-all', adminController.deleteAllPendingAccounts);
+// Delete user account
+router.delete('/users/:userId/delete', adminController.deleteUser);
+router.delete('/users/:userId', adminController.deleteUser);
+router.delete('/users', adminController.deleteUserByEmail);
+
+// Bulk delete all non-admin users
+router.delete('/users', adminController.deleteAllNonAdminUsers);
+
+// User counts (diagnostics)
+router.get('/users/counts', adminController.getUserCounts);
 
 export default router;

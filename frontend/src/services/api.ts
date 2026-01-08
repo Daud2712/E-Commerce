@@ -2,8 +2,8 @@ import axios from 'axios';
 import { RegisterFormData, LoginFormData, Delivery, User, UpdateProfileData } from '../types';
 
 // Single source of truth for the API base URL
-// For production: use your domain
-// For development: use localhost
+// Development: uses /api proxy (Vite -> localhost:5002) or production backend
+// Production (Namecheap): uses deployed backend on Render
 const BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 const API = axios.create({
@@ -27,7 +27,20 @@ API.interceptors.response.use(
     return response;
   },
   (error) => {
-    console.error(`[API] Error from ${error.config?.url}:`, error.response?.data || error.message);
+    if (error.response) {
+      // The request was made and the server responded with a status code outside 2xx
+      console.error(`[API] Error from ${error.config?.url}:`, {
+        message: error.response.data?.message || 'Server responded with an error',
+        status: error.response.status,
+        data: error.response.data,
+      });
+    } else if (error.request) {
+      // The request was made but no response was received
+      console.error(`[API] No response from ${error.config?.url}:`, error.request);
+    } else {
+      // Something happened in setting up the request
+      console.error('[API] Request setup error:', error.message);
+    }
     return Promise.reject(error);
   }
 );
@@ -77,41 +90,17 @@ export const updatePaymentStatus = (id: string, paymentStatus: string) => API.pu
 export const getPendingSellers = (token: string) => API.get('/admin/pending-sellers', { headers: { Authorization: `Bearer ${token}` } });
 export const getPendingRiders = (token: string) => API.get('/admin/pending-riders', { headers: { Authorization: `Bearer ${token}` } });
 export const getAllUsers = (token: string) => API.get('/admin/users', { headers: { Authorization: `Bearer ${token}` } });
+export const getAllBuyers = (token: string) => API.get('/admin/buyers', { headers: { Authorization: `Bearer ${token}` } });
+export const getAllSellers = (token: string) => API.get('/admin/sellers', { headers: { Authorization: `Bearer ${token}` } });
+export const getAllRiders = (token: string) => API.get('/admin/riders', { headers: { Authorization: `Bearer ${token}` } });
+export const approveAllBuyers = (token: string) => API.post('/admin/buyers/approve-all', {}, { headers: { Authorization: `Bearer ${token}` } });
 export const getUserDetails = (userId: string, token: string) => API.get(`/admin/users/${userId}`, { headers: { Authorization: `Bearer ${token}` } });
+export const deleteUser = (userId: string, token: string) => API.delete(`/admin/users/${userId}`, { headers: { Authorization: `Bearer ${token}` } });
 export const approveUser = (userId: string, token: string) => API.post(`/admin/users/${userId}/approve`, {}, { headers: { Authorization: `Bearer ${token}` } });
 export const rejectUser = (userId: string, reason: string, token: string) => API.post(`/admin/users/${userId}/reject`, { reason }, { headers: { Authorization: `Bearer ${token}` } });
 export const suspendUser = (userId: string, reason: string, token: string) => API.post(`/admin/users/${userId}/suspend`, { reason }, { headers: { Authorization: `Bearer ${token}` } });
 export const reactivateUser = (userId: string, token: string) => API.post(`/admin/users/${userId}/reactivate`, {}, { headers: { Authorization: `Bearer ${token}` } });
 
-
-API.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response) {
-      // The request was made and the server responded with a status code
-      // that falls out of the range of 2xx
-      console.error('API call failed (response error):', {
-        message: error.response.data?.message || 'Server responded with an error',
-        status: error.response.status,
-        data: error.response.data,
-        headers: error.response.headers,
-      });
-    } else if (error.request) {
-      // The request was made but no response was received
-      console.error('API call failed (no response):', {
-        message: 'No response received from server. Network error or server is down.',
-        request: error.request,
-      });
-    } else {
-      // Something happened in setting up the request that triggered an Error
-      console.error('API call failed (request setup error):', {
-        message: error.message,
-        error: error,
-      });
-    }
-    return Promise.reject(error);
-  }
-);
 
 // Helper function to get full image URL
 export const getImageUrl = (imagePath: string): string => {
@@ -123,13 +112,18 @@ export const getImageUrl = (imagePath: string): string => {
   }
 
   // Construct the full URL using a base URL that doesn't include the /api path.
-  const backendURL = BASE_URL.replace('/api', '');
+  const backendURL = BASE_URL.replace(/\/api\/?$/, '');
   
-  // Use the URL constructor for robust path joining.
-  // It correctly handles slashes, preventing duplicates or missing ones.
-  const fullUrl = new URL(imagePath, backendURL);
-  
-  return fullUrl.href;
+  try {
+    // Use the URL constructor for robust path joining.
+    // It correctly handles slashes, preventing duplicates or missing ones.
+    const fullUrl = new URL(imagePath, backendURL);
+    return fullUrl.href;
+  } catch (error) {
+    // If backendURL is relative (e.g. empty string in dev), URL constructor might fail.
+    // In that case, return the path as is.
+    return imagePath;
+  }
 };
 
 

@@ -25,6 +25,7 @@ import ReportsPage from './pages/ReportsPage';
 import ProfitLossReport from './components/ProfitLossReport';
 import Footer from './components/Footer'; // Import Footer
 import UserSettingsDropdown from './components/UserSettingsDropdown'; // Import UserSettingsDropdown
+// DebugFetch removed from UI after diagnostics
 
 import { useAuth } from './context/AuthContext';
 import { useCart } from './context/CartContext';

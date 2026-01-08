@@ -1,6 +1,8 @@
 import { io, Socket } from 'socket.io-client';
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || window.location.origin;
+// Development: connects to localhost:5002
+// Production (Namecheap): connects to deployed backend on Render
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5002';
 
 type UserRole = 'BUYER' | 'SELLER' | 'RIDER';
 

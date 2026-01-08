@@ -34,8 +34,8 @@ export const register = async (req: Request, res: Response) => {
 
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    // All roles start pending until an admin approves
-    const initialStatus = UserStatus.PENDING;
+    // Buyers are auto-approved; sellers and riders are pending
+    const initialStatus = role === UserRole.BUYER ? UserStatus.APPROVED : UserStatus.PENDING;
 
     const user = new User({
       name,
@@ -48,12 +48,22 @@ export const register = async (req: Request, res: Response) => {
 
     await user.save();
 
-    res.status(201).json({ 
-      message: 'Registration successful. Your account is pending admin approval. Please wait for confirmation before logging in.',
-      isPending: true,
-      status: initialStatus,
-      registrationNumber: generatedRegistrationNumber,
-    });
+    // Different response based on role
+    if (role === UserRole.BUYER) {
+      res.status(201).json({ 
+        message: 'Registration successful! You can now login and start shopping.',
+        isPending: false,
+        status: initialStatus,
+        registrationNumber: generatedRegistrationNumber,
+      });
+    } else {
+      res.status(201).json({ 
+        message: 'Registration successful. Your account is pending admin approval. Please wait for confirmation before logging in.',
+        isPending: true,
+        status: initialStatus,
+        registrationNumber: generatedRegistrationNumber,
+      });
+    }
   } catch (error: any) {
     if (error.code === 11000 && error.keyPattern && error.keyPattern.registrationNumber) {
       return res.status(400).json({ message: 'Registration number already in use.' });
