@@ -351,6 +351,7 @@ const CheckoutPage: React.FC = () => {
                                   marginRight: '10px',
                                   borderRadius: '4px',
                                 }}
+                                onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/Logo.jpeg'; }}
                               />
                             )}
                             <span>{item.product.name}</span>

@@ -110,6 +110,7 @@ const ProductDetailPage: React.FC = () => {
                 src={getImageUrl(product.images[0])}
                 alt={product.name}
                 style={{ width: '100%', maxHeight: '500px', objectFit: 'cover', borderRadius: '8px' }}
+                onError={(e: React.SyntheticEvent<HTMLImageElement>) => { (e.currentTarget as HTMLImageElement).src = '/Logo.jpeg'; }}
               />
             ) : (
               <Carousel>
@@ -120,6 +121,7 @@ const ProductDetailPage: React.FC = () => {
                       src={getImageUrl(image)}
                       alt={`${product.name} ${idx + 1}`}
                       style={{ maxHeight: '500px', objectFit: 'cover', borderRadius: '8px' }}
+                      onError={(e: React.SyntheticEvent<HTMLImageElement>) => { (e.currentTarget as HTMLImageElement).src = '/Logo.jpeg'; }}
                     />
                   </Carousel.Item>
                 ))}

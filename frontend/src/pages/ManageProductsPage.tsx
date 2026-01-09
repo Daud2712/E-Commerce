@@ -175,9 +175,15 @@ const ManageProductsPage: React.FC = () => {
                         <div className="mt-2">
                             <small className="text-muted">{'Current Images'}</small>
                             <div className="d-flex flex-wrap gap-2 mt-1">
-                                {editingProduct.images.map((img, idx) => (
-                                    <img key={idx} src={getImageUrl(img)} alt={`Product image ${idx + 1}`} style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '4px' }} />
-                                ))}
+                                                                {editingProduct.images.map((img, idx) => (
+                                                                        <img
+                                                                            key={idx}
+                                                                            src={getImageUrl(img)}
+                                                                            alt={`Product image ${idx + 1}`}
+                                                                            style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '4px' }}
+                                                                            onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/Logo.jpeg'; }}
+                                                                        />
+                                                                ))}
                             </div>
                             <Form.Check
                                 type="checkbox"

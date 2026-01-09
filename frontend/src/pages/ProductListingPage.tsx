@@ -191,7 +191,12 @@ const ProductListingPage = () => {
               <Col key={product._id}>
                 <Card className="h-100">
                   {product.images && product.images.length > 0 ? (
-                    <Card.Img variant="top" src={getImageUrl(product.images[0])} style={{ height: '200px', objectFit: 'cover' }} />
+                    <Card.Img
+                      variant="top"
+                      src={getImageUrl(product.images[0])}
+                      style={{ height: '200px', objectFit: 'cover' }}
+                      onError={(e: React.SyntheticEvent<HTMLImageElement>) => { (e.currentTarget as HTMLImageElement).src = '/Logo.jpeg'; }}
+                    />
                   ) : (
                     <div style={{ height: '200px', backgroundColor: '#e9ecef', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <span className="text-muted">No image available</span>

@@ -13,6 +13,8 @@ import expenseRoutes from './routes/expenses';
 import reportRoutes from './routes/reports';
 import adminRoutes from './routes/admin';
 import { setSocketIO } from './utils/socket';
+import fs from 'fs';
+import path from 'path';
 
 dotenv.config();
 
@@ -40,7 +42,14 @@ app.use(cors({
     credentials: true
 }));
 app.use(express.json());
-app.use('/uploads', express.static('public/uploads'));
+// Ensure uploads directory exists
+const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
+try {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+} catch (e) {
+    console.warn('Could not ensure uploads directory:', e);
+}
+app.use('/uploads', express.static(uploadsDir));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/deliveries', deliveryRoutes);

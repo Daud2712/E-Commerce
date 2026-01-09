@@ -231,6 +231,7 @@ const InventoryPage: React.FC = () => {
                             src={getImageUrl(product.images[0])}
                             alt={product.name}
                             style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '4px' }}
+                            onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/Logo.jpeg'; }}
                           />
                         ) : (
                           <div style={{ width: '50px', height: '50px', backgroundColor: '#f0f0f0', borderRadius: '4px' }} />

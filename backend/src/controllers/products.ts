@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import Product from '../models/Product';
+import { isCloudinaryEnabled, uploadLocalFileToCloudinary } from '../utils/cloudinary';
+import fs from 'fs';
 import { UserRole, AuthRequest } from '../types';
 
 // @desc    Create new product
@@ -10,11 +12,21 @@ export const createProduct = async (req: AuthRequest, res: Response) => {
   const price = parseFloat(req.body.price as string);
   const images: string[] = [];
 
-  // Handle file uploads
+  // Handle file uploads (Cloudinary if configured, else local)
   if (req.files && Array.isArray(req.files)) {
-    req.files.forEach((file: Express.Multer.File) => {
-      images.push(`/uploads/${file.filename}`);
-    });
+    for (const file of req.files as Express.Multer.File[]) {
+      try {
+        if (isCloudinaryEnabled() && (file as any).path) {
+          const url = await uploadLocalFileToCloudinary((file as any).path, 'freshedtz/products');
+          images.push(url);
+        } else {
+          images.push(`/uploads/${file.filename}`);
+        }
+      } catch (e) {
+        // If cloud upload fails, fallback to local reference
+        images.push(`/uploads/${file.filename}`);
+      }
+    }
   }
 
   // Handle image URLs
@@ -94,11 +106,20 @@ export const updateProduct = async (req: AuthRequest, res: Response) => {
   const price = parseFloat(req.body.price as string);
   const newImages: string[] = [];
 
-  // Handle file uploads
+  // Handle file uploads (Cloudinary if configured, else local)
   if (req.files && Array.isArray(req.files)) {
-    req.files.forEach((file: Express.Multer.File) => {
-      newImages.push(`/uploads/${file.filename}`);
-    });
+    for (const file of req.files as Express.Multer.File[]) {
+      try {
+        if (isCloudinaryEnabled() && (file as any).path) {
+          const url = await uploadLocalFileToCloudinary((file as any).path, 'freshedtz/products');
+          newImages.push(url);
+        } else {
+          newImages.push(`/uploads/${file.filename}`);
+        }
+      } catch (e) {
+        newImages.push(`/uploads/${file.filename}`);
+      }
+    }
   }
 
   // Handle image URLs

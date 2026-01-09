@@ -66,6 +66,7 @@ const CartPage: React.FC = () => {
                               src={getImageUrl(item.product.images[0])}
                               alt={item.product.name}
                               style={{ width: '60px', height: '60px', objectFit: 'cover', marginRight: '10px', borderRadius: '4px' }}
+                              onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/Logo.jpeg'; }}
                             />
                           )}
                           <div>
